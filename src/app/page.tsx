@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { loadSummary } from "./benchmark/summary";
 import { HeroScheduler } from "./HeroScheduler";
+import { HeroVisual } from "./HeroVisual";
 
 const AUDIENCE = [
   ["FOR DRIVERS", "Save through flexibility.", "Say how much energy you need and when you leave. Pick a cheaper window and pay only after the energy is delivered."],
@@ -15,7 +16,7 @@ const STEPS: readonly { title: string; body: string; state: string; rule: Rule }
   { title: "Compare offers", body: "Every window is checked against port and site limits and priced against charging now.", state: "NO PAYMENT", rule: "none" },
   { title: "Approve exact terms", body: "One amount, one window, one merchant. PayPal authorizes it. Nothing is collected yet.", state: "AUTHORIZED · HELD", rule: "held" },
   { title: "Charge in the window", body: "Your car stays plugged in. Power flows only in the scheduled hours.", state: "HELD · NOT COLLECTED", rule: "held" },
-  { title: "Pay after delivery", body: "Delivered: captured once. Not delivered: voided. Your FlexReceipt shows the evidence.", state: "CAPTURED — OR VOIDED", rule: "settled" },
+  { title: "Pay after delivery", body: "Delivered: captured once. Not delivered: voided. Your FlexReceipt shows the evidence.", state: "CAPTURED OR VOIDED", rule: "settled" },
 ];
 
 const RULE_CLASS: Record<Rule, string> = {
@@ -37,17 +38,17 @@ export default async function Home() {
   return (
     <div className="space-y-[clamp(56px,8vw,96px)]">
       <section className="space-y-10">
-        <p className="eyebrow">FLEXIBLE EV CHARGING · AUTHORIZED WITH PAYPAL</p>
-        <div className="flex flex-wrap items-end gap-x-12 gap-y-6">
-          <h1 className="flex-[1_1_520px] font-semibold leading-[0.94] tracking-[-0.05em] text-[clamp(46px,7.6vw,96px)]">
-            Smarter charging.
-            <br />
-            Better timing.
-            <br />
-            <span className="text-teal-ink">More value.</span>
-          </h1>
-          <div className="flex-[1_1_300px] max-w-[440px] space-y-6">
-            <p className="text-[clamp(17px,1.6vw,19px)] text-text-2">
+        <div className="grid items-center gap-x-12 gap-y-8 min-[960px]:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+          <div className="space-y-7">
+            <p className="eyebrow">FLEXIBLE EV CHARGING · AUTHORIZED WITH PAYPAL</p>
+            <h1 className="font-semibold leading-[1] tracking-[-0.04em] text-[clamp(38px,5vw,64px)]">
+              Smarter charging.
+              <br />
+              Better timing.
+              <br />
+              <span className="text-teal-ink">More value.</span>
+            </h1>
+            <p className="max-w-[520px] text-[clamp(17px,1.6vw,19px)] text-text-2">
               GridWindow helps drivers choose flexible charging windows while giving operators greater control over demand, capacity, and modeled costs.
             </p>
             <div className="flex flex-wrap gap-3">
@@ -59,6 +60,7 @@ export default async function Home() {
               </Link>
             </div>
           </div>
+          <HeroVisual />
         </div>
         <HeroScheduler />
       </section>

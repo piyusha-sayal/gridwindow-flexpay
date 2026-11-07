@@ -12,12 +12,12 @@ export function RequestCard({ config, form, onEdit }: { config: DriverConfig; fo
   const cap = Number(form.spendCap.replace(/^\$/, "").trim());
   const summary = summarizeRequest(form, port?.maxPowerW ?? 0);
   const rows: [string, string][] = [
-    ["Energy", form.targetBatteryKWh.trim() ? `${form.targetBatteryKWh.trim()} kWh` : "—"],
-    ["Port", port ? `Port ${port.label} · ${port.maxPowerW / 1000} kW` : "—"],
-    ["Night of", form.nightOf || "—"],
-    ["Plug in", form.plugInLocal ? `${form.plugInLocal} tonight` : "—"],
-    ["Ready by", form.departLocal ? `${form.departLocal} tomorrow` : "—"],
-    ["Budget", Number.isFinite(cap) && cap > 0 ? `up to $${cap.toFixed(2)}` : "—"],
+    ["Energy", form.targetBatteryKWh.trim() ? `${form.targetBatteryKWh.trim()} kWh` : "Not set"],
+    ["Port", port ? `Port ${port.label} · ${port.maxPowerW / 1000} kW` : "Not set"],
+    ["Night of", form.nightOf || "Not set"],
+    ["Plug in", form.plugInLocal ? `${form.plugInLocal} tonight` : "Not set"],
+    ["Ready by", form.departLocal ? `${form.departLocal} tomorrow` : "Not set"],
+    ["Budget", Number.isFinite(cap) && cap > 0 ? `up to $${cap.toFixed(2)}` : "Not set"],
     ["Min. saving", Number(form.minSavings) > 0 ? `at least $${Number(form.minSavings).toFixed(2)} · ${form.minSavingsRequired ? "required" : "preferred"}` : "any"],
   ];
   return (

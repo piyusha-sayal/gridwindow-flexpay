@@ -59,7 +59,7 @@ test("demo rehearsal (MOCK): timed per DEMO_PLAN", async ({ page }) => {
     await page.getByRole("button", { name: "Review and approve" }).click();
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: /^Approve \$/ }).click();
-    await expect(page.getByText("MOCK PAYMENT PROVIDER — this is not PayPal")).toBeVisible();
+    await expect(page.getByText("MOCK PAYMENT PROVIDER: this is not PayPal")).toBeVisible();
     await page.getByRole("button", { name: "Approve (mock)" }).click();
     await expect(page.getByText("Authorized, not captured.", { exact: false })).toBeVisible();
   });

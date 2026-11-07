@@ -26,7 +26,7 @@ async function providerMode(): Promise<"PAYPAL_SANDBOX" | "MOCK" | "ERROR"> {
 function ConfigErrorBanner() {
   return (
     <p className="bg-danger-soft text-danger text-sm px-4 py-2 text-center" role="alert">
-      Server configuration error — payments are disabled. Check the server log.
+      Server configuration error. Payments are disabled. Check the server log.
     </p>
   );
 }
@@ -41,14 +41,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </a>
         {mode === "ERROR" && <ConfigErrorBanner />}
         <header className="site-header">
-          <SiteNav providerMode={mode} />
+          <SiteNav />
         </header>
         <main id="main" className="page-wrap py-8 sm:py-10">
           {children}
         </main>
         <footer className="site-footer page-wrap pb-10 pt-6 text-[13px] text-muted flex flex-wrap justify-between gap-x-6 gap-y-1 border-t border-line">
-          <span>GridWindow FlexPay · hackathon sandbox demo</span>
-          <span>Tariffs, fees, loads and charging are synthetic assumptions — not measured results or real-world grid benefits.</span>
+          <span>
+            GridWindow FlexPay · {mode === "PAYPAL_SANDBOX" ? "Payments via PayPal Sandbox" : mode === "MOCK" ? "Payments simulated (MOCK, not PayPal)" : "Payments unavailable"}
+          </span>
+          <span>Tariffs, fees, loads and charging are synthetic assumptions, not measured results or real-world grid benefits.</span>
         </footer>
       </body>
     </html>

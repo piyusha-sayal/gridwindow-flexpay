@@ -118,7 +118,7 @@ function Row({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps)
       <td className="pr-3">
         <PaymentBadge state={s.paymentState} />
         <code className="block meta mt-0.5">{s.paymentState}</code>
-        {hasCaptureConflict(s) && <span className="block meta mt-0.5 text-[var(--amber-ink)]">Provider captured — reconcile</span>}
+        {hasCaptureConflict(s) && <span className="block meta mt-0.5 text-[var(--amber-ink)]">Provider captured. Reconcile</span>}
       </td>
       <td className="py-3">
         <Actions s={s} mock={mock} busy={busy} working={working} onAct={onAct} />

@@ -7,7 +7,7 @@ import type { ReservationView } from "@/server/services/viewService";
 export const PAYMENT_COPY: Record<PaymentState, { tone: Tone; title: string; body: string }> = {
   QUOTE_ACCEPTED: { tone: "neutral", title: "Starting checkout…", body: "No payment has been taken." },
   ORDER_CREATED: { tone: "neutral", title: "Waiting for your approval on the payment page.", body: "Nothing is authorized until you approve." },
-  BUYER_APPROVED: { tone: "info", title: "Approved — authorizing…", body: "This page updates automatically." },
+  BUYER_APPROVED: { tone: "info", title: "Approved, authorizing…", body: "This page updates automatically." },
   AUTHORIZED: {
     tone: "info",
     title: "Authorized, not captured. Payment is captured only after the energy is delivered and the provider confirms it.",
@@ -15,7 +15,7 @@ export const PAYMENT_COPY: Record<PaymentState, { tone: Tone; title: string; bod
   },
   CAPTURE_PENDING: {
     tone: "warn",
-    title: "Capture submitted after delivery; the payment provider reports it as pending. The outcome is not final yet — this page updates when the provider confirms or declines it.",
+    title: "Capture submitted after delivery; the payment provider reports it as pending. The outcome is not final yet. This page updates when the provider confirms or declines it.",
     body: "The payment may still complete. No second capture will ever be attempted while this is pending.",
   },
   CAPTURED: { tone: "success", title: "Captured after delivery was verified.", body: "Your FlexReceipt is below." },
@@ -26,10 +26,10 @@ export const PAYMENT_COPY: Record<PaymentState, { tone: Tone; title: string; bod
   },
   VOIDED: {
     tone: "neutral",
-    title: "Authorization voided — no payment was collected.",
+    title: "Authorization voided. No payment was collected.",
     body: "The payment provider voided the authorization, so it can no longer be captured. Your bank may take some time to remove the pending hold from your statement. A void is not a refund: nothing was charged to refund.",
   },
-  CANCELLED: { tone: "neutral", title: "Checkout cancelled — no authorization was made.", body: "You can request new offers at any time." },
+  CANCELLED: { tone: "neutral", title: "Checkout cancelled. No authorization was made.", body: "You can request new offers at any time." },
   FAILED: { tone: "danger", title: "Payment could not be started. No charge was made.", body: "Please request new offers." },
   NEEDS_RECONCILIATION: { tone: "warn", title: "Payment status is being reconciled with the provider. No new charge will be attempted.", body: "We confirm the provider's record before showing any result." },
 };
@@ -39,7 +39,7 @@ type Copy = (typeof PAYMENT_COPY)[PaymentState];
 /** Delivered but not yet settled: the capture has been requested and the provider has not answered. */
 export const CAPTURE_REQUESTED_COPY: Copy = {
   tone: "info",
-  title: "Charging delivered — capture requested, awaiting the payment provider's confirmation.",
+  title: "Charging delivered. Capture requested, awaiting the payment provider's confirmation.",
   body: "Nothing is shown as paid until the provider confirms the capture. No second capture will be attempted.",
 };
 

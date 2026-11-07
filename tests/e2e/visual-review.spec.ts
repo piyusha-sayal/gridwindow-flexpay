@@ -111,7 +111,7 @@ test("state gallery: validation, infeasible, terms, authorized, captured, pendin
   ids.captured = await authorize(page, nightAt(41), "A");
   await page.getByRole("button", { name: "Run the synthetic overnight charge" }).click();
   const receipt = page.getByRole("region", { name: "FlexReceipt" });
-  await expect(receipt.getByText(/^Paid \$\d+\.\d{2} — capture confirmed by provider$/)).toBeVisible();
+  await expect(receipt.getByText(/^Paid \$\d+\.\d{2}, capture confirmed by provider$/)).toBeVisible();
   await expect(receipt.getByText("Total paid")).toBeVisible();
   await expect(page.getByRole("listitem").filter({ hasText: "Payment captured (provider-confirmed)" })).toBeVisible();
   await expect(receipt.getByRole("button", { name: "Print receipt" })).toBeVisible();
@@ -148,7 +148,7 @@ test("state gallery: validation, infeasible, terms, authorized, captured, pendin
   await expect(page.getByText(/^\$0\.00 · \+\$\d+\.\d{2} was projected$/)).toBeVisible();
   await shot(page, "state-11-operator-failure-evidence");
   await page.goto(`/reservations/${ids.voided}`);
-  await expect(page.getByRole("region", { name: "FlexReceipt" }).getByText(/Not charged — authorization voided by provider/)).toBeVisible();
+  await expect(page.getByRole("region", { name: "FlexReceipt" }).getByText(/Not charged. Authorization voided by provider/)).toBeVisible();
   await expect(page.getByRole("listitem").filter({ hasText: "Authorization voided: not charged (provider-confirmed)" })).toBeVisible();
   await shot(page, "state-12-voided-authorization");
 
@@ -187,13 +187,10 @@ test("viewport matrix: no horizontal overflow on core screens at 320–1440 px",
 });
 
 test("navigation marks the current page and the landing CTA works from the keyboard", async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 800 });
+  await page.setViewportSize({ width: 500, height: 800 });
   await page.goto("/benchmark");
-  // Below 760px the links sit behind the Menu button.
-  const menu = page.getByRole("button", { name: "Menu" });
-  await expect(menu).toHaveAttribute("aria-expanded", "false");
-  await menu.click();
-  await expect(menu).toHaveAttribute("aria-expanded", "true");
+  // Links stay inline at every width; there is no Menu button.
+  await expect(page.getByRole("button", { name: "Menu" })).toHaveCount(0);
   await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Benchmark" })).toHaveAttribute("aria-current", "page");
   await page.goto("/");
   const cta = page.getByRole("link", { name: "Start Charging →" });
@@ -201,7 +198,6 @@ test("navigation marks the current page and the landing CTA works from the keybo
   await expect(cta).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/drive$/);
-  await page.getByRole("button", { name: "Menu" }).click();
   await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Driver" })).toHaveAttribute("aria-current", "page");
 });
 
@@ -248,7 +244,7 @@ test("print media: receipt-only output, every section expanded, PDF renders", as
   const count = await sections.count();
   expect(count).toBeGreaterThanOrEqual(5);
   for (let i = 0; i < count; i++) await expect(sections.nth(i)).toHaveAttribute("open", "");
-  for (const text of ["Total paid", "Terms SHA-256", "Payment evidence", "Discount math (modeled)", "MOCK — simulated payment, not PayPal"]) await expect(receipt.getByText(text).first()).toBeVisible();
+  for (const text of ["Total paid", "Terms SHA-256", "Payment evidence", "Discount math (modeled)", "MOCK: simulated payment, not PayPal"]) await expect(receipt.getByText(text).first()).toBeVisible();
   // Running footer with the receipt number on every printed page (CSS @page margin box).
   const footerRule = await page.evaluate(() =>
     Array.from(document.styleSheets).flatMap((sh) => Array.from(sh.cssRules).map((r) => r.cssText)).find((t) => t.includes("GridWindow FlexReceipt FR-")) ?? null,

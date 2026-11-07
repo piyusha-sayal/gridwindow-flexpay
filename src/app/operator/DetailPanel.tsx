@@ -89,7 +89,7 @@ export function DetailPanel({ id, version, onClose }: { id: string; version: num
             <Item k="Parked" v={`Port ${r.portLabel} · ${formatLocalTime(r.plugInMs, r.timeZone)}–${formatLocalTime(r.departMs, r.timeZone)}`} />
             <Item k="Energy target" v={formatKWh(r.targetBatteryWh)} />
             <Item k="Delivered" v={r.simulation ? `${formatKWh(Math.floor(r.simulation.deliveredBatteryMilliWh / 1000))} (${r.simulation.outcome})` : "not run"} />
-            <Item k="Authorization expires" v={r.authorizationExpiresAt ? new Date(r.authorizationExpiresAt).toISOString().slice(0, 16).replace("T", " ") + " UTC" : "—"} />
+            <Item k="Authorization expires" v={r.authorizationExpiresAt ? new Date(r.authorizationExpiresAt).toISOString().slice(0, 16).replace("T", " ") + " UTC" : "n/a"} />
             <Item k="Price / list" v={`${formatUsd(r.economics.priceCents)} / ${formatUsd(r.economics.listPriceCents)}`} />
             <Item k="Driver discount" v={formatUsd(r.economics.discountCents)} />
             <Item k="Energy cost immediate → flexible" v={`${r.economics.baselineEnergyCostCents !== null ? formatUsd(r.economics.baselineEnergyCostCents) : "n/a"} → ${formatUsd(r.economics.energyCostCents)}`} />

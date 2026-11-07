@@ -33,7 +33,7 @@ test("driver compares, approves exact terms, authorizes, simulates delivery and 
   await page.getByRole("checkbox").check();
   await approve.click();
 
-  await expect(page.getByText("MOCK PAYMENT PROVIDER — this is not PayPal")).toBeVisible();
+  await expect(page.getByText("MOCK PAYMENT PROVIDER: this is not PayPal")).toBeVisible();
   await page.getByRole("button", { name: "Approve (mock)" }).click();
 
   await expect(page.getByText("Authorized, not captured.", { exact: false })).toBeVisible();
@@ -55,7 +55,7 @@ test("driver can cancel on the provider page and nothing is authorized", async (
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: /^Approve \$/ }).click();
   await page.getByRole("button", { name: "Cancel" }).click();
-  await expect(page.getByText("Checkout cancelled — no authorization was made.")).toBeVisible();
+  await expect(page.getByText("Checkout cancelled. No authorization was made.")).toBeVisible();
 });
 
 test("natural-language box only fills form fields", async ({ page }) => {

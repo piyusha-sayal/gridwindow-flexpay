@@ -32,7 +32,7 @@ async function accept(page: Page, night: string, port: string): Promise<string> 
     await route.fulfill({ response: res });
   });
   await page.getByRole("button", { name: /^Approve \$/ }).click();
-  await expect(page.getByText("MOCK PAYMENT PROVIDER — this is not PayPal")).toBeVisible();
+  await expect(page.getByText("MOCK PAYMENT PROVIDER: this is not PayPal")).toBeVisible();
   await page.unroute("**/api/offers/accept");
   expect(reservationId).toMatch(/^res_/);
   return reservationId;
@@ -56,7 +56,7 @@ async function operatorRow(page: Page, night: string, id: string) {
 test("order created → authorized → captured", async ({ page }) => {
   const night = nightAt(31);
   const id = await accept(page, night, "A");
-  await expect(page.getByText("MOCK PAYMENT PROVIDER — this is not PayPal")).toBeVisible();
+  await expect(page.getByText("MOCK PAYMENT PROVIDER: this is not PayPal")).toBeVisible();
   const checkoutUrl = page.url();
   await expectState(page, id, "ORDER_CREATED");
   // The buyer returns to the provider's checkout page and approves there.
@@ -113,7 +113,7 @@ test("amounts: accepted, held, captured and voided amounts match the persisted r
   await expect(payment).toContainText(`${price}held, not collected`);
   await expect(receipt).toHaveCount(0);
   await page.getByRole("button", { name: "Run the synthetic overnight charge" }).click();
-  await expect(receipt.getByText(`Paid ${price} — capture confirmed by provider`)).toBeVisible();
+  await expect(receipt.getByText(`Paid ${price}, capture confirmed by provider`)).toBeVisible();
   const done = await view(captured);
   expect(done.paymentState).toBe("CAPTURED");
   expect(done.proofs.find((p) => p.type === "CAPTURED")?.amountCents).toBe(held.economics.priceCents);

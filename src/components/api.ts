@@ -30,7 +30,7 @@ export async function api<T>(path: string, init?: RequestInit & { json?: unknown
 }
 
 export const ERROR_COPY: Record<string, string> = {
-  QUOTE_EXPIRED: "That offer expired. Request fresh offers — prices and capacity can change.",
+  QUOTE_EXPIRED: "That offer expired. Request fresh offers. Prices and capacity can change.",
   CAPACITY_CHANGED: "Station capacity changed since the offer was made. Request fresh offers.",
   CHECKOUT_STATE_INVALID: "We couldn't verify that checkout session. No authorization was made from this request.",
   PROVIDER_MISMATCH: "The payment provider returned details that don't match your accepted terms. Nothing was authorized.",

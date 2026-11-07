@@ -48,7 +48,7 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
           Approve these exact terms
         </h1>
         <div className="flex flex-wrap gap-2 badge-wrap">
-          {mock ? <span className="badge tone-warn">MOCK payment · simulated</span> : <span className="badge tone-info">PayPal Sandbox · test money</span>}
+          {mock ? <span className="badge tone-warn">MOCK payment · simulated</span> : <span className="badge tone-info">PayPal Sandbox</span>}
           <ExpiryChip secondsLeft={secondsLeft} label="Expires in" />
         </div>
       </header>
@@ -132,7 +132,7 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
           Back to offers
         </button>
       </div>
-      {expired && <p className="text-[14px] text-red">This offer expired. Prices and capacity can change — request fresh offers.</p>}
+      {expired && <p className="text-[14px] text-red">This offer expired. Prices and capacity can change. Request fresh offers.</p>}
     </section>
   );
 }

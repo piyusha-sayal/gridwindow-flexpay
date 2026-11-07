@@ -110,7 +110,7 @@ function NoOffers({ quote, onEdit }: { quote: QuoteSet; onEdit: () => void }) {
       {physicallyImpossible ? (
         <p className="text-text-2">
           You asked for {formatKWh(cap.requiredBatteryWh)}, but parked for {hoursMinutes(cap.parkedSlots)} on a {cap.portMaxPowerW / 1000} kW port at most {formatKWh(cap.maxBatteryWh)} can reach the
-          battery — even before sharing the site&apos;s capacity with other drivers. Leave later, plug in earlier, or ask for less energy.
+          battery, even before sharing the site&apos;s capacity with other drivers. Leave later, plug in earlier, or ask for less energy.
         </p>
       ) : !quote.baseline.feasible ? (
         <p className="text-text-2">The port and site capacity left after other drivers&apos; commitments cannot deliver this energy in time.</p>

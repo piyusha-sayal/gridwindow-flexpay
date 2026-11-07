@@ -39,7 +39,7 @@ export function ChargingPanel({ r, shown, busy, onSimulate }: ChargingPanelProps
           <span className="sr-only">delivered ({pct}%)</span>
         </p>
         {finished && (
-          <strong className={r.simulation!.outcome === "DELIVERED" ? "text-teal-ink" : "text-red"}>{r.simulation!.outcome === "DELIVERED" ? "Delivered" : "Failed — charger outage"}</strong>
+          <strong className={r.simulation!.outcome === "DELIVERED" ? "text-teal-ink" : "text-red"}>{r.simulation!.outcome === "DELIVERED" ? "Delivered" : "Failed: charger outage"}</strong>
         )}
       </div>
 
@@ -47,7 +47,7 @@ export function ChargingPanel({ r, shown, busy, onSimulate }: ChargingPanelProps
 
       <ScheduleColumns r={r} revealed={revealed} />
       <p className="meta">
-        Scheduled {chargingStart >= 0 ? formatLocalTime(r.gridStartMs + chargingStart * SLOT_MS, r.timeZone) : "—"} onward · {r.powerW.filter((w) => w > 0).length} × 15 min
+        Scheduled {chargingStart >= 0 ? formatLocalTime(r.gridStartMs + chargingStart * SLOT_MS, r.timeZone) : "n/a"} onward · {r.powerW.filter((w) => w > 0).length} × 15 min
       </p>
 
       {r.simulation === null &&

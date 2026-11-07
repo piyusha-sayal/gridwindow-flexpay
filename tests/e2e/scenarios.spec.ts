@@ -63,15 +63,15 @@ test("Scenario A: flexible agreement → mock authorization → simulated charge
   await expect(page.getByText("MOCK payment · simulated").first()).toBeVisible();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: /^Approve \$/ }).click();
-  await expect(page.getByText("MOCK PAYMENT PROVIDER — this is not PayPal")).toBeVisible();
+  await expect(page.getByText("MOCK PAYMENT PROVIDER: this is not PayPal")).toBeVisible();
   await page.getByRole("button", { name: "Approve (mock)" }).click();
   await expect(page.getByText("Authorized, not captured.", { exact: false })).toBeVisible();
   await expect(page.getByRole("region", { name: "FlexReceipt" })).toHaveCount(0);
 
   await page.getByRole("button", { name: "Run the synthetic overnight charge" }).click();
   const receipt = page.getByRole("region", { name: "FlexReceipt" });
-  await expect(receipt.getByText("MOCK — simulated payment, not PayPal")).toBeVisible();
-  await expect(receipt.getByText(/^Paid \$\d+\.\d{2} — capture confirmed by provider$/)).toBeVisible();
+  await expect(receipt.getByText("MOCK: simulated payment, not PayPal")).toBeVisible();
+  await expect(receipt.getByText(/^Paid \$\d+\.\d{2}, capture confirmed by provider$/)).toBeVisible();
   await expect(page.getByRole("progressbar", { name: "Energy delivered" })).toBeVisible();
 
   await page.reload();
@@ -97,9 +97,9 @@ test("Scenario B: operator outage → service failure → mock void → truthful
   await expect(page.getByRole("dialog", { name: id }).getByText("SERVICE_FAILED", { exact: true })).toBeVisible();
 
   await page.goto(driverUrl);
-  await expect(page.getByText("Authorization voided — no payment was collected.")).toBeVisible();
+  await expect(page.getByText("Authorization voided. No payment was collected.")).toBeVisible();
   await expect(page.getByText("Charging failed (synthetic charger outage), so the authorization was voided.")).toBeVisible();
-  await expect(page.getByRole("region", { name: "FlexReceipt" }).getByText("Not charged — authorization voided by provider (bank hold removal may take time)")).toBeVisible();
+  await expect(page.getByRole("region", { name: "FlexReceipt" }).getByText("Not charged. Authorization voided by provider (bank hold removal may take time)")).toBeVisible();
 });
 
 test("Scenario C: physically infeasible request is truthfully rejected with the reason", async ({ page }) => {
@@ -132,14 +132,14 @@ test("pending then completed settlement, and declined settlement, never show fal
 
   await page.goto(pendingUrl);
   await expect(page.getByText(/The outcome is not final yet/)).toBeVisible();
-  await expect(page.getByText("Capture pending — not final; the provider has not confirmed the payment")).toBeVisible();
+  await expect(page.getByText("Capture pending, not final; the provider has not confirmed the payment")).toBeVisible();
   // A pending capture must never read as a definitive outcome either way.
   await expect(page.getByText(/not charged|you were not charged|Paid \$/i)).toHaveCount(0);
   await expect(page.getByText(/capture confirmed by provider/)).toHaveCount(0);
 
   await page.goto(declinedUrl);
   await expect(page.getByText(/declined the capture, so no payment was collected/)).toBeVisible();
-  await expect(page.getByText("Capture declined — no payment collected")).toBeVisible();
+  await expect(page.getByText("Capture declined. No payment collected")).toBeVisible();
 
   await operatorView(page, night);
   await page.getByRole("row").filter({ hasText: pendingId }).getByRole("button", { name: "Provider completes capture" }).click();

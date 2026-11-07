@@ -115,7 +115,7 @@ describe("receipt money line", () => {
     for (const paymentState of ["VOIDED", "FAILED", "CANCELLED", "CAPTURE_DECLINED", "NEEDS_RECONCILIATION", "AUTHORIZED"] as const) {
       const r = view({ paymentState, proofs: captured });
       expect(totalLine(r), paymentState).toEqual({ label: "Payment under review", value: "$10.00 USD captured by provider · reconciling, not final" });
-      expect(settlement(r), paymentState).toEqual({ tone: "warn", text: "Provider recorded a capture of $10.00; payment status is being reconciled — not final" });
+      expect(settlement(r), paymentState).toEqual({ tone: "warn", text: "Provider recorded a capture of $10.00; payment status is being reconciled, not final" });
       expect(settlementStep(r), paymentState).toEqual({ label: "Provider recorded a capture: reconciling, not final", status: "in-progress" });
     }
   });

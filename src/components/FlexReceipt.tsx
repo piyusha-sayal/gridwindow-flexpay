@@ -10,11 +10,11 @@ export function settlement(r: Pick<ReservationView, "paymentState" | "proofs" | 
   const capture = r.proofs.find((p) => p.type === "CAPTURED");
   // A recorded provider capture the local state does not reflect is never shown as "not charged".
   if (capture && r.paymentState !== "CAPTURED")
-    return { tone: "warn", text: `Provider recorded a capture of ${formatUsd(capture.amountCents ?? r.economics.priceCents)}; payment status is being reconciled — not final` };
-  if (r.paymentState === "CAPTURED" && capture) return { tone: "success", text: `Paid ${formatUsd(capture.amountCents ?? r.economics.priceCents)} — capture confirmed by provider` };
-  if (r.paymentState === "VOIDED") return { tone: "neutral", text: "Not charged — authorization voided by provider (bank hold removal may take time)" };
-  if (r.paymentState === "CAPTURE_PENDING") return { tone: "warn", text: "Capture pending — not final; the provider has not confirmed the payment" };
-  if (r.paymentState === "CAPTURE_DECLINED") return { tone: "danger", text: "Capture declined — no payment collected" };
+    return { tone: "warn", text: `Provider recorded a capture of ${formatUsd(capture.amountCents ?? r.economics.priceCents)}; payment status is being reconciled, not final` };
+  if (r.paymentState === "CAPTURED" && capture) return { tone: "success", text: `Paid ${formatUsd(capture.amountCents ?? r.economics.priceCents)}, capture confirmed by provider` };
+  if (r.paymentState === "VOIDED") return { tone: "neutral", text: "Not charged. Authorization voided by provider (bank hold removal may take time)" };
+  if (r.paymentState === "CAPTURE_PENDING") return { tone: "warn", text: "Capture pending, not final; the provider has not confirmed the payment" };
+  if (r.paymentState === "CAPTURE_DECLINED") return { tone: "danger", text: "Capture declined. No payment collected" };
   return { tone: "warn", text: `Settlement incomplete (${r.paymentState})` };
 }
 
@@ -26,7 +26,7 @@ export function receiptNumber(id: string): string {
 /** Latest provider observation, else the latest event: when this receipt's status was established. */
 function issuedAt(r: ReservationView): string {
   const times = [...r.proofs.map((p) => p.observedAt), ...r.events.map((e) => e.occurredAt)].map((t) => new Date(t).getTime());
-  return times.length ? new Date(Math.max(...times)).toISOString().replace("T", " ").slice(0, 16) + " UTC" : "—";
+  return times.length ? new Date(Math.max(...times)).toISOString().replace("T", " ").slice(0, 16) + " UTC" : "n/a";
 }
 
 /** The money line: only a provider-confirmed capture is shown as an amount paid. */
@@ -121,7 +121,7 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
               FlexReceipt
             </h2>
             <div className="flex flex-wrap gap-2 badge-wrap">
-              {r.providerMode === "MOCK" ? <Badge tone="warn">MOCK — simulated payment, not PayPal</Badge> : <Badge tone="info">PayPal Sandbox — test money</Badge>}
+              {r.providerMode === "MOCK" ? <Badge tone="warn">MOCK: simulated payment, not PayPal</Badge> : <Badge tone="info">PayPal Sandbox</Badge>}
               <Badge tone="neutral">SYNTHETIC charging</Badge>
             </div>
           </div>

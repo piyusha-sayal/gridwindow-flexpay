@@ -158,7 +158,7 @@ test("full journey: words → required saving → agent pick → exact terms →
   await page.getByRole("checkbox").check();
   await approve.click();
 
-  await expect(page.getByText("MOCK PAYMENT PROVIDER — this is not PayPal")).toBeVisible();
+  await expect(page.getByText("MOCK PAYMENT PROVIDER: this is not PayPal")).toBeVisible();
   await page.getByRole("button", { name: "Approve (mock)" }).click();
   await expect(page.getByText("Authorized, not captured.", { exact: false })).toBeVisible();
   await page.reload();

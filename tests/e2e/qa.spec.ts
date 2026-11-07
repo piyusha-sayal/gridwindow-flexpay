@@ -102,7 +102,7 @@ test.describe("keyboard-only journeys", () => {
     await tabUntil(page, (f) => f.name.startsWith("Approve $"));
     await page.keyboard.press("Enter");
 
-    await expect(page.getByText("MOCK PAYMENT PROVIDER — this is not PayPal")).toBeVisible();
+    await expect(page.getByText("MOCK PAYMENT PROVIDER: this is not PayPal")).toBeVisible();
     await tabUntil(page, (f) => f.name === "Approve (mock)");
     await page.keyboard.press("Enter");
     await expect(page.getByText("Authorized, not captured.", { exact: false })).toBeVisible();
@@ -110,7 +110,7 @@ test.describe("keyboard-only journeys", () => {
     await tabUntil(page, (f) => f.name === "Run the synthetic overnight charge");
     await page.keyboard.press("Enter");
     const receipt = page.getByRole("region", { name: "FlexReceipt" });
-    await expect(receipt.getByText(/^Paid \$\d+\.\d{2} — capture confirmed by provider$/)).toBeVisible();
+    await expect(receipt.getByText(/^Paid \$\d+\.\d{2}, capture confirmed by provider$/)).toBeVisible();
 
     await tabUntil(page, (f) => f.id === "ask");
     await page.keyboard.type("When was I charged?");

@@ -91,14 +91,14 @@ export function Highlights({ s }: { s: BenchmarkSummary }) {
         </h2>
         <dl className="grid gap-x-5 gap-y-5 border-t border-ink pt-5 grid-cols-2 min-[700px]:grid-cols-[repeat(auto-fit,minmax(170px,1fr))]">
           <Headline k="Requests simulated" v={n(h.requestCount)} sub={`${n(s.scenarioCount)} seeded scenarios`} />
-          <Headline k="Optimized served" v={o ? n(o.served) : "—"} sub={o ? `${o.infeasible} infeasible` : "no optimized policy in results"} />
+          <Headline k="Optimized served" v={o ? n(o.served) : "n/a"} sub={o ? `${o.infeasible} infeasible` : "no optimized policy in results"} />
           <Headline k="Hard-constraint violations" v={n(h.totalViolations)} sub="reported, all policies" />
           <Headline
             k="Mean energy cost"
-            v={o ? usd(o.meanEnergyCostCentsPerServed) : "—"}
+            v={o ? usd(o.meanEnergyCostCentsPerServed) : "n/a"}
             sub={immediate ? `vs ${usd(immediate.meanEnergyCostCentsPerServed)} charging immediately, per served request` : "per served request"}
           />
-          <Headline k="Mean site peak" v={o ? kw(o.meanPeakSiteW) : "—"} sub={immediate ? `vs ${kw(immediate.meanPeakSiteW)} charging immediately` : "optimized"} />
+          <Headline k="Mean site peak" v={o ? kw(o.meanPeakSiteW) : "n/a"} sub={immediate ? `vs ${kw(immediate.meanPeakSiteW)} charging immediately` : "optimized"} />
           <Headline
             k="Unfavorable pairwise comparisons"
             v={n(unfavorable)}

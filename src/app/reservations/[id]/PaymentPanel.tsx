@@ -8,7 +8,7 @@ const STEPS: { key: string; label: string; done: (r: ReservationView) => boolean
   { key: "accepted", label: "Terms approved by you", done: () => true },
   { key: "order", label: "Payment order created", done: (r) => r.proofs.some((p) => p.type === "ORDER_CREATED") },
   { key: "buyer", label: "Buyer approval confirmed by provider", done: (r) => r.proofs.some((p) => p.type === "BUYER_APPROVED") },
-  { key: "auth", label: "Amount authorized — not captured", done: (r) => r.proofs.some((p) => p.type === "AUTHORIZED") },
+  { key: "auth", label: "Amount authorized, not captured", done: (r) => r.proofs.some((p) => p.type === "AUTHORIZED") },
   { key: "service", label: "Synthetic overnight charging", done: (r) => r.simulation !== null },
 ];
 

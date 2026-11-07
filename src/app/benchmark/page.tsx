@@ -2,10 +2,10 @@ import type { BenchmarkSummary } from "@/domain/benchmark";
 import { Highlights } from "./Highlights";
 import { loadSummary } from "./summary";
 
-export const metadata = { title: "Benchmark — GridWindow FlexPay" };
+export const metadata = { title: "Benchmark · GridWindow FlexPay" };
 export const dynamic = "force-dynamic";
 
-const pct = (n: number, d: number) => (d === 0 ? "—" : `${((n / d) * 100).toFixed(1)}%`);
+const pct = (n: number, d: number) => (d === 0 ? "n/a" : `${((n / d) * 100).toFixed(1)}%`);
 const usd = (cents: number) => `${cents < 0 ? "−" : ""}$${(Math.abs(cents) / 100).toFixed(2)}`;
 
 export default async function BenchmarkPage() {
@@ -115,8 +115,8 @@ export default async function BenchmarkPage() {
                     </th>
                     <td className="pr-3">{c.requests ?? s.requestCount}</td>
                     <td className="pr-3">{c.pairs}</td>
-                    <td className="pr-3">{c.excludedBaselineInfeasible ?? "—"}</td>
-                    <td className="pr-3">{c.excludedOptimizedInfeasible ?? "—"}</td>
+                    <td className="pr-3">{c.excludedBaselineInfeasible ?? "n/a"}</td>
+                    <td className="pr-3">{c.excludedOptimizedInfeasible ?? "n/a"}</td>
                     <td className="pr-3">
                       {c.optimizedCheaper} ({pct(c.optimizedCheaper, c.pairs)})
                     </td>
@@ -152,7 +152,7 @@ function OfferEconomics({ s }: { s: BenchmarkSummary }) {
   const o = s.offers;
   const measures = [
     { k: "Driver saving", v: usd(o.meanDiscountCents), def: "List price − offer price." },
-    { k: "Operator gross energy saving", v: o.meanEnergyCostSavingCents !== undefined ? usd(o.meanEnergyCostSavingCents) : "—", def: "Immediate − flexible modeled energy cost." },
+    { k: "Operator gross energy saving", v: o.meanEnergyCostSavingCents !== undefined ? usd(o.meanEnergyCostSavingCents) : "n/a", def: "Immediate − flexible modeled energy cost." },
     { k: "Operator contribution improvement", v: usd(o.meanOperatorImprovementCents), def: "Net, after the driver discount, assumed payment fee and operating cost." },
   ];
   return (
@@ -162,7 +162,7 @@ function OfferEconomics({ s }: { s: BenchmarkSummary }) {
           Offer economics
         </h2>
         <p className="text-[14px] text-on-navy-body">
-          Means per published offer ({o.offerCount ?? "—"} offers). Three separate measures, not parts of one total.
+          Means per published offer ({o.offerCount ?? "n/a"} offers). Three separate measures, not parts of one total.
         </p>
       </div>
       <dl className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))]">
@@ -177,7 +177,7 @@ function OfferEconomics({ s }: { s: BenchmarkSummary }) {
       <ul className="space-y-1 text-[14px] text-on-navy-body tabular">
         <li>Requests with ≥ 1 published win-win offer: {o.withOffer} ({pct(o.withOffer, s.requestCount)})</li>
         <li>Requests with ≥ 2 offers: {o.withTwoOrMore}</li>
-        <li>Requests with zero offers: {o.withZero} — reasons: {Object.entries(o.zeroReasons).map(([k, v]) => `${k} ${v}`).join(", ") || "none"}</li>
+        <li>Requests with zero offers: {o.withZero}, reasons: {Object.entries(o.zeroReasons).map(([k, v]) => `${k} ${v}`).join(", ") || "none"}</li>
         <li>Offers failing independent validators after generation: {o.validatorFailures}</li>
       </ul>
     </section>

@@ -3,7 +3,7 @@ import { formatUsd } from "@/domain/units";
 import { isMockGateway } from "@/payments/mockGateway";
 import { getRuntime } from "@/server/runtime";
 
-export const metadata = { title: "MOCK provider approval — not PayPal" };
+export const metadata = { title: "MOCK provider approval, not PayPal" };
 
 /** Stand-in for a hosted approval page, available only when PAYMENT_MODE=mock. */
 export default async function MockCheckout({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -20,7 +20,7 @@ export default async function MockCheckout({ searchParams }: { searchParams: Pro
   return (
     <div className="mx-auto max-w-[520px] card overflow-hidden p-0">
       <p className="border-b border-[var(--amber-line)] bg-warn-soft px-6 py-3 text-[14px] font-semibold text-warn" role="note">
-        MOCK PAYMENT PROVIDER — this is not PayPal. No money, real or sandbox, moves. Configure PayPal Sandbox credentials to use the real sandbox checkout.
+        MOCK PAYMENT PROVIDER: this is not PayPal. No money, real or sandbox, moves. Configure PayPal Sandbox credentials to use the real sandbox checkout.
       </p>
       <div className="space-y-6 p-6 sm:p-8">
         <h1 className="text-[28px] font-semibold tracking-[-0.02em]">Approve authorization</h1>
