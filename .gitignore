@@ -1,0 +1,30 @@
+node_modules/
+.next*/
+.data/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+next-env.d.ts
+.env
+.env.local
+.env.*
+!.env.example
+artifacts/screenshots/
+artifacts/qa/
+# Sandbox payment test records (redacted, but never committed)
+artifacts/paypal-smoke*.json
+artifacts/ai-smoke*.json
+artifacts/payment-preflight*.json
+artifacts/scenario-a-certification*.json
+artifacts/scenario-b-certification*.json
+# local agent/design workspace
+.claude/
+design/
+# internal agent notes and development logs (kept locally, not published)
+CLAUDE.md
+MASTER_PROMPT_FOR_CLAUDE_CODE.md
+plans/PROGRESS.md
+plans/OVERNIGHT_STABILIZATION_REPORT.md
+plans/INTEGRATION_CERTIFICATION_HANDOFF.md
+.claudeignore

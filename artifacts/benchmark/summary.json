@@ -1,0 +1,118 @@
+{
+  "generatedAt": "2026-10-29T17:46:02.992Z",
+  "scenarioCount": 500,
+  "requestCount": 1500,
+  "seedRange": "1–500",
+  "provenance": "SYNTHETIC",
+  "policies": [
+    {
+      "policy": "immediate",
+      "served": 1499,
+      "infeasible": 1,
+      "infeasibleReasons": {
+        "INSUFFICIENT_CAPACITY": 1
+      },
+      "violations": 0,
+      "meanEnergyCostCentsPerServed": 1201,
+      "meanPeakSiteW": 30163,
+      "congestedRequests": 862
+    },
+    {
+      "policy": "static_offpeak",
+      "served": 1465,
+      "infeasible": 35,
+      "infeasibleReasons": {
+        "INSUFFICIENT_CAPACITY": 35
+      },
+      "violations": 0,
+      "meanEnergyCostCentsPerServed": 725,
+      "meanPeakSiteW": 31500,
+      "congestedRequests": 965
+    },
+    {
+      "policy": "greedy_tariff",
+      "served": 1498,
+      "infeasible": 2,
+      "infeasibleReasons": {
+        "INSUFFICIENT_CAPACITY": 2
+      },
+      "violations": 0,
+      "meanEnergyCostCentsPerServed": 746,
+      "meanPeakSiteW": 31973,
+      "congestedRequests": 998
+    },
+    {
+      "policy": "optimized",
+      "served": 1500,
+      "infeasible": 0,
+      "infeasibleReasons": {},
+      "violations": 0,
+      "meanEnergyCostCentsPerServed": 537,
+      "meanPeakSiteW": 23843,
+      "congestedRequests": 46
+    }
+  ],
+  "pairwise": [
+    {
+      "baseline": "immediate",
+      "requests": 1500,
+      "pairs": 1499,
+      "excludedBaselineInfeasible": 1,
+      "excludedOptimizedInfeasible": 0,
+      "excludedBothInfeasible": 0,
+      "optimizedCheaper": 1465,
+      "equal": 0,
+      "optimizedWorse": 34,
+      "meanDeltaCents": -666
+    },
+    {
+      "baseline": "static_offpeak",
+      "requests": 1500,
+      "pairs": 1465,
+      "excludedBaselineInfeasible": 35,
+      "excludedOptimizedInfeasible": 0,
+      "excludedBothInfeasible": 0,
+      "optimizedCheaper": 961,
+      "equal": 499,
+      "optimizedWorse": 5,
+      "meanDeltaCents": -206
+    },
+    {
+      "baseline": "greedy_tariff",
+      "requests": 1500,
+      "pairs": 1498,
+      "excludedBaselineInfeasible": 2,
+      "excludedOptimizedInfeasible": 0,
+      "excludedBothInfeasible": 0,
+      "optimizedCheaper": 996,
+      "equal": 500,
+      "optimizedWorse": 2,
+      "meanDeltaCents": -211
+    }
+  ],
+  "offers": {
+    "withOffer": 1497,
+    "withTwoOrMore": 1444,
+    "withZero": 3,
+    "zeroReasons": {
+      "NO_ENERGY_SAVINGS": 2,
+      "DISCOUNT_BELOW_MINIMUM": 1
+    },
+    "offerCount": 3101,
+    "meanDiscountCents": 310,
+    "meanEnergyCostSavingCents": 621,
+    "meanOperatorImprovementCents": 322,
+    "validatorFailures": 0
+  },
+  "methodology": [
+    "Each scenario: one seeded synthetic night (date drawn across 2026, including DST nights) on the demo station (33 kW cap, 1 kW safety headroom, 3 × 11 kW ports), one request per port with plug-in 18:00–23:15, departure ~05:00–09:00 local, 10–55 kWh battery target, 92 % efficiency.",
+    "Requests arrive in plug-in order; each policy allocates every request against the commitments it already made (no re-optimization of earlier sessions).",
+    "Policies: immediate = max power from plug-in; static_offpeak = start at 00:00 local at max power; greedy_tariff = cheapest TOU slots first at max power, ignoring congestion; optimized = marginal-cost greedy over TOU + congestion surcharge in 100 W steps.",
+    "Cost = synthetic TOU energy + congestion surcharge attributable to the session (forecast base load), rounded up to cents. Pairwise comparisons pair the same request; because earlier commitments differ by policy, a later request can be cheaper under a baseline.",
+    "Hard violations are counted by the independent validator (station cap incl. headroom, port cap, charging while unplugged, port double-booking, energy shortfall) over each policy's final committed set.",
+    "Offer statistics re-run the production quote engine with each request's spend cap set to its list price; drivers accept the first offer when one exists, otherwise charge immediately.",
+    "Pairwise denominators: a request is paired only when both optimized and the baseline served it; requests a policy could not serve are listed as exclusions with reasons, so pairs + exclusions = all requests.",
+    "Three distinct money measures per offer: driver discount (list price minus offer price), operator gross energy saving (immediate minus flexible modeled energy cost), and operator contribution improvement (net, after the driver discount, assumed payment fee and operating cost). Means are per published offer, not per request.",
+    "All inputs are synthetic; results are not measured savings or real-world grid benefits."
+  ]
+}
