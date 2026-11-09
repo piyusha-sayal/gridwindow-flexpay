@@ -43,8 +43,8 @@ TypeScript, Next.js, React, PostgreSQL/PGlite, PayPal REST (Sandbox), Google Gem
 
 | Criterion | Evidence |
 |---|---|
-| Technology | Idempotent PayPal authorize/capture/void with reconciliation; independent validator; `docs/ARCHITECTURE.md`; tests listed above; tracker `plans/SUBMISSION_TRACKER.md` |
+| Technology | Idempotent PayPal authorize/capture/void with reconciliation; independent validator; `docs/ARCHITECTURE.md`; tests listed above; evidence `docs/EVIDENCE.md` |
 | Design | Driver wizard that contrasts immediate vs flexible, shows assumptions, explicit consent; operator console; axe + keyboard e2e (`tests/e2e/qa.spec.ts`) |
 | Impact | Peak 23.8 kW vs 30.2 kW immediate, congested slots 46 vs 862, cheaper in 1465/1499 pairs (synthetic, `artifacts/benchmark/summary.json`) |
 | Innovation | Win-win-gated offers + AI that cannot touch money + provider-truth receipts |
-| Presentation | ≤ 2:55 storyboard `plans/DEMO_PLAN.md`; judge quickstart `docs/JUDGES.md` (no credentials) |
+| Presentation | demo video of at most 2:55; judge quickstart `docs/JUDGES.md` (no credentials) |

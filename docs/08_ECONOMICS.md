@@ -1,4 +1,4 @@
-# 08 — Economics (synthetic assumptions)
+# 08. Economics (synthetic assumptions)
 
 Every number below is a **labeled synthetic assumption** used for a sandbox demo. None is a real utility tariff, a real PayPal fee quote, or a measured operating cost. Source: `src/domain/economics.ts`, `src/domain/forecast.ts`.
 

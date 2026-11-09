@@ -57,4 +57,4 @@ GridWindow FlexPay sells overnight EV charging flexibility. The engine decides w
 | Both parties win on every published offer | `tests/unit/economics.test.ts`, benchmark `validatorFailures=0` |
 | Payment safety, recovery, idempotency | `tests/integration/{paymentSafety,recovery,lifecycle,certification}.test.ts` |
 | AI cannot inject prices or capture claims | `tests/unit/assistant.test.ts`, `tests/integration/dealAgent.test.ts` (scripted model offline; one genuine Gemini run is summarized in `docs/EVIDENCE.md`) |
-| Genuine PayPal Sandbox authorize→capture and authorize→void | `plans/SUBMISSION_TRACKER.md` §3 (standalone smoke, 2026-10-30) |
+| Genuine PayPal Sandbox authorize→capture and authorize→void | [EVIDENCE.md](EVIDENCE.md) (standalone smoke, 2026-10-30) |

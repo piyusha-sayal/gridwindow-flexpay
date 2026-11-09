@@ -80,7 +80,7 @@ Run `npm start` with the `.env.local` above.
 
 Approve on PayPal before the offer's first charging slot starts. A buyer return after that is refused with "Scheduled charging has already started" and no authorization is made (`APPROVAL_AFTER_DEADLINE` event). Use a night in the future for this test.
 
-**Failure path:** use a second reservation, authorize it, then in `/operator` press **Inject outage**. The driver page should say "Authorization voided — no payment was collected".
+**Failure path:** use a second reservation, authorize it, then in `/operator` press **Inject outage**. The driver page should say "Authorization voided. No payment was collected".
 
 Record the reservation IDs and the operator detail panel evidence. Do not screenshot `.env.local`.
 
@@ -90,7 +90,7 @@ Config in `.env.local` (values never pasted anywhere): `GEMINI_API_KEY`, optiona
 
 - Model ID source: Google's models and pricing pages list `gemini-3.6-flash` (stable) and `gemini-3.5-flash-lite` / `gemini-3.1-flash-lite` (stable) as free of charge on the Gemini Developer API free tier (read 2026-11-05). `gemini-2.5-flash` is deprecated. The ID was **not** confirmed with a live call.
 - `AI_PROVIDER=gemini AI_SMOKE_BUDGET_USD=0.50 npm run ai:smoke -- --approve-paid-calls` runs the same 5 synthetic cases (max 8 requests). Gemini is priced at $0 in the meter, so the cap that binds is the request count. A key with billing enabled can be charged.
-- Result of the first live run (2026-11-05, 5 requests, not certified): the structured-output schemas were accepted (4 of 5 calls returned schema-valid JSON), one call failed as UNAVAILABLE, and three model answers were rejected by the grounding check. See `plans/SUBMISSION_TRACKER.md` G20 for causes and fixes.
+- Result of the first live run (2026-11-05, 5 requests, not certified): the structured-output schemas were accepted (4 of 5 calls returned schema-valid JSON), one call failed as UNAVAILABLE, and three model answers were rejected by the grounding check. The causes were fixed before the certified run described in `docs/EVIDENCE.md`.
 - The run now has a metadata-only preflight (`models.get`, no tokens) that stops before any generation if the key's project cannot see the model. It cannot show the billing tier or remaining quota: check the tier in AI Studio (API keys / Usage and billing) and the per-model limits at https://aistudio.google.com/rate-limit. A model with no free quota shows up as HTTP 429 `QUOTA_EXHAUSTED` on the first generation call.
 - Certification: the command exits non-zero unless every mandatory case (parse, explain, own-reservation Q&A, injection) is a genuine model answer that passed validation. A deterministic fallback, even a safe one, is reported separately (`FALLBACK`) and does not certify. Each run writes its own `artifacts/ai-smoke-<provider>-<time>.json` (git-ignored) with request/response counts, sanitized provider error categories, HTTP status and, for rejected answers on the synthetic fixtures, the rejected text and the grounding issue.
 - Still unverified: the meaning of `retryOptions.attempts: 1`, whether the response carries a provider request ID (none is read today), and your key's free-tier rate limits.

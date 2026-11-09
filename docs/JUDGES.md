@@ -1,6 +1,6 @@
 # Running GridWindow FlexPay as a judge
 
-The fastest path needs **no credentials and no network services**. It runs the full app against a built-in **MOCK payment provider** and an embedded database. Every MOCK screen says so ("MOCK PAYMENT PROVIDER — this is not PayPal", "MOCK — simulated payment, not PayPal"). Nothing in MOCK mode contacts PayPal or any AI provider.
+The fastest path needs **no credentials and no network services**. It runs the full app against a built-in **MOCK payment provider** and an embedded database. Every MOCK screen says so ("MOCK PAYMENT PROVIDER: this is not PayPal", "MOCK: simulated payment, not PayPal"). Nothing in MOCK mode contacts PayPal or any AI provider.
 
 ## 1. MOCK demonstration (recommended, ~5 minutes)
 

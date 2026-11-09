@@ -9,7 +9,7 @@ Method: after each run, the team read the application database inside a read-onl
 | Scenario | Date | What happened | Result |
 |---|---|---|---|
 | A. Successful charging | 2026-11-06 | Driver consent to exact terms, PayPal buyer approval, authorization of USD 14.82, synthetic delivery of 30.015 kWh against a 30 kWh target, one capture of USD 14.82 | Provider authorization status CAPTURED, capture COMPLETED and tied to that authorization, one CAPTURE operation, reservation CAPTURED, FlexReceipt shows "capture confirmed by provider" |
-| B. Charging outage | 2026-11-07 | Same approval flow, authorization of USD 14.19, operator-injected synthetic outage, 0 kWh delivered, run FAILED | Provider authorization status VOIDED, exactly one VOID operation, no capture, USD 0.00 collected, reservation VOIDED, FlexReceipt "Not charged — authorization voided by provider" |
+| B. Charging outage | 2026-11-07 | Same approval flow, authorization of USD 14.19, operator-injected synthetic outage, 0 kWh delivered, run FAILED | Provider authorization status VOIDED, exactly one VOID operation, no capture, USD 0.00 collected, reservation VOIDED, FlexReceipt "Not charged. Authorization voided by provider (bank hold removal may take time)" |
 | Standalone smoke test | 2026-10-30 | One authorize → capture and one authorize → void of USD 1.23 each | Passed (historical; not repeated) |
 
 The orders were approved on PayPal's Sandbox page with a Sandbox personal (buyer) account; for scenario A the approving account was confirmed to differ from the Sandbox business (merchant) account. Before every authorization the application compares the order's payee to the configured merchant, and the amount, currency and custom ID to the stored terms; mismatches stop before authorization.
