@@ -113,5 +113,5 @@ export async function resetApp(app: TestApp): Promise<void> {
 }
 
 export function request(overrides: Partial<QuoteRequestInput> = {}): QuoteRequestInput {
-  return { portId: "port_a", nightOf: NIGHT, plugInLocal: "19:00", departLocal: "07:00", targetBatteryKWh: 30, spendCapCents: 2500, ...overrides };
+  return { portId: "port_c", nightOf: NIGHT, plugInLocal: "19:00", departLocal: "07:00", targetBatteryKWh: 30, spendCapCents: 2500, ...overrides };
 }

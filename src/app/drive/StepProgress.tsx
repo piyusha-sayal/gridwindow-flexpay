@@ -2,7 +2,7 @@
 
 export type WizardStep = 1 | 2 | 3;
 
-const STEPS = ["Request", "Offers", "Approve", "Charge", "Receipt"] as const;
+const STEPS = ["Your Needs", "Compare Plans", "Confirm & PayPal", "Charging Simulation", "Receipt"] as const;
 
 interface StepProgressProps {
   step: WizardStep;

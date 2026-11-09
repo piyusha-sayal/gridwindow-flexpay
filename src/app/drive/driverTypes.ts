@@ -5,7 +5,7 @@ import type { PricedOffer } from "@/domain/quotes";
 
 export interface DriverConfig {
   providerMode: "PAYPAL_SANDBOX" | "MOCK";
-  station: { name: string; timeZone: string; stationCapW: number; ports: { id: string; label: string; maxPowerW: number }[] };
+  station: { name: string; timeZone: string; stationCapW: number; ports: { id: string; label: string; maxPowerW: number; tier?: string }[] };
   ai: { enabled: boolean; model: string | null };
   defaultNightOf: string;
   /** Server-chosen default window that has not started yet (station wall time). */

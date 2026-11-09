@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-29T17:46:02.992Z",
+  "generatedAt": "2026-11-09T07:18:55.806Z",
   "scenarioCount": 500,
   "requestCount": 1500,
   "seedRange": "1–500",
@@ -7,105 +7,108 @@
   "policies": [
     {
       "policy": "immediate",
-      "served": 1499,
-      "infeasible": 1,
+      "served": 1246,
+      "infeasible": 254,
       "infeasibleReasons": {
-        "INSUFFICIENT_CAPACITY": 1
+        "INSUFFICIENT_CAPACITY": 254
       },
       "violations": 0,
-      "meanEnergyCostCentsPerServed": 1201,
-      "meanPeakSiteW": 30163,
-      "congestedRequests": 862
+      "meanEnergyCostCentsPerServed": 1061,
+      "meanPeakSiteW": 22102,
+      "congestedRequests": 826
     },
     {
       "policy": "static_offpeak",
-      "served": 1465,
-      "infeasible": 35,
+      "served": 1024,
+      "infeasible": 476,
       "infeasibleReasons": {
-        "INSUFFICIENT_CAPACITY": 35
+        "INSUFFICIENT_CAPACITY": 476
       },
       "violations": 0,
-      "meanEnergyCostCentsPerServed": 725,
-      "meanPeakSiteW": 31500,
-      "congestedRequests": 965
+      "meanEnergyCostCentsPerServed": 601,
+      "meanPeakSiteW": 20227,
+      "congestedRequests": 493
     },
     {
       "policy": "greedy_tariff",
-      "served": 1498,
-      "infeasible": 2,
+      "served": 1243,
+      "infeasible": 257,
       "infeasibleReasons": {
-        "INSUFFICIENT_CAPACITY": 2
+        "INSUFFICIENT_CAPACITY": 257
       },
       "violations": 0,
-      "meanEnergyCostCentsPerServed": 746,
-      "meanPeakSiteW": 31973,
-      "congestedRequests": 998
+      "meanEnergyCostCentsPerServed": 686,
+      "meanPeakSiteW": 21902,
+      "congestedRequests": 648
     },
     {
       "policy": "optimized",
-      "served": 1500,
-      "infeasible": 0,
-      "infeasibleReasons": {},
+      "served": 1254,
+      "infeasible": 246,
+      "infeasibleReasons": {
+        "INSUFFICIENT_CAPACITY": 246
+      },
       "violations": 0,
-      "meanEnergyCostCentsPerServed": 537,
-      "meanPeakSiteW": 23843,
-      "congestedRequests": 46
+      "meanEnergyCostCentsPerServed": 544,
+      "meanPeakSiteW": 17616,
+      "congestedRequests": 91
     }
   ],
   "pairwise": [
     {
       "baseline": "immediate",
       "requests": 1500,
-      "pairs": 1499,
-      "excludedBaselineInfeasible": 1,
-      "excludedOptimizedInfeasible": 0,
-      "excludedBothInfeasible": 0,
-      "optimizedCheaper": 1465,
+      "pairs": 1245,
+      "excludedBaselineInfeasible": 9,
+      "excludedOptimizedInfeasible": 1,
+      "excludedBothInfeasible": 245,
+      "optimizedCheaper": 1183,
       "equal": 0,
-      "optimizedWorse": 34,
-      "meanDeltaCents": -666
+      "optimizedWorse": 62,
+      "meanDeltaCents": -521
     },
     {
       "baseline": "static_offpeak",
       "requests": 1500,
-      "pairs": 1465,
-      "excludedBaselineInfeasible": 35,
+      "pairs": 1024,
+      "excludedBaselineInfeasible": 230,
       "excludedOptimizedInfeasible": 0,
-      "excludedBothInfeasible": 0,
-      "optimizedCheaper": 961,
-      "equal": 499,
-      "optimizedWorse": 5,
-      "meanDeltaCents": -206
+      "excludedBothInfeasible": 246,
+      "optimizedCheaper": 469,
+      "equal": 506,
+      "optimizedWorse": 49,
+      "meanDeltaCents": -119
     },
     {
       "baseline": "greedy_tariff",
       "requests": 1500,
-      "pairs": 1498,
-      "excludedBaselineInfeasible": 2,
+      "pairs": 1243,
+      "excludedBaselineInfeasible": 11,
       "excludedOptimizedInfeasible": 0,
-      "excludedBothInfeasible": 0,
-      "optimizedCheaper": 996,
-      "equal": 500,
-      "optimizedWorse": 2,
-      "meanDeltaCents": -211
+      "excludedBothInfeasible": 246,
+      "optimizedCheaper": 633,
+      "equal": 596,
+      "optimizedWorse": 14,
+      "meanDeltaCents": -147
     }
   ],
   "offers": {
-    "withOffer": 1497,
-    "withTwoOrMore": 1444,
-    "withZero": 3,
+    "withOffer": 1215,
+    "withTwoOrMore": 1081,
+    "withZero": 285,
     "zeroReasons": {
-      "NO_ENERGY_SAVINGS": 2,
-      "DISCOUNT_BELOW_MINIMUM": 1
+      "BASELINE_INSUFFICIENT_CAPACITY": 246,
+      "DISCOUNT_BELOW_MINIMUM": 36,
+      "NO_ENERGY_SAVINGS": 3
     },
-    "offerCount": 3101,
-    "meanDiscountCents": 310,
-    "meanEnergyCostSavingCents": 621,
-    "meanOperatorImprovementCents": 322,
+    "offerCount": 2413,
+    "meanDiscountCents": 251,
+    "meanEnergyCostSavingCents": 503,
+    "meanOperatorImprovementCents": 260,
     "validatorFailures": 0
   },
   "methodology": [
-    "Each scenario: one seeded synthetic night (date drawn across 2026, including DST nights) on the demo station (33 kW cap, 1 kW safety headroom, 3 × 11 kW ports), one request per port with plug-in 18:00–23:15, departure ~05:00–09:00 local, 10–55 kWh battery target, 92 % efficiency.",
+    "Each scenario: one seeded synthetic night (date drawn across 2026, including DST nights) on the demo station (24 kW cap, 1 kW safety headroom, ports of 3.6, 7.2 and 11 kW), one request per port with plug-in 18:00–23:15, departure ~05:00–09:00 local, 10–55 kWh battery target, 92 % efficiency.",
     "Requests arrive in plug-in order; each policy allocates every request against the commitments it already made (no re-optimization of earlier sessions).",
     "Policies: immediate = max power from plug-in; static_offpeak = start at 00:00 local at max power; greedy_tariff = cheapest TOU slots first at max power, ignoring congestion; optimized = marginal-cost greedy over TOU + congestion surcharge in 100 W steps.",
     "Cost = synthetic TOU energy + congestion surcharge attributable to the session (forecast base load), rounded up to cents. Pairwise comparisons pair the same request; because earlier commitments differ by policy, a later request can be cheaper under a baseline.",

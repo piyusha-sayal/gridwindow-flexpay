@@ -8,6 +8,7 @@ import { AiExplain } from "./AiExplain";
 import { DealAgentPanel } from "./DealAgentPanel";
 import type { DealState } from "./driverTypes";
 import { hoursMinutes, OfferList, offersHeadline, offerTraits } from "./OfferList";
+import { PlanComparison } from "./PlanComparison";
 
 /** Countdown from quote.expiresAtMs: amber under two minutes, red once expired. */
 export function ExpiryChip({ secondsLeft, label = "Prices held" }: { secondsLeft: number; label?: string }) {
@@ -34,10 +35,12 @@ interface OffersStepProps {
   onSelect: (id: string) => void;
   onRefresh: () => void;
   onEdit: () => void;
+  /** Link into the Impact Lab with this request prefilled (read-only exploration). */
+  impactHref: string;
 }
 
 /** Step 2: the result headline, the shared-axis comparison and why the selected offer is cheaper. */
-export function OffersStep({ quote, tz, selected, offer, recommendedKind, deal, preferredMinSavingsCents, onRunDeal, secondsLeft, refreshing, onSelect, onRefresh, onEdit }: OffersStepProps) {
+export function OffersStep({ quote, tz, selected, offer, recommendedKind, deal, preferredMinSavingsCents, onRunDeal, secondsLeft, refreshing, onSelect, onRefresh, onEdit, impactHref }: OffersStepProps) {
   const expired = secondsLeft === 0;
   const none = quote.offers.length === 0;
   const traits = offer ? offerTraits(offer) : null;
@@ -76,6 +79,8 @@ export function OffersStep({ quote, tz, selected, offer, recommendedKind, deal, 
 
       <OfferList quote={quote} tz={tz} selected={selected} recommendedKind={recommendedKind} deal={deal.status === "done" && !expired ? deal.data.evaluation : null} preferredMinSavingsCents={preferredMinSavingsCents} expired={expired} onSelect={onSelect} />
 
+      {!none && <PlanComparison quote={quote} tz={tz} />}
+
       {offer && traits && (
         <section aria-label={`${offer.label} at a glance`} className="space-y-4">
           <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-[var(--r-card-sm)] border border-line bg-line text-[15px] tabular">
@@ -92,6 +97,12 @@ export function OffersStep({ quote, tz, selected, offer, recommendedKind, deal, 
           </dl>
           <AiExplain key={offer.offerId} quoteSetId={quote.quoteSetId} offerId={offer.offerId} />
         </section>
+      )}
+
+      {!none && (
+        <Link href={impactHref} className="inline-block text-[14px] text-teal-ink underline underline-offset-4">
+          Compare in Impact Lab
+        </Link>
       )}
 
       <p className="text-[13px] text-muted">

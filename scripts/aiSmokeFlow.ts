@@ -143,7 +143,7 @@ export function smokeFixtures() {
   const quote = generateQuote({
     ctx: allocationContext(DEMO_STATION, scenario, []),
     economics: SYNTHETIC_ECONOMICS,
-    request: { portId: "port_a", plugInMs: slotStartMs(scenario.grid, 4), departMs: slotStartMs(scenario.grid, 52), targetBatteryWh: 30_000, efficiencyBp: 9_200, spendCapCents: 2_000 },
+    request: { portId: "port_c", plugInMs: slotStartMs(scenario.grid, 4), departMs: slotStartMs(scenario.grid, 52), targetBatteryWh: 30_000, efficiencyBp: 9_200, spendCapCents: 2_000 },
     quoteSetId: "q_ai_smoke",
     merchantRef: "mock-merchant",
     nowMs: 0,
@@ -155,7 +155,7 @@ export function smokeFixtures() {
     providerMode: "MOCK",
     paymentState: "AUTHORIZED",
     serviceState: "SCHEDULED",
-    portLabel: "A",
+    portLabel: "C",
     timeZone: DEMO_STATION.timeZone,
     plugInMs: quote.request.plugInMs,
     departMs: quote.request.departMs,

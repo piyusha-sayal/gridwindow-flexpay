@@ -88,7 +88,7 @@ test("demo rehearsal (MOCK): timed per DEMO_PLAN", async ({ page }) => {
     await expect(page.getByText("This request cannot be met before your departure.")).toBeVisible();
   });
   await step("benchmark", async () => {
-    await page.goto("/benchmark");
+    await page.goto("/impact-lab");
     await expect(page.locator("h1")).toBeVisible();
   });
 

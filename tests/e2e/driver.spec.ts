@@ -78,7 +78,7 @@ test("wizard keeps its state across reload and moves between steps with browser 
   await expect(page.getByRole("heading", { name: "What does your car need tonight?" })).toBeVisible();
   await expect(page.getByLabel("Energy into battery (kWh)")).toHaveValue("30");
   await expect(page.getByRole("radio", { name: /^Port B/ })).toBeChecked();
-  await expect(page.getByRole("complementary", { name: "Request summary" })).toContainText("Port B · 11 kW");
+  await expect(page.getByRole("complementary", { name: "Request summary" })).toContainText("Port B · 7.2 kW");
 
   await page.goForward();
   await expect(page.getByRole("heading", { name: /flexible offer|cannot be met/ })).toBeVisible();

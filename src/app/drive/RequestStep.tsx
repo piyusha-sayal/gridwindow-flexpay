@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { AiSourceBadge, type AiSource } from "@/components/ui";
 import type { ParsedRequest } from "@/domain/nlRequest";
 import { AxisTicks, FIXED_NIGHT_AXIS, pctOf } from "./NightAxis";
+import { GuidedDemo } from "./GuidedDemo";
 import { PREFERENCES, type DriverConfig, type FieldErrors, type FormState } from "./driverTypes";
 import { AXIS_MINUTES, formatDuration, summarizeRequest } from "./requestSummary";
 
@@ -42,6 +43,8 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
         </p>
         <h1 tabIndex={-1} className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(34px,4.6vw,48px)]">What does your car need tonight?</h1>
       </header>
+
+      <GuidedDemo onLoad={onUpdate} />
 
       <section aria-labelledby="nl-label" className="space-y-2">
         <div className="flex flex-wrap items-center gap-2 rounded-[var(--r-card-sm)] border border-line bg-surface p-2 pl-4 focus-within:border-ink">
@@ -133,11 +136,12 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
               return (
                 <label
                   key={p.id}
-                  className={`relative flex-[1_1_90px] min-h-[60px] cursor-pointer rounded-[var(--r-input)] border px-4 py-2.5 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-ink ${on ? "border-ink bg-ink text-white" : "border-line-strong bg-surface hover:border-ink"}`}
+                  className={`relative flex-[1_1_110px] min-h-[72px] cursor-pointer rounded-[var(--r-input)] border px-4 py-2.5 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-ink ${on ? "border-ink bg-ink text-white" : "border-line-strong bg-surface hover:border-ink"}`}
                 >
                   <input id={`port-${p.id}`} type="radio" name="port" value={p.id} checked={on} onChange={() => onUpdate({ portId: p.id })} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
                   <span className="block text-[16px] font-semibold">Port {p.label}</span>
                   <span className={`block font-mono text-[11px] tracking-[0.06em] uppercase ${on ? "text-on-navy-muted" : "text-muted"}`}>Up to {p.maxPowerW / 1000} kW</span>
+                  {p.tier && <span className={`block text-[12px] ${on ? "text-on-navy-muted" : "text-muted"}`}>{p.tier}</span>}
                 </label>
               );
             })}

@@ -63,7 +63,7 @@ Captured from the running app in MOCK mode with seeded synthetic data. Nothing h
 
 ### For operators
 - Passphrase-protected console with reservations and a night timeline.
-- Site load plan against the configured cap (33 kW on the demo station), with port occupancy shown separately from electrical draw.
+- Site load plan against the configured cap (24 kW on the demo station, whose three ports are rated 3.6, 7.2 and 11 kW), with port occupancy shown separately from electrical draw.
 - Run the simulated night, inject a charger outage, and reconcile payment state against the provider.
 - Per-reservation payment status and an event trail.
 
@@ -154,10 +154,12 @@ Then open <http://localhost:3000>. The values above are throwaway local placehol
 | Route | What you see |
 |---|---|
 | `/` | Landing page with an interactive pricing scheduler |
-| `/drive` | Driver request, offers, consent and approval |
+| `/drive` | Smart Charge: your needs, plan comparison, consent and PayPal approval |
 | `/reservations/<id>` | Payment status, simulated night and FlexReceipt |
 | `/operator` | Operator console (sign in with the passphrase) |
-| `/benchmark` | The 500-scenario synthetic comparison |
+| `/rewards` | Rewards & Payments: this session's commitments and verified payment states |
+| `/impact-lab` | Interactive Charge now vs Smart Flex scenarios and the 500-scenario synthetic study |
+| `/how-it-works` | Four-step walkthrough and FAQ |
 
 For a guided evaluation, follow the [judge walkthrough](docs/JUDGES.md). For a persistent local setup, the repository includes an `.env.example` template to copy to `.env.local` (`cp .env.example .env.local`, or `Copy-Item .env.example .env.local` in PowerShell). Data is stored under `.data/`. Delete that folder to start over.
 
@@ -222,8 +224,8 @@ Results from the release candidate:
 
 | Check | Result |
 |---|---|
-| Vitest (unit and integration, including adversarial payment cases on embedded PostgreSQL) | 344 passed, 10 skipped |
-| Playwright (desktop, tablet and mobile, with axe accessibility and keyboard tests) | 67 passed, 6 skipped |
+| Vitest (unit and integration, including adversarial payment cases on embedded PostgreSQL) | 360 passed, 10 skipped |
+| Playwright (desktop, tablet and mobile, with axe accessibility and keyboard tests) | 73 passed, 6 skipped |
 | TypeScript strict check and ESLint | clean |
 | Production build | passes |
 | `npm run release:scan` (secret and configured-value scan of the client bundle) | pass |
@@ -233,16 +235,16 @@ Run them yourself with `npm run typecheck`, `npm run lint`, `npm test` and `npm 
 
 ### The benchmark
 
-`npm run benchmark` replays 500 seeded synthetic nights (1,500 requests) against four policies: charge immediately, a static off-peak start, a greedy cheapest-tariff policy, and the optimizer. An independent validator re-checks every plan, and it reported 0 failures. Results are in [`artifacts/benchmark/summary.json`](artifacts/benchmark/summary.json) and `requests.csv`, and are shown at `/benchmark`.
+`npm run benchmark` replays 500 seeded synthetic nights (1,500 requests) against four policies: charge immediately, a static off-peak start, a greedy cheapest-tariff policy, and the optimizer. An independent validator re-checks every plan, and it reported 0 failures. Results are in [`artifacts/benchmark/summary.json`](artifacts/benchmark/summary.json) and `requests.csv`, and are shown in the Impact Lab at `/impact-lab`.
 
 | Policy | Served of 1,500 | Mean modeled energy cost per session | Mean site peak |
 |---|---|---|---|
-| Immediate | 1,499 | $12.01 | 30.2 kW |
-| Static off-peak | 1,465 | $7.25 | 31.5 kW |
-| Greedy tariff | 1,498 | $7.46 | 32.0 kW |
-| Optimized | 1,500 | $5.37 | 23.8 kW |
+| Immediate | 1,246 | $10.61 | 22.1 kW |
+| Static off-peak | 1,024 | $6.01 | 20.2 kW |
+| Greedy tariff | 1,243 | $6.86 | 21.9 kW |
+| Optimized | 1,254 | $5.44 | 17.6 kW |
 
-The optimizer was not better on every request. Compared request by request, it cost more than immediate charging in 34 cases, more than static off-peak in 5 and more than greedy tariff in 2, which is 41 unfavorable comparisons in total. The pairwise table is on the benchmark page.
+The optimizer was not better on every request. Compared request by request, it cost more than immediate charging in 62 cases, more than static off-peak in 49 and more than greedy tariff in 14, which is 125 unfavorable comparisons in total. 246 of the 1,500 requests are infeasible even for the optimizer (the port and site cannot deliver the requested energy in the parked time), and those are excluded from the pairwise comparisons. The pairwise table is on the benchmark page.
 
 The benchmark measures how scheduling policies behave under one set of synthetic tariffs, loads and a fixed demo station. It does not measure real utility costs, real vehicles or real grid benefit, and the numbers should not be read as predicted savings.
 

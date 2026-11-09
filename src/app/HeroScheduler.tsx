@@ -49,7 +49,7 @@ export function HeroScheduler() {
   return (
     <figure className="card overflow-hidden" aria-labelledby="hero-caption">
       <div className="flex flex-wrap gap-x-5 gap-y-1 border-b border-line px-5 py-3 meta">
-        <span className="text-ink">PORT B · 11 kW</span>
+        <span className="text-ink">PORT C · 11 kW</span>
         <span>NEED 30 kWh</span>
         <span>PLUGGED IN 19:00</span>
         <span className="ml-auto">ILLUSTRATION · SYNTHETIC TARIFF · ONE VEHICLE</span>

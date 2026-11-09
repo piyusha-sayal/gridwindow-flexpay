@@ -36,7 +36,7 @@ test("goal in words → agent recommends a validated offer, approval stays with 
   await fillFromWords(page, "Find me 30 kWh before 7 AM and save at least $4.");
   await expect(page.getByLabel("Minimum saving (USD, optional)")).toHaveValue("4.00");
   await expect(page.getByLabel("Ready by (next morning)")).toHaveValue("07:00");
-  await seeOffers(page, nightFor(info.project.name, 80), "A");
+  await seeOffers(page, nightFor(info.project.name, 80), "C");
 
   const agent = page.getByRole("region", { name: "Flex Deal Agent" });
   await expect(agent.getByText(/Recommended for your goals|No offer meets your goals/)).toBeVisible();
@@ -105,7 +105,7 @@ test("price-setting and auto-approval instructions are refused and change nothin
 
 test("a preferred (not required) saving stays choosable, with the shortfall shown before approval", async ({ page }, info) => {
   await fillFromWords(page, "30 kWh by 7am, save at least $400");
-  await seeOffers(page, nightFor(info.project.name, 84), "A");
+  await seeOffers(page, nightFor(info.project.name, 84), "C");
   const agent = page.getByRole("region", { name: "Flex Deal Agent" });
   await expect(agent.getByText("No offer meets your goals")).toBeVisible();
   const offers = page.getByRole("group", { name: "Choose a flexible offer" }).getByRole("radio");
@@ -124,7 +124,7 @@ test("if the agent fails, a required saving still blocks offers that miss it", a
   await page.route("**/api/agent/deals", (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: { code: "UNAVAILABLE", message: "Agent unavailable." } }) }));
   await fillFromWords(page, "30 kWh by 7am, save at least $400");
   await page.getByRole("checkbox", { name: /Require this saving/ }).check();
-  await seeOffers(page, nightFor(info.project.name, 86), "A");
+  await seeOffers(page, nightFor(info.project.name, 86), "C");
   const offers = page.getByRole("group", { name: "Choose a flexible offer" }).getByRole("radio");
   expect(await offers.count()).toBeGreaterThan(0);
   for (const radio of await offers.all()) {
@@ -139,7 +139,7 @@ test("full journey: words → required saving → agent pick → exact terms →
   const required = page.getByRole("checkbox", { name: /Require this saving/ });
   await expect(required).not.toBeChecked();
   await required.check();
-  await seeOffers(page, nightFor(info.project.name, 88), "A");
+  await seeOffers(page, nightFor(info.project.name, 88), "C");
   const agent = page.getByRole("region", { name: "Flex Deal Agent" });
   await expect(agent.getByText("Recommended for your goals")).toBeVisible();
   await expect(agent.getByText("save at least $4.00 (required)", { exact: false })).toBeVisible();

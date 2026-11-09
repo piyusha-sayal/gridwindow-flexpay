@@ -51,6 +51,6 @@ test("screens: home, driver offers, reservation receipt, operator console, bench
   await page.getByRole("button", { name: /^Reservation res_.*parked/ }).first().click();
   await shot("5-operator");
 
-  await page.goto("/benchmark");
+  await page.goto("/impact-lab");
   await shot("6-benchmark");
 });

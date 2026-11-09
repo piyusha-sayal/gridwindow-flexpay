@@ -48,7 +48,7 @@ describe("quote generation", () => {
   const scenario = buildNightScenario(DEMO_STATION, "2026-10-20", 42);
   const ctx = allocationContext(DEMO_STATION, scenario, []);
   const request: ChargeRequest = {
-    portId: "port_a",
+    portId: "port_c",
     plugInMs: slotStartMs(scenario.grid, 4), // 19:00
     departMs: slotStartMs(scenario.grid, 52), // 07:00
     targetBatteryWh: 30_000,
@@ -65,7 +65,7 @@ describe("quote generation", () => {
       expect(o.operatorImprovementCents).toBeGreaterThan(0);
       expect(o.priceCents).toBe(o.listPriceCents - o.discountCents);
       expect(o.priceCents).toBeLessThanOrEqual(request.spendCapCents);
-      expect(validatePlans(DEMO_STATION, scenario.grid, scenario.forecastBaseLoadW, [{ sessionId: o.offerId, portId: "port_a", plugInMs: request.plugInMs, departMs: request.departMs, powerW: o.powerW }], [{ sessionId: o.offerId, targetBatteryWh: 30_000, efficiencyBp: 9_200 }])).toEqual([]);
+      expect(validatePlans(DEMO_STATION, scenario.grid, scenario.forecastBaseLoadW, [{ sessionId: o.offerId, portId: "port_c", plugInMs: request.plugInMs, departMs: request.departMs, powerW: o.powerW }], [{ sessionId: o.offerId, targetBatteryWh: 30_000, efficiencyBp: 9_200 }])).toEqual([]);
     }
   });
 

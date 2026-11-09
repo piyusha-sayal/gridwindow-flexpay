@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   // Lets a verification build go to its own directory so a running `next start` keeps serving the normal .next build.
   distDir: process.env.NEXT_DIST_DIR || ".next",
   serverExternalPackages: ["@electric-sql/pglite", "pg"],
+  async redirects() {
+    // Old /benchmark links keep working; the page now lives at /impact-lab.
+    return [{ source: "/benchmark", destination: "/impact-lab", permanent: false }];
+  },
   async headers() {
     return [
       {

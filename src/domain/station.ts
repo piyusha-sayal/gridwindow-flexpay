@@ -4,6 +4,8 @@ export interface Port {
   id: string;
   label: string;
   maxPowerW: number;
+  /** Short plain-language class shown next to the port (synthetic demo station). */
+  tier: string;
 }
 
 export interface StationConfig {
@@ -43,13 +45,13 @@ export const DEMO_STATION: StationConfig = {
   id: "stn_demo_harbor",
   name: "Harbor Lane Overnight Depot (synthetic)",
   timeZone: "America/Los_Angeles",
-  stationCapW: 33_000,
+  stationCapW: 24_000,
   safetyHeadroomW: 1_000,
   powerStepW: 100,
   ports: [
-    { id: "port_a", label: "A", maxPowerW: 11_000 },
-    { id: "port_b", label: "B", maxPowerW: 11_000 },
-    { id: "port_c", label: "C", maxPowerW: 11_000 },
+    { id: "port_a", label: "A", maxPowerW: 3_600, tier: "Lower-power AC" },
+    { id: "port_b", label: "B", maxPowerW: 7_200, tier: "Standard AC" },
+    { id: "port_c", label: "C", maxPowerW: 11_000, tier: "Higher-power AC" },
   ],
 };
 

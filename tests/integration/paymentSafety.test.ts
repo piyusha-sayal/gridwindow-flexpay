@@ -109,7 +109,7 @@ describe("#7 a capacity-conflict loser never re-commits, even after capacity fre
     const sessions = ["drv_7a", "drv_7b", "drv_7c"];
     const pending = [];
     for (const [i, port] of ["port_a", "port_b", "port_c"].entries()) {
-      const quote = await createQuote(app.deps, sessions[i]!, request({ portId: port, targetBatteryKWh: 45 }));
+      const quote = await createQuote(app.deps, sessions[i]!, request({ portId: port, targetBatteryKWh: 30 }));
       const offer = quote.offers[0]!;
       const accepted = await acceptOffer(app.deps, sessions[i]!, { quoteSetId: quote.quoteSetId, offerId: offer.offerId, termsHash: offer.termsHash, consent: true });
       pending.push({ session: sessions[i]!, rid: accepted.reservationId });

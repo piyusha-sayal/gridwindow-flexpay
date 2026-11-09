@@ -67,6 +67,8 @@ function resumesNavigation(): boolean {
   return nav?.type === "reload" || nav?.type === "back_forward";
 }
 
+const IMPACT_PREFERENCE = { lowest_cost: "lowest_price", early_finish: "finish_early", gentle: "gentle" } as const;
+
 export function DriverFlow({ initialError }: { initialError: string | null }) {
   const [config, setConfig] = useState<DriverConfig | null>(null);
   const [form, setForm] = useState<FormState | null>(null);
@@ -260,7 +262,7 @@ export function DriverFlow({ initialError }: { initialError: string | null }) {
     <div className="space-y-8">
       <StepProgress step={step} reachable={reachable} onGo={goStep} />
       {error && <Alert tone="danger">{error}</Alert>}
-      <div className={`flex flex-wrap items-start gap-x-10 gap-y-8 ${step === 2 && offer ? "pb-24 min-[760px]:pb-0" : ""}`}>
+      <div className={`flex flex-wrap items-start gap-x-10 gap-y-8 ${step === 2 && offer ? "pb-40 min-[760px]:pb-0" : ""}`}>
         <div ref={headingRef} className="min-w-0 flex-[999_1_560px] [&_h1]:outline-none">
           {step === 1 && (
             <RequestStep
@@ -294,6 +296,7 @@ export function DriverFlow({ initialError }: { initialError: string | null }) {
               }}
               onRefresh={() => void requestQuote()}
               onEdit={() => goStep(1)}
+              impactHref={`/impact-lab?${new URLSearchParams({ portId: form.portId, kWh: form.targetBatteryKWh, plugInLocal: form.plugInLocal, readyByLocal: form.departLocal, nightOf: form.nightOf, preference: IMPACT_PREFERENCE[form.preference] }).toString()}`}
             />
           )}
           {step === 3 && quote && offer && (

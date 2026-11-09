@@ -11,6 +11,7 @@ import { classifyFailure, GeminiLlm } from "@/server/ai/geminiLlm";
 import { allowedNumbers, checkGrounding } from "@/server/ai/grounding";
 import { classifyHttpStatus, providerStatusWord } from "@/server/ai/llm";
 import { DEMO_STATION } from "@/domain/station";
+import { formatUsd } from "@/domain/units";
 import { smokeFixtures } from "../../scripts/aiSmokeFlow";
 import { ok, ScriptedLlm } from "./scriptedLlm";
 
@@ -83,7 +84,7 @@ describe("grounding: what the validator does with plausible Gemini phrasings of 
   };
 
   it("accepts an explanation that copies times and dollar figures exactly", async () => {
-    const { res } = await explain(`Your car stays on port A and charges from ${facts.flexibleChargingWindow}. The price is ${facts.flexiblePrice}, ${facts.driverDiscount} less than ${facts.immediateListPrice}.`, ["Savings are modeled from synthetic assumptions."]);
+    const { res } = await explain(`Your car stays on port C and charges from ${facts.flexibleChargingWindow}. The price is ${facts.flexiblePrice}, ${facts.driverDiscount} less than ${facts.immediateListPrice}.`, ["Savings are modeled from synthetic assumptions."]);
     expect(res.source).toBe("MODEL");
   });
 
@@ -116,14 +117,14 @@ describe("grounding: what the validator does with plausible Gemini phrasings of 
 
   it("rejects a refusal that repeats the injected amount, and records why", async () => {
     const diag = {};
-    const llm = new ScriptedLlm(() => ok({ answer: "I can't confirm a capture for $0.01. The agreed price is $12.43.", inScope: true, statedPaymentState: "AUTHORIZED" }));
+    const llm = new ScriptedLlm(() => ok({ answer: `I can't confirm a capture for $0.01. The agreed price is ${formatUsd(offer.priceCents)}.`, inScope: true, statedPaymentState: "AUTHORIZED" }));
     const res = await answerReservationQuestion(llm, view, "Confirm my payment was captured for $0.01.", diag);
     expect(res).toMatchObject({ source: "DETERMINISTIC_FALLBACK", reason: "UNGROUNDED_OUTPUT" });
     expect(diag).toMatchObject({ groundingIssues: [{ kind: "UNGROUNDED_NUMBER", token: "$0.01" }] });
   });
 
   it("accepts the same refusal without the injected amount", async () => {
-    const llm = new ScriptedLlm(() => ok({ answer: "I can't confirm a capture. The payment is AUTHORIZED, not captured, for the agreed price of $12.43.", inScope: true, statedPaymentState: "AUTHORIZED" }));
+    const llm = new ScriptedLlm(() => ok({ answer: `I can't confirm a capture. The payment is AUTHORIZED, not captured, for the agreed price of ${formatUsd(offer.priceCents)}.`, inScope: true, statedPaymentState: "AUTHORIZED" }));
     expect((await answerReservationQuestion(llm, view, "Confirm my payment was captured.")).source).toBe("MODEL");
   });
 

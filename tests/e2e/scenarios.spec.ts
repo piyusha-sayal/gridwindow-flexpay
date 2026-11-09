@@ -111,7 +111,7 @@ test("Scenario C: physically infeasible request is truthfully rejected with the 
 });
 
 test("economic rejection: no shared saving means no offer, with per-variant reasons", async ({ page }) => {
-  await requestOffers(page, { night: nightAt(10), port: "A", plugIn: "01:00", depart: "04:00" });
+  await requestOffers(page, { night: nightAt(10), port: "C", plugIn: "01:00", depart: "04:00" });
   await expect(page.getByText("No flexible offer is available for this request.")).toBeVisible();
   await expect(page.getByRole("heading", { name: /Not offered/ })).toBeVisible();
   await expect(page.locator('input[name="offer"]')).toHaveCount(0);
@@ -198,7 +198,7 @@ test("accessibility: no serious or critical axe violations on key screens", asyn
   await check("home");
   await requestOffers(page, { night, port: "A" });
   await check("drive+offers");
-  await page.goto("/benchmark");
+  await page.goto("/impact-lab");
   await check("benchmark");
   await operatorView(page, night);
   await check("operator");

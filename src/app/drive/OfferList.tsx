@@ -19,7 +19,7 @@ const REJECTION_COPY: Record<string, string> = {
   OUTSIDE_HORIZON: "the window is outside tonight's schedule (18:00–10:00)",
 };
 
-export const VARIANT_NAME: Record<string, string> = { flex_lowest_cost: "Lowest-cost window", flex_early_finish: "Ready 1 hour early", flex_gentle: "Gentle half-power" };
+export const VARIANT_NAME: Record<string, string> = { flex_lowest_cost: "Lowest-cost window", flex_early_finish: "Ready 1 hour early", flex_gentle: "Gentle Charging" };
 
 export function reasonCopy(reason: string): string {
   const code = reason.split(":")[0]!.trim();
@@ -116,6 +116,7 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
           <legend className="sr-only">Choose a flexible offer</legend>
           {quote.offers.map((o) => {
             const on = selected === o.offerId;
+            const tiedHigherPeak = quote.offers.some((x) => x.offerId !== o.offerId && x.priceCents === o.priceCents && offerTraits(x).maxPowerW > offerTraits(o).maxPowerW);
             // Below a required minimum (stored with the quote, enforced at accept): cannot be chosen, agent or not.
             const blocked = !meetsRequiredSaving(quote, o);
             // Below a preference only: stays choosable, with the shortfall visible.
@@ -123,8 +124,8 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
             const pct = Math.round((o.discountCents / o.listPriceCents) * 100);
             const t = offerTraits(o);
             return (
+              <div key={o.offerId}>
               <label
-                key={o.offerId}
                 className={`${ROW} cursor-pointer rounded-[var(--r-card-sm)] border bg-surface px-4 py-4 transition-[background,box-shadow] min-[760px]:rounded-none min-[760px]:border-0 min-[760px]:border-t min-[760px]:border-line min-[760px]:px-5 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-teal-ink ${on ? "border-ink shadow-[inset_0_0_0_1px_var(--ink)] min-[760px]:bg-teal-tint min-[760px]:shadow-[inset_0_0_0_1.5px_var(--ink)]" : "border-line hover:bg-paper/60"}`}
               >
                 <span className="flex min-w-0 items-start gap-3">
@@ -142,7 +143,8 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
                       {blocked && <span className="badge no-dot tone-warn">Below your required {formatUsd(quote.requiredMinSavingsCents!)} saving · change requirements to choose</span>}
                       {belowPreference && <span className="badge no-dot tone-warn">Below your preferred {formatUsd(preferredMinSavingsCents!)} saving</span>}
                       {o.kind === recommendedKind && <span className="badge no-dot tone-info">Your preference</span>}
-                      {o.kind === "flex_gentle" && <span className="badge no-dot tone-neutral">{t.maxPowerW / 1000} kW · easier on the site</span>}
+                      {o.kind === "flex_gentle" && <span className="badge no-dot tone-neutral">{t.maxPowerW / 1000} kW peak</span>}
+                      {tiedHigherPeak && <span className="badge no-dot tone-info">Same price, lower peak power.</span>}
                     </span>
                   </span>
                 </span>
@@ -158,6 +160,8 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
                   </span>
                 </span>
               </label>
+              {o.kind === "flex_gentle" && <GentleWhy peakKw={t.maxPowerW / 1000} portKw={maxW / 1000} tiedHigherPeak={tiedHigherPeak} />}
+              </div>
             );
           })}
         </fieldset>
@@ -182,6 +186,26 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
         <span>▮ Charging · bar height = power</span>
         <span>{formatKWh(quote.request.targetBatteryWh)} to battery</span>
       </p>
+    </div>
+  );
+}
+
+/** Short, grounded explanation of the real lower-power schedule. Makes no battery-health or extra-saving claims. */
+function GentleWhy({ peakKw, portKw, tiedHigherPeak }: { peakKw: number; portKw: number; tiedHigherPeak: boolean }) {
+  return (
+    <div className="px-4 pb-3 pt-1 min-[760px]:px-5 text-[13px] text-text-2 space-y-1.5">
+      <p>Lower-power charging that reduces peak demand while still meeting your departure deadline.</p>
+      <details>
+        <summary className="cursor-pointer text-teal-ink underline underline-offset-4">Why choose this plan?</summary>
+        <ul className="mt-2 list-disc space-y-1 pl-5">
+          <li>
+            Full power on this port is up to {portKw} kW. This plan never draws more than {peakKw} kW, so it takes longer to deliver the same energy.
+          </li>
+          <li>It only appears when the slower schedule still delivers your energy before you leave.</li>
+          <li>Lower instantaneous power means less load on the site when several cars charge at once.</li>
+          <li>{tiedHigherPeak ? "Same price, lower peak power than another offer." : "Its price can differ from the other offers because it uses different time slots."} It is not automatically cheaper.</li>
+        </ul>
+      </details>
     </div>
   );
 }

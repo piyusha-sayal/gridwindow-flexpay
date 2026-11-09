@@ -43,10 +43,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="site-header">
           <SiteNav />
         </header>
-        <main id="main" className="page-wrap py-8 sm:py-10">
+        <main id="main" className="page-wrap py-8 sm:py-10 max-[899px]:pb-24">
           {children}
         </main>
-        <footer className="site-footer page-wrap pb-10 pt-6 text-[13px] text-muted flex flex-wrap justify-between gap-x-6 gap-y-1 border-t border-line">
+        <footer className="site-footer page-wrap max-[899px]:pb-24 pb-10 pt-6 text-[13px] text-muted flex flex-wrap justify-between gap-x-6 gap-y-1 border-t border-line">
           <span>
             GridWindow FlexPay · {mode === "PAYPAL_SANDBOX" ? "Payments via PayPal Sandbox" : mode === "MOCK" ? "Payments simulated (MOCK, not PayPal)" : "Payments unavailable"}
           </span>

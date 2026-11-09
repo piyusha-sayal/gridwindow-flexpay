@@ -1,37 +1,81 @@
+import { getRuntime } from "@/server/runtime";
+import { ServiceError } from "@/server/deps";
+import { compareScenario, type ImpactComparison } from "@/server/services/impactService";
+import { driverDefaultWindow } from "@/server/services/quoteService";
 import type { BenchmarkSummary } from "@/domain/benchmark";
 import { Highlights } from "./Highlights";
+import { ImpactLabPanel } from "./ImpactLabPanel";
+import { DEFAULT_SCENARIO, scenarioFromQuery, type ImpactScenarioInput, type QueryValue } from "./scenario";
 import { loadSummary } from "./summary";
 
-export const metadata = { title: "Benchmark · GridWindow FlexPay" };
+export const metadata = { title: "Impact Lab · GridWindow FlexPay" };
 export const dynamic = "force-dynamic";
 
 const pct = (n: number, d: number) => (d === 0 ? "n/a" : `${((n / d) * 100).toFixed(1)}%`);
 const usd = (cents: number) => `${cents < 0 ? "−" : ""}$${(Math.abs(cents) / 100).toFixed(2)}`;
 
-export default async function BenchmarkPage() {
-  const s = await loadSummary();
-  if (!s) {
-    return (
-      <div className="card p-6 space-y-2">
-        <h1 className="text-[28px] font-semibold tracking-[-0.02em]">Benchmark</h1>
-        <p>No benchmark results found. Run <code>npm run benchmark</code> to generate <code>artifacts/benchmark/summary.json</code>.</p>
-      </div>
-    );
+export default async function ImpactLabPage({ searchParams }: { searchParams: Promise<Record<string, QueryValue>> }) {
+  const [{ deps }, query, s] = await Promise.all([getRuntime(), searchParams, loadSummary()]);
+  const tonight = driverDefaultWindow(deps.station, deps.now());
+  const defaults: ImpactScenarioInput = { ...DEFAULT_SCENARIO, nightOf: tonight.nightOf, plugInLocal: tonight.plugInLocal };
+  const scenario = scenarioFromQuery(query, defaults);
+
+  let initialComparison: ImpactComparison | null = null;
+  let initialError: string | null = null;
+  try {
+    initialComparison = await compareScenario(deps, scenario);
+  } catch (err: unknown) {
+    // A bad combination (for example ready-by before plug-in) is shown as a message, not a crash.
+    if (!(err instanceof ServiceError)) throw err;
+    initialError = err.message;
   }
+
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <header className="space-y-3 max-w-[820px]">
-        <p className="meta break-words">
-          {s.provenance} · generated {s.generatedAt} · seeds {s.seedRange}
-        </p>
-        <h1 className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(32px,4.6vw,52px)]">
-          {s.scenarioCount.toLocaleString("en-US")} synthetic nights. {s.requestCount.toLocaleString("en-US")} charging requests.
-        </h1>
+        <h1 className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(32px,4.6vw,52px)]">Impact Lab</h1>
         <p className="text-[17px] text-text-2">
-          Each seeded night replays the same requests under every scheduling policy, so differences come from the policy alone. This is a simulation, not measured field data.
+          Explore one modeled night at the demo station. Every number is synthetic and modeled, not measured.
         </p>
       </header>
 
+      <ImpactLabPanel
+        ports={deps.station.ports}
+        timeZone={deps.station.timeZone}
+        initialScenario={scenario}
+        initialComparison={initialComparison}
+        initialError={initialError}
+      />
+
+      <section className="space-y-10" aria-labelledby="study-title">
+        <div className="space-y-3 max-w-[820px]">
+          <h2 id="study-title" className="text-[22px] font-semibold tracking-[-0.01em]">
+            Precomputed study
+          </h2>
+          {s ? (
+            <>
+              <p className="meta break-words">
+                {s.provenance} · generated {s.generatedAt} · seeds {s.seedRange}
+              </p>
+              <p className="text-[17px] text-text-2">
+                {s.scenarioCount.toLocaleString("en-US")}-scenario synthetic benchmark: {s.scenarioCount.toLocaleString("en-US")} seeded nights and{" "}
+                {s.requestCount.toLocaleString("en-US")} charging requests. Each seeded night replays the same requests under every scheduling policy, so differences come from the
+                policy alone. This is a simulation, not measured field data.
+              </p>
+            </>
+          ) : (
+            <p>No benchmark results found. Run <code>npm run benchmark</code> to generate <code>artifacts/benchmark/summary.json</code>.</p>
+          )}
+        </div>
+        {s && <BenchmarkStudy s={s} />}
+      </section>
+    </div>
+  );
+}
+
+function BenchmarkStudy({ s }: { s: BenchmarkSummary }) {
+  return (
+    <>
       <Highlights s={s} />
 
       <OfferEconomics s={s} />
@@ -143,7 +187,7 @@ export default async function BenchmarkPage() {
           ))}
         </ol>
       </section>
-    </div>
+    </>
   );
 }
 

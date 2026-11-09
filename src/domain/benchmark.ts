@@ -238,7 +238,7 @@ export function runBenchmark(station: StationConfig, economics: EconomicsConfig,
       validatorFailures: offerStats.validatorFailures,
     },
     methodology: [
-      "Each scenario: one seeded synthetic night (date drawn across 2026, including DST nights) on the demo station (33 kW cap, 1 kW safety headroom, 3 × 11 kW ports), one request per port with plug-in 18:00–23:15, departure ~05:00–09:00 local, 10–55 kWh battery target, 92 % efficiency.",
+      "Each scenario: one seeded synthetic night (date drawn across 2026, including DST nights) on the demo station (24 kW cap, 1 kW safety headroom, ports of 3.6, 7.2 and 11 kW), one request per port with plug-in 18:00–23:15, departure ~05:00–09:00 local, 10–55 kWh battery target, 92 % efficiency.",
       "Requests arrive in plug-in order; each policy allocates every request against the commitments it already made (no re-optimization of earlier sessions).",
       "Policies: immediate = max power from plug-in; static_offpeak = start at 00:00 local at max power; greedy_tariff = cheapest TOU slots first at max power, ignoring congestion; optimized = marginal-cost greedy over TOU + congestion surcharge in 100 W steps.",
       "Cost = synthetic TOU energy + congestion surcharge attributable to the session (forecast base load), rounded up to cents. Pairwise comparisons pair the same request; because earlier commitments differ by policy, a later request can be cheaper under a baseline.",

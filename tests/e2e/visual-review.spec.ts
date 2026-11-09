@@ -152,7 +152,7 @@ test("state gallery: validation, infeasible, terms, authorized, captured, pendin
   await expect(page.getByRole("listitem").filter({ hasText: "Authorization voided: not charged (provider-confirmed)" })).toBeVisible();
   await shot(page, "state-12-voided-authorization");
 
-  await page.goto("/benchmark");
+  await page.goto("/impact-lab");
   await shot(page, "state-13-benchmark");
 });
 
@@ -170,7 +170,7 @@ test("viewport matrix: no horizontal overflow on core screens at 320–1440 px",
       await operatorRow(p, nightAt(42), ids.pending!);
       await expect(p.getByRole("region", { name: "Night summary" })).toBeVisible();
     }],
-    ["benchmark", async (p) => void (await p.goto("/benchmark"))],
+    ["benchmark", async (p) => void (await p.goto("/impact-lab"))],
   ];
   const manifest: { width: number; screen: string; file: string; issues: string[] }[] = [];
   for (const width of WIDTHS) {
@@ -187,18 +187,33 @@ test("viewport matrix: no horizontal overflow on core screens at 320–1440 px",
 });
 
 test("navigation marks the current page and the landing CTA works from the keyboard", async ({ page }) => {
-  await page.setViewportSize({ width: 500, height: 800 });
-  await page.goto("/benchmark");
-  // Links stay inline at every width; there is no Menu button.
-  await expect(page.getByRole("button", { name: "Menu" })).toHaveCount(0);
-  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Benchmark" })).toHaveAttribute("aria-current", "page");
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/impact-lab");
+  const main = page.getByRole("navigation", { name: "Main" });
+  await expect(main.getByRole("link", { name: "Impact Lab", exact: true })).toHaveAttribute("aria-current", "page");
+  for (const name of ["Home", "Smart Charge", "Rewards & Payments", "Impact Lab", "How It Works", "Operator Console"]) await expect(main.getByRole("link", { name, exact: true })).toBeVisible();
   await page.goto("/");
-  const cta = page.getByRole("link", { name: "Start Charging →" });
+  const cta = page.getByRole("link", { name: "Plan My Charge" }).first();
   await cta.focus();
   await expect(cta).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/drive$/);
-  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Driver" })).toHaveAttribute("aria-current", "page");
+  await expect(main.getByRole("link", { name: "Smart Charge", exact: true })).toHaveAttribute("aria-current", "page");
+});
+
+test("mobile uses a bottom bar with a More sheet instead of a top menu", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto("/");
+  const bar = page.getByRole("navigation", { name: "Mobile" });
+  for (const name of ["Home", "Charge", "Rewards"]) await expect(bar.getByRole("link", { name, exact: true })).toBeVisible();
+  const more = bar.getByRole("button", { name: "More" });
+  await expect(more).toHaveAttribute("aria-expanded", "false");
+  await more.click();
+  await expect(more).toHaveAttribute("aria-expanded", "true");
+  for (const name of ["Impact Lab", "How It Works", "Operator Console"]) await expect(bar.getByRole("link", { name })).toBeVisible();
+  await bar.getByRole("link", { name: "How It Works" }).click();
+  await expect(page).toHaveURL(/\/how-it-works$/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
 test("mobile operator cards show payment status and keep actions reachable without horizontal scroll", async ({ page }) => {
@@ -219,13 +234,14 @@ test("mobile operator cards show payment status and keep actions reachable witho
   await shot(page, "mobile-0320-operator-card-detail");
 });
 
-test("mobile benchmark leads with the headline results from the summary artifact", async ({ page }) => {
+test("mobile Impact Lab shows the study headline results below the scenario panel, without horizontal scroll", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto("/benchmark");
+  await page.goto("/impact-lab");
   const glance = page.getByRole("region", { name: "At a glance" });
-  for (const label of ["Requests simulated", "Optimized served", "Hard-constraint violations", "Unfavorable pairwise comparisons"]) await expect(glance.getByText(label)).toBeInViewport({ ratio: 0.1 });
+  for (const label of ["Requests simulated", "Optimized served", "Hard-constraint violations", "Unfavorable pairwise comparisons"]) await expect(glance.getByText(label)).toBeVisible();
   await expect(glance.getByText("Requests not served (infeasible)")).toBeVisible();
   await expect(page.getByRole("table").first()).toBeAttached();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
 test("print media: receipt-only output, every section expanded, PDF renders", async ({ page }) => {

@@ -81,7 +81,7 @@ export function SelectedCard({ offer, tz, expired, onReview }: SelectedProps) {
 /** Fixed bottom bar replacing the aside on small screens (step 2). */
 export function MobileOfferBar({ offer, expired, onReview }: Omit<SelectedProps, "tz">) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 px-[var(--gutter)] pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))] backdrop-blur min-[760px]:hidden">
+    <div className="fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] z-20 border-t border-line bg-surface/95 px-[var(--gutter)] py-3 backdrop-blur min-[760px]:hidden">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-[14px] font-medium">{offer.label}</p>

@@ -524,12 +524,73 @@ h3 {
   font-weight: 500;
   background: rgba(12, 21, 38, 0.08);
 }
-.nav-optional {
+.nav-link-quiet {
+  font-size: 13px;
+  color: var(--muted);
+}
+.nav-desktop {
   display: none;
 }
-@media (min-width: 480px) {
-  .nav-optional {
-    display: inline-flex;
+.bottom-nav {
+  display: flex;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: rgba(246, 244, 239, 0.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+}
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.bottom-nav-item[aria-current="page"] {
+  color: var(--ink);
+  box-shadow: inset 0 3px 0 var(--teal);
+}
+.more-sheet {
+  position: absolute;
+  right: 8px;
+  bottom: calc(100% + 8px);
+  min-width: 220px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card-sm);
+  box-shadow: var(--shadow-popover);
+}
+.more-sheet-link {
+  display: block;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.more-sheet-link[aria-current="page"] {
+  background: rgba(12, 21, 38, 0.07);
+  font-weight: 500;
+}
+@media (min-width: 900px) {
+  .nav-desktop {
+    display: flex;
+  }
+  .bottom-nav {
+    display: none;
   }
 }
 .mock-pill {
@@ -675,4 +736,35 @@ h3 {
   height: auto;
   /* The PNG carries its own rounded corners and transparency, so the shadow follows the alpha edge. */
   filter: drop-shadow(0 22px 28px rgba(12, 21, 38, 0.22));
+}
+
+/* ---------- Hero status overlay ---------- */
+.hero-media {
+  position: relative;
+}
+.hero-status {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: var(--r-card-sm);
+  background: var(--ink);
+  color: #f6f4ef;
+}
+.hero-status-tag {
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #7fd6d0;
+}
+@media (min-width: 960px) {
+  .hero-status {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    margin-top: 0;
+    background: rgba(12, 21, 38, 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
 }

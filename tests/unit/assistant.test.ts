@@ -13,7 +13,7 @@ const scenario = buildNightScenario(DEMO_STATION, "2026-10-20", 42);
 const quote = generateQuote({
   ctx: allocationContext(DEMO_STATION, scenario, []),
   economics: SYNTHETIC_ECONOMICS,
-  request: { portId: "port_a", plugInMs: slotStartMs(scenario.grid, 4), departMs: slotStartMs(scenario.grid, 52), targetBatteryWh: 30_000, efficiencyBp: 9_200, spendCapCents: 2_000 },
+  request: { portId: "port_c", plugInMs: slotStartMs(scenario.grid, 4), departMs: slotStartMs(scenario.grid, 52), targetBatteryWh: 30_000, efficiencyBp: 9_200, spendCapCents: 2_000 },
   quoteSetId: "q_ai",
   merchantRef: "mock-merchant",
   nowMs: 0,

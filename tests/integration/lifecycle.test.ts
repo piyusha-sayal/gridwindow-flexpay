@@ -237,7 +237,7 @@ describe("capacity", () => {
     // Three drivers all want the same cheap overnight window on different ports.
     const quotes = [];
     for (const [i, port] of ["port_a", "port_b", "port_c"].entries()) {
-      const quote = await createQuote(app.deps, `drv_${i}`, request({ portId: port, targetBatteryKWh: 45 }));
+      const quote = await createQuote(app.deps, `drv_${i}`, request({ portId: port, targetBatteryKWh: 30 }));
       quotes.push({ quote, session: `drv_${i}` });
     }
     // All three accept while nothing is committed yet (each passes the accept-time recheck)...
@@ -428,7 +428,7 @@ describe("review regressions", () => {
   it("#7 failed void after a capacity conflict never re-commits capacity and is retried by recovery", async () => {
     const quotes = [];
     for (const [i, port] of ["port_a", "port_b", "port_c"].entries()) {
-      quotes.push({ session: `drv_${i}`, quote: await createQuote(app.deps, `drv_${i}`, request({ portId: port, targetBatteryKWh: 45 })) });
+      quotes.push({ session: `drv_${i}`, quote: await createQuote(app.deps, `drv_${i}`, request({ portId: port, targetBatteryKWh: 30 })) });
     }
     const accepted = [];
     for (const { quote, session } of quotes) {

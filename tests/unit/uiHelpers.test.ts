@@ -3,7 +3,7 @@
  * receipt money line (only a provider-confirmed capture reads as paid).
  */
 import { describe, expect, it } from "vitest";
-import { benchmarkHighlights } from "@/app/benchmark/Highlights";
+import { benchmarkHighlights } from "@/app/impact-lab/Highlights";
 import { lowestPriceOfferIds, offerTraits } from "@/app/drive/OfferList";
 import { contributionItem } from "@/app/operator/DetailPanel";
 import { nightSummary } from "@/app/operator/metrics";

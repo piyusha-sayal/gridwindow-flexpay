@@ -264,7 +264,7 @@ test("layout and full axe report per viewport (all impacts)", async ({ page }, i
   await page.getByRole("button", { name: /^Reservation res_.*parked/ }).first().click();
   await expect(page.getByText("Event trail")).toBeVisible();
   await audit("operator-with-detail");
-  await page.goto("/benchmark");
+  await page.goto("/impact-lab");
   await audit("benchmark");
 
   await mkdir("artifacts/qa", { recursive: true });

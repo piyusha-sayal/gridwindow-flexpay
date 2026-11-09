@@ -30,7 +30,7 @@ GridWindow FlexPay sells overnight EV charging flexibility. The engine decides w
 
 | Layer | Path | Role |
 |---|---|---|
-| Domain (pure, deterministic) | `src/domain/` | Integer units (cents, W, Wh). `allocator` (33 kW aggregate cap, per-port power, 92 % efficiency), `validator` (independent recompute), `economics`, `quotes`/`terms` (hash, expiry, approval deadline), `simulator`, `paymentState` (CAS transitions), `dealAgent`, `benchmark`. |
+| Domain (pure, deterministic) | `src/domain/` | Integer units (cents, W, Wh). `allocator` (24 kW aggregate cap, per-port power, 92 % efficiency), `validator` (independent recompute), `economics`, `quotes`/`terms` (hash, expiry, approval deadline), `simulator`, `paymentState` (CAS transitions), `dealAgent`, `benchmark`. |
 | Payments | `src/payments/` | `PaymentGateway` contract; `PayPalSandboxGateway` (sandbox host hard-coded); `MockGateway` (labeled MOCK). |
 | Services | `src/server/services/` | quote, checkout, order creation (crash-safe, leased), settlement, reconcile, recovery sweep, webhook, views. |
 | AI | `src/server/ai/` | `llm` (Anthropic SDK), `assistant`, `dealAgent` (server-orchestrated, read-only), `grounding`. |

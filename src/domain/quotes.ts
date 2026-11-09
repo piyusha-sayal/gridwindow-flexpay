@@ -96,7 +96,7 @@ const VARIANTS: { kind: OfferKind; label: string; policy: (req: ChargeRequest, p
   },
   {
     kind: "flex_gentle",
-    label: "Gentle half-power charge",
+    label: "Gentle Charging",
     policy: (_req, portMaxW, step) => ({ kind: "optimized", maxPowerW: Math.floor(portMaxW / 2 / step) * step }),
   },
 ];
