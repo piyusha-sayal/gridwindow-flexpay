@@ -6,8 +6,8 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { validateOfferEconomics } from "@/domain/economics";
 import { meetsRequiredSaving } from "@/domain/quotes";
-import { approvalDeadlineMs, termsHash } from "@/domain/terms";
-import { validatePlans } from "@/domain/validator";
+import { approvalDeadlineMs, settlementPolicyOf, termsHash } from "@/domain/terms";
+import { validateWithEnvelope } from "@/domain/disturbance";
 import { ProviderError } from "@/payments/gateway";
 import { ServiceError, type AppDeps } from "../deps";
 import {
@@ -16,8 +16,10 @@ import {
   committedPlans,
   finishOperation,
   getReservation,
+  digestOfEventIds,
   getReservationByOffer,
   leaseOperation,
+  nightDisturbances,
   patchReservation,
   planOf,
   providerSource,
@@ -27,7 +29,8 @@ import {
   type ReservationRow,
 } from "../repo";
 import { attemptCreateOrder, awaitingOrder, resumeOrderCreation, type StoredOrderRequest } from "./orderCreationService";
-import { getQuoteSet, scenarioFor } from "./quoteService";
+import { getQuoteSet } from "./quoteService";
+import { nightContext } from "./scheduleService";
 import { recoverReservation } from "./recoveryService";
 import { voidAuthorization } from "./settlementService";
 
@@ -96,11 +99,17 @@ export async function acceptOffer(deps: AppDeps, driverSession: string, input: A
     return toAcceptResult(await resumeOrderCreation(deps, existing.id, "DRIVER"), true);
   }
 
+  // A disturbance recorded for this station-night after the quote was priced makes its offers unverified: fail closed.
+  const disturbed = await nightDisturbances(deps.db, deps.station.id, nightOf);
+  if (digestOfEventIds(disturbed.eventIds) !== (quote.disturbanceDigest ?? digestOfEventIds([]))) {
+    throw new ServiceError("QUOTE_STALE", "A disturbance was recorded at this station tonight after these offers were made. No payment was taken; please request new offers.", 409);
+  }
+
   // Capacity may have changed since quoting: re-validate against current commitments.
-  const scenario = scenarioFor(deps.station, nightOf);
+  const { scenario, envelope } = await nightContext(deps.db, deps.station, nightOf);
   const committed = await committedPlans(deps.db, deps.station.id, nightOf);
   const plan = { sessionId: "candidate", portId: offer.terms.portId, plugInMs: offer.terms.plugInMs, departMs: offer.terms.departMs, powerW: offer.terms.powerW };
-  if (validatePlans(deps.station, scenario.grid, scenario.forecastBaseLoadW, [...committed, plan]).length > 0) {
+  if (validateWithEnvelope({ station: deps.station, grid: scenario.grid, forecastBaseLoadW: scenario.forecastBaseLoadW, envelope, plans: [...committed, plan] }).length > 0) {
     throw new ServiceError("CAPACITY_CHANGED", "Station capacity changed since this offer was made. Please request new offers.", 409);
   }
 
@@ -138,7 +147,12 @@ export async function acceptOffer(deps: AppDeps, driverSession: string, input: A
           sha256(stateToken),
         ],
       );
-      await appendEvent(q, reservationId, "OFFER_ACCEPTED", "DRIVER", { offerId: offer.offerId, termsHash: recomputed, amountCents: offer.terms.amountCents });
+      await appendEvent(q, reservationId, "OFFER_ACCEPTED", "DRIVER", {
+        offerId: offer.offerId,
+        termsHash: recomputed,
+        amountCents: offer.terms.amountCents,
+        settlementPolicy: settlementPolicyOf(offer.terms),
+      });
       const claimed = await claimOperation(q, reservationId, "CREATE_ORDER", { termsHash: recomputed, amountCents: offer.terms.amountCents, request });
       return (await leaseOperation(q, claimed.op.idempotency_key, deps.now()))!;
     });
@@ -252,12 +266,12 @@ export async function commitCapacityOrVoid(deps: AppDeps, rid: string): Promise<
     await appendEvent(deps.db, rid, "AUTHORIZATION_AFTER_DEADLINE", "APP", { deadline: new Date(approvalDeadlineMs(r.terms)).toISOString() });
     return voidAuthorization(deps, rid, "AUTHORIZATION_AFTER_DEADLINE");
   }
-  const scenario = scenarioFor(deps.station, r.night_of);
+  const { scenario, envelope } = await nightContext(deps.db, deps.station, r.night_of);
   const committed = await deps.db.tx(async (q) => {
     const others = await committedPlans(q, r.station_id, r.night_of, r.id);
-    const violations = validatePlans(deps.station, scenario.grid, scenario.forecastBaseLoadW, [...others, planOf(r)], [
-      { sessionId: r.id, targetBatteryWh: r.terms.targetBatteryWh, efficiencyBp: r.terms.efficiencyBp },
-    ]);
+    const violations = validateWithEnvelope({ station: deps.station, grid: scenario.grid, forecastBaseLoadW: scenario.forecastBaseLoadW, envelope, plans: [...others, planOf(r)],
+      targets: [{ sessionId: r.id, targetBatteryWh: r.terms.targetBatteryWh, efficiencyBp: r.terms.efficiencyBp }],
+    });
     if (violations.length > 0) {
       await appendEvent(q, rid, "CAPACITY_CONFLICT", "APP", { violations: violations.slice(0, 5).map((v) => v.code) });
       return false;

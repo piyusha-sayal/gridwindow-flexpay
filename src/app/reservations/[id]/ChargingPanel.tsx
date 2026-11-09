@@ -1,5 +1,6 @@
 "use client";
 
+import { formatShortfallWh } from "@/components/recoveryCopy";
 import { ServiceBadge } from "@/components/ui";
 import { formatLocalTime } from "@/domain/time";
 import { formatKWh, SLOT_MS } from "@/domain/units";
@@ -39,9 +40,16 @@ export function ChargingPanel({ r, shown, busy, onSimulate }: ChargingPanelProps
           <span className="sr-only">delivered ({pct}%)</span>
         </p>
         {finished && (
-          <strong className={r.simulation!.outcome === "DELIVERED" ? "text-teal-ink" : "text-red"}>{r.simulation!.outcome === "DELIVERED" ? "Delivered" : "Failed: charger outage"}</strong>
+          <strong className={r.simulation!.outcome === "DELIVERED" ? "text-teal-ink" : "text-red"}>
+            {r.simulation!.outcome === "DELIVERED" ? "Delivered" : r.simulation!.outageInjected ? "Failed: charger outage" : "Failed: short of target"}
+          </strong>
         )}
       </div>
+      {finished && r.simulation!.shortfallBatteryMilliWh > 0 && (
+        <p className="text-[14px]">
+          Short of the agreed target by {formatShortfallWh(r.simulation!.shortfallBatteryMilliWh)} (SYNTHETIC ledger, actual delivery, not the forecast).
+        </p>
+      )}
 
       <Battery pct={pct} />
 

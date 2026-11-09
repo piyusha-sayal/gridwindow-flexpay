@@ -54,6 +54,9 @@ function session(over: Partial<DashboardSession>): DashboardSession {
     lastEvent: null,
     updatedAt: "",
     providerCapturedCents: null,
+    operatorResolutionRequired: false,
+    resolutionDeadline: null,
+    resolutionOverdue: false,
     ...over,
   };
 }

@@ -3,9 +3,19 @@ import { SLOT_MS } from "./units";
 
 export const TERMS_VERSION = "gw-terms-v1";
 
+/** Settlement policy for operator-attributable service failure, carried in the hashed terms of new agreements. */
+export const SETTLEMENT_POLICY_V1 = "OPERATOR_FAILURE_FULL_VOID_V1";
+export type SettlementPolicyVersion = typeof SETTLEMENT_POLICY_V1;
+/** Agreements stored without the field (before the policy existed) keep the legacy rules. */
+export type SettlementPolicy = SettlementPolicyVersion | "LEGACY";
+export const SETTLEMENT_POLICY_TEXT =
+  "An operator-attributable, unrecoverable failure to deliver the agreed energy by the deadline is eligible for a FULL authorization void and ZERO customer charge. This may include partial physical energy delivery.";
+
 /** Immutable, hashable terms the driver approves. Server recomputes and compares before any payment call. */
 export interface OfferTerms {
   version: typeof TERMS_VERSION;
+  /** Absent on agreements made before the policy existed; see settlementPolicyOf. */
+  settlementPolicy?: SettlementPolicyVersion;
   quoteSetId: string;
   offerId: string;
   stationId: string;
@@ -37,6 +47,10 @@ function canonicalize(value: unknown): unknown {
 
 export function canonicalJson(value: unknown): string {
   return JSON.stringify(canonicalize(value));
+}
+
+export function settlementPolicyOf(terms: Pick<OfferTerms, "settlementPolicy">): SettlementPolicy {
+  return terms.settlementPolicy ?? "LEGACY";
 }
 
 export function termsHash(terms: OfferTerms): string {

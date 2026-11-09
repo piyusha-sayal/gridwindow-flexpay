@@ -3,6 +3,7 @@
 import { Alert } from "@/components/ui";
 import type { PricedOffer, QuoteSet } from "@/domain/quotes";
 import { formatLocalTime } from "@/domain/time";
+import { SETTLEMENT_POLICY_TEXT } from "@/domain/terms";
 import { formatKWh, formatUsd } from "@/domain/units";
 import type { DriverConfig } from "./driverTypes";
 import { ExpiryChip } from "./OffersStep";
@@ -38,7 +39,7 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
   const flow: { when: string; what: string; rule: string }[] = [
     { when: "Now", what: "Authorize. The amount is held, not collected.", rule: "border-amber" },
     { when: chargeWindow, what: "Charge. Your car stays plugged in.", rule: "border-amber" },
-    { when: "After delivery", what: "Capture if delivered, otherwise void.", rule: "border-teal" },
+    { when: "After delivery", what: "Captured once the agreed energy is delivered. If the operator fails to deliver, voided.", rule: "border-teal" },
   ];
 
   return (
@@ -103,6 +104,16 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
         </ol>
       </section>
 
+      <section aria-labelledby="failure-policy" className="space-y-2">
+        <h2 id="failure-policy" className="meta">
+          If charging fails
+        </h2>
+        <p className="text-[14px] text-text-2">{SETTLEMENT_POLICY_TEXT}</p>
+        <p className="text-[14px] text-text-2">
+          Other outcomes, such as an early departure you request or unclear delivery records, are not voided automatically. The operator resolves them, and nothing is captured automatically.
+        </p>
+      </section>
+
       <details className="text-[14px]">
         <summary className="cursor-pointer text-text-2">Terms fingerprint</summary>
         <p className="mt-2 font-mono text-[12px] text-muted break-all">SHA-256 {offer.termsHash}</p>
@@ -120,7 +131,7 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
         <span className="text-[15px]">
           I approve <strong>{formatUsd(offer.priceCents)}</strong> for at least {formatKWh(quote.request.targetBatteryWh)} delivered to my battery on port {port} before{" "}
           {formatLocalTime(quote.request.departMs, tz)}. {providerName} will
-          <strong> authorize</strong> this amount now; it is <strong>captured only if the energy is delivered</strong>, otherwise the authorization is voided.
+          <strong> authorize</strong> this amount now; it is <strong>captured only if the energy is delivered</strong>. If the operator cannot deliver, the authorization is voided and nothing is charged.
         </span>
       </label>
 

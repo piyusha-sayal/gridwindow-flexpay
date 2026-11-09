@@ -2,6 +2,10 @@
  * Synthetic delivery → exactly one settlement: capture on verified delivery, void on failure.
  * Capture-after-void is prevented by state CAS + a unique settlement-operation index.
  */
+import { effectiveDepartMs, validateWithEnvelope } from "@/domain/disturbance";
+import { captureOrVoidFor } from "@/domain/deliveredEnergy";
+import { OPERATOR_RESOLUTION_WINDOW_MS } from "@/domain/outdatedSession";
+import { SETTLEMENT_POLICY_V1, settlementPolicyOf } from "@/domain/terms";
 import { simulateSession, type SimulationFaults } from "@/domain/simulator";
 import { ProviderError } from "@/payments/gateway";
 import { ServiceError, type AppDeps } from "../deps";
@@ -9,17 +13,19 @@ import {
   appendEvent,
   claimOperation,
   committedPlans,
+  effectivePowerOf,
   finishOperation,
   getReservation,
   leaseOperation,
   patchReservation,
+  planOf,
   providerSource,
   recordProof,
   SettlementConflictError,
   transitionPayment,
   type ReservationRow,
 } from "../repo";
-import { scenarioFor } from "./quoteService";
+import { nightContext } from "./scheduleService";
 import { reconcileReservation, truthFromCapture } from "./reconcileService";
 
 export const HONOR_PERIOD_MS = 3 * 86_400_000;
@@ -42,18 +48,31 @@ export async function runSimulation(deps: AppDeps, rid: string, actor: Simulatio
     throw new ServiceError("AUTHORIZATION_EXPIRED", "The authorization has expired; routed to reconciliation.", 409);
   }
 
-  const scenario = scenarioFor(deps.station, r.night_of);
+  const { scenario, envelope } = await nightContext(deps.db, deps.station, r.night_of);
+  const powerW = await effectivePowerOf(deps.db, r);
   const others = await committedPlans(deps.db, r.station_id, r.night_of, r.id);
+  // A disturbance that the current schedule violates must be recovered before charging is replayed.
+  const own = { ...planOf(r, powerW), departMs: effectiveDepartMs(envelope, r.id, r.terms.departMs) };
+  const outdated = validateWithEnvelope({
+    station: deps.station,
+    grid: scenario.grid,
+    forecastBaseLoadW: scenario.forecastBaseLoadW,
+    envelope,
+    plans: [...others, own],
+    targets: [{ sessionId: r.id, targetBatteryWh: r.terms.targetBatteryWh, efficiencyBp: r.terms.efficiencyBp }],
+  }).some((v) => v.sessionId === r.id);
+  if (outdated) throw new ServiceError("PLAN_OUTDATED", "A recorded disruption affects this schedule. A valid recovery must be committed before charging can be simulated.", 409);
   const otherW = Array.from({ length: scenario.grid.slotCount }, (_, i) => others.reduce((sum, p) => sum + (p.powerW[i] ?? 0), 0));
   const result = simulateSession({
     station: deps.station,
     grid: scenario.grid,
-    powerW: r.terms.powerW,
+    powerW,
     actualBaseLoadW: scenario.actualBaseLoadW,
     otherSessionsW: otherW,
     targetBatteryWh: r.terms.targetBatteryWh,
     efficiencyBp: r.terms.efficiencyBp,
     faults,
+    siteCapW: envelope.siteCapW,
   });
 
   const runId = deps.newId("run");
@@ -86,17 +105,45 @@ export async function runSimulation(deps: AppDeps, rid: string, actor: Simulatio
   if (r.authorized_at && deps.now() - r.authorized_at.getTime() > HONOR_PERIOD_MS) {
     await appendEvent(deps.db, rid, "HONOR_PERIOD_ELAPSED", "APP", { note: "Capture after the 3-day honor period may be declined by the provider." });
   }
-  return result.outcome === "DELIVERED" ? captureAuthorization(deps, rid) : voidAuthorization(deps, rid, "SERVICE_FAILED");
+  return settleFromLedger(deps, r, result.deliveredBatteryMilliWh, Boolean(faults.outage));
+}
+
+/**
+ * Capture when the ledger delivered the agreed energy. A shortfall voids automatically only when it is conclusively
+ * operator-attributable: on an agreement under the full-void policy that means an operator-injected charger outage.
+ * Any other shortfall (for example forecast error) is not attributed, so it is flagged for the operator with a stored
+ * resolution deadline and no money moves. Agreements made before the policy keep the earlier rule (void on shortfall).
+ */
+async function settleFromLedger(deps: AppDeps, r: ReservationRow, deliveredMilliWh: number, outageInjected: boolean): Promise<ReservationRow> {
+  if (captureOrVoidFor(r.terms.targetBatteryWh, deliveredMilliWh) === "CAPTURE") return captureAuthorization(deps, r.id);
+  if (settlementPolicyOf(r.terms) === SETTLEMENT_POLICY_V1 && !outageInjected) {
+    await deps.db.tx(async (q) => {
+      const open = await q.query("select 1 from events where reservation_id = $1 and type = 'OPERATOR_RESOLUTION_REQUIRED' limit 1", [r.id]);
+      if (open.length > 0) return;
+      await appendEvent(q, r.id, "OPERATOR_RESOLUTION_REQUIRED", "APP", {
+        basis: "ATTRIBUTION_UNKNOWN",
+        deliveredBatteryMilliWh: deliveredMilliWh,
+        resolveBy: new Date(deps.now() + OPERATOR_RESOLUTION_WINDOW_MS).toISOString(),
+        reason: "Delivered energy fell short of the agreed target without a confirmed operator-attributable failure, so no money moves automatically. An operator must decide.",
+      });
+    }, `outdated:${r.id}`);
+    return (await getReservation(deps.db, r.id))!;
+  }
+  return voidAuthorization(deps, r.id, "SERVICE_FAILED");
 }
 
 /** Completes capture/void for a reservation whose synthetic run is recorded but not yet settled. */
 export async function settleFromExistingRun(deps: AppDeps, rid: string): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;
   if (r.payment_state !== "AUTHORIZED") return r;
-  const runs = await deps.db.query<{ outcome: "DELIVERED" | "FAILED" }>("select outcome from simulation_runs where reservation_id = $1", [rid]);
+  const runs = await deps.db.query<{ delivered_battery_mwh: number; faults: { outage?: unknown } | null }>(
+    "select delivered_battery_mwh, faults from simulation_runs where reservation_id = $1",
+    [rid],
+  );
   const run = runs[0];
   if (!run) return r;
-  return run.outcome === "DELIVERED" ? captureAuthorization(deps, rid) : voidAuthorization(deps, rid, "SERVICE_FAILED");
+  // The ledger's delivered energy decides against the accepted target; a stored label or forecast never does.
+  return settleFromLedger(deps, r, run.delivered_battery_mwh, Boolean(run.faults?.outage));
 }
 
 async function handleSettlementError(deps: AppDeps, rid: string, key: string, err: unknown, event: string): Promise<ReservationRow> {

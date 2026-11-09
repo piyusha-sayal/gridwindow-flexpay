@@ -13,6 +13,8 @@ import { createLlm } from "./ai/llmFactory";
 import type { StructuredLlm } from "./ai/llm";
 import { assertReplayWindowWithinRetention } from "./services/orderCreationService";
 import { recoverPendingReservations } from "./services/recoveryService";
+import { LEASE_MS, resumeStuckRuns } from "./services/recoveryOrchestrator";
+import { OUTDATED_SWEEP_INTERVAL_MS, resolveOutdatedSessions } from "./services/outdatedSessionService";
 
 interface Runtime {
   env: AppEnv;
@@ -55,19 +57,28 @@ async function init(): Promise<Runtime> {
     db,
     gateway: buildGateway(env, db),
     station: DEMO_STATION,
-    economics: SYNTHETIC_ECONOMICS,
+    economics: { ...SYNTHETIC_ECONOMICS, failedServiceRemedyCents: env.FAILED_SERVICE_REMEDY_CENTS },
     now: () => Date.now(),
     newId: randomId,
     baseUrl: env.APP_BASE_URL.replace(/\/$/, ""),
     merchantRef: env.PAYMENT_MODE === "paypal_sandbox" ? "paypal-sandbox-merchant" : "mock-merchant",
     expectedMerchantId: env.PAYMENT_MODE === "paypal_sandbox" ? env.PAYPAL_EXPECTED_MERCHANT_ID : null,
     quoteTtlMs: 10 * 60_000,
+    llm: createLlm(env)?.llm ?? null,
   };
   assertReplayWindowWithinRetention(deps.quoteTtlMs);
   // Finish work interrupted by the previous process (crash mid-checkout, lost provider response, pending capture).
   void recoverPendingReservations(deps).catch((err: unknown) => console.warn("[gridwindow] startup recovery sweep failed", err instanceof Error ? err.name : "UNKNOWN"));
-  const configured = createLlm(env);
-  const llm = configured?.llm ?? null;
+  // Recovery runs left by a previous process resume once their lease has expired.
+  const resumeRecoveryRuns = () => resumeStuckRuns(deps).catch((err: unknown) => console.warn("[gridwindow] recovery resume sweep failed", err instanceof Error ? err.name : "UNKNOWN"));
+  void resumeRecoveryRuns();
+  setTimeout(() => void resumeRecoveryRuns(), LEASE_MS + 1_000).unref();
+  // Sessions a disturbance made unschedulable are settled or escalated at boot and then periodically; each pass is idempotent.
+  const resolveOutdated = () =>
+    resolveOutdatedSessions(deps).catch((err: unknown) => console.warn("[gridwindow] outdated session sweep failed", err instanceof Error ? err.name : "UNKNOWN"));
+  void resolveOutdated();
+  setInterval(() => void resolveOutdated(), OUTDATED_SWEEP_INTERVAL_MS).unref();
+  const llm = deps.llm ?? null;
   if (!llm) console.warn("[gridwindow] no GEMINI_API_KEY or ANTHROPIC_API_KEY (or AI_PROVIDER mismatch); AI assistant runs in deterministic fallback mode.");
   return { env, deps, llm, sessionKey: createHash("sha256").update(`gw-session:${secret}`).digest(), operatorPassHash };
 }

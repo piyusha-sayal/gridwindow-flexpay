@@ -11,6 +11,8 @@ import type { ReservationView } from "@/server/services/viewService";
 import { AskAssistant } from "./AskAssistant";
 import { ChargingPanel } from "./ChargingPanel";
 import { PaymentPanel } from "./PaymentPanel";
+import { RecoveryConsent } from "./RecoveryConsent";
+import { RecoveryStatus } from "./RecoveryStatus";
 
 const POLL_STATES = new Set(["QUOTE_ACCEPTED", "BUYER_APPROVED", "CAPTURE_PENDING", "NEEDS_RECONCILIATION"]);
 
@@ -108,6 +110,11 @@ export function ReservationStatus({ id }: { id: string }) {
       </header>
 
       {error && <Alert tone="danger">{error}</Alert>}
+
+      <div className="no-print">
+        <RecoveryConsent r={r} onChanged={() => void load()} />
+        {r.recovery && <RecoveryStatus recovery={r.recovery} />}
+      </div>
 
       <div className="grid gap-5 min-[900px]:grid-cols-2 no-print">
         <ChargingPanel r={r} shown={shown} busy={busy} onSimulate={simulate} />

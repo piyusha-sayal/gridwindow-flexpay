@@ -46,7 +46,11 @@ export function PaymentPanel({ r }: { r: ReservationView }) {
 
       <div className={`rounded-[var(--r-card-sm)] p-4 tone-${copy.tone}`} aria-live="polite">
         <p className="font-semibold">{copy.title}</p>
-        <p className="mt-1 text-[14px]">{r.serviceState === "FAILED" && r.paymentState === "VOIDED" && !hasUnreconciledCapture(r) ? "Charging failed (synthetic charger outage), so the authorization was voided." : copy.body}</p>
+        <p className="mt-1 text-[14px]">{r.serviceState === "FAILED" && r.paymentState === "VOIDED" && !hasUnreconciledCapture(r)
+  ? r.simulation && !r.simulation.outageInjected && r.simulation.shortfallBatteryMilliWh > 0
+    ? "Charging delivered less than the agreed energy (synthetic ledger), so the authorization was voided."
+    : "Charging failed (synthetic charger outage), so the authorization was voided."
+  : copy.body}</p>
       </div>
 
       <ol className="space-y-0" aria-label="Payment steps">

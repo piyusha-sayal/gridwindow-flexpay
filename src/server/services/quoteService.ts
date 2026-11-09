@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { generateQuote, type QuoteSet } from "@/domain/quotes";
+import { generateQuote, type PricedOffer, type QuoteSet } from "@/domain/quotes";
+import { buildEnvelope, violationsIntroducedBy, type DisturbanceRecord } from "@/domain/disturbance";
 import { allocationContext, buildNightScenario, FORECAST_LABEL, type NightScenario } from "@/domain/scenario";
-import type { ChargeRequest, StationConfig } from "@/domain/station";
+import type { ChargeRequest, SessionPlan, StationConfig } from "@/domain/station";
 import { addLocalDays, localParts, parseLocalDate, zonedTimeToUtc } from "@/domain/time";
-import { committedPlans } from "../repo";
+import { committedPlans, digestOfEventIds, nightDisturbances } from "../repo";
 import { ServiceError, type AppDeps } from "../deps";
 
 /** Charging efficiency is a server-side assumption, never client supplied. */
@@ -116,6 +117,30 @@ export function toChargeRequest(station: StationConfig, input: QuoteRequestInput
   };
 }
 
+/**
+ * Drops offers the disturbed envelope cannot carry, and says why in `rejected`. Returns the quote unchanged when the
+ * night has no disturbance, so undisturbed quotes are exactly as before.
+ */
+function offersUnderEnvelope(station: StationConfig, scenario: NightScenario, committed: SessionPlan[], records: DisturbanceRecord[], request: ChargeRequest, quote: QuoteSet): QuoteSet {
+  if (records.length === 0) return quote;
+  const envelope = buildEnvelope(station, scenario.grid, records);
+  const offers: PricedOffer[] = [];
+  const rejected = [...quote.rejected];
+  for (const offer of quote.offers) {
+    const problems = violationsIntroducedBy({
+      station,
+      grid: scenario.grid,
+      forecastBaseLoadW: scenario.forecastBaseLoadW,
+      envelope,
+      committed,
+      candidate: { sessionId: offer.offerId, portId: request.portId, plugInMs: request.plugInMs, departMs: request.departMs, powerW: offer.powerW },
+    });
+    if (problems.length === 0) offers.push(offer);
+    else rejected.push({ kind: offer.kind, reason: "A disturbance recorded at this station tonight means this option can no longer be delivered." });
+  }
+  return { ...quote, offers, rejected };
+}
+
 export async function createQuote(deps: AppDeps, driverSession: string, input: QuoteRequestInput): Promise<QuoteSet> {
   const nowMs = deps.now();
   const request = toChargeRequest(deps.station, input);
@@ -124,6 +149,7 @@ export async function createQuote(deps: AppDeps, driverSession: string, input: Q
   if (request.plugInMs < nowMs) throw new ServiceError("PLUG_IN_PASSED", `Plug-in time has already passed. Choose ${driverDefaultWindow(deps.station, nowMs).plugInLocal} or later.`);
   const scenario = scenarioFor(deps.station, input.nightOf);
   const committed = await committedPlans(deps.db, deps.station.id, input.nightOf);
+  const disturbed = await nightDisturbances(deps.db, deps.station.id, input.nightOf);
   const quoteSetId = deps.newId("qs");
   const priced = generateQuote({
     ctx: allocationContext(deps.station, scenario, committed),
@@ -135,7 +161,8 @@ export async function createQuote(deps: AppDeps, driverSession: string, input: Q
     ttlMs: deps.quoteTtlMs,
     forecastLabel: FORECAST_LABEL,
   });
-  const quote: QuoteSet = { ...priced, requiredMinSavingsCents: input.requiredMinSavingsCents ?? null };
+  const envelopeChecked = offersUnderEnvelope(deps.station, scenario, committed, disturbed.records, request, priced);
+  const quote: QuoteSet = { ...envelopeChecked, requiredMinSavingsCents: input.requiredMinSavingsCents ?? null, disturbanceDigest: digestOfEventIds(disturbed.eventIds) };
   await deps.db.query(
     "insert into quote_sets (id, driver_session, station_id, night_of, created_at, expires_at, payload) values ($1, $2, $3, $4, $5, $6, $7)",
     [quoteSetId, driverSession, deps.station.id, input.nightOf, new Date(nowMs).toISOString(), new Date(quote.expiresAtMs).toISOString(), JSON.stringify(quote)],

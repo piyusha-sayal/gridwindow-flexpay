@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SYNTHETIC_ECONOMICS } from "@/domain/economics";
 
 /**
  * Process configuration. Fails closed: any PAYPAL_ENV other than "sandbox" aborts,
@@ -28,8 +29,18 @@ const schema = z
     /** Set by automated test runners: forbids any hosted database URL (see runtime.openDb). */
     GW_ISOLATED_DB: z.enum(["true"]).optional(),
     DEMO_TOOLS: z.enum(["true", "false"]).optional(),
+    /** MODELED operator cost per voided session (whole cents, 0 or more). An assumption, not a customer fee. */
+    FAILED_SERVICE_REMEDY_CENTS: z
+      .string()
+      .regex(/^(0|[1-9]\d{0,5})$/, "FAILED_SERVICE_REMEDY_CENTS must be a whole number of cents, 0 or more")
+      .optional(),
   })
-  .transform((e) => ({ ...e, PAYPAL_ENV: e.PAYPAL_ENV?.trim() || undefined }));
+  .transform((e) => ({
+    ...e,
+    PAYPAL_ENV: e.PAYPAL_ENV?.trim() || undefined,
+    /** Default: the SYNTHETIC_ECONOMICS remedy assumption (200 cents). */
+    FAILED_SERVICE_REMEDY_CENTS: e.FAILED_SERVICE_REMEDY_CENTS === undefined ? SYNTHETIC_ECONOMICS.failedServiceRemedyCents : Number(e.FAILED_SERVICE_REMEDY_CENTS),
+  }));
 
 export type AppEnv = z.infer<typeof schema>;
 

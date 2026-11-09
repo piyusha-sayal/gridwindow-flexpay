@@ -16,6 +16,8 @@ export interface EconomicsConfig {
   driverShareBp: number;
   minDriverDiscountCents: number;
   minOperatorImprovementCents: number;
+  /** MODELED: operator cost of remedying one failed session (dispatch, attendant, goodwill). Not measured. */
+  failedServiceRemedyCents: number;
 }
 
 export const SYNTHETIC_ECONOMICS: EconomicsConfig = {
@@ -27,6 +29,7 @@ export const SYNTHETIC_ECONOMICS: EconomicsConfig = {
   driverShareBp: 5_000,
   minDriverDiscountCents: 25,
   minOperatorImprovementCents: 1,
+  failedServiceRemedyCents: 200,
 };
 
 export function microcentsToCentsCeil(microcents: number): number {

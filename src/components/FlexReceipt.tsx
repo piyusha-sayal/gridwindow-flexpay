@@ -3,6 +3,8 @@ import { economicOutcome } from "@/domain/paymentState";
 import { formatLocalTime } from "@/domain/time";
 import { formatKWh, formatUsd } from "@/domain/units";
 import type { ReservationView } from "@/server/services/viewService";
+import { formatShortfallWh } from "./recoveryCopy";
+import { RecoveryDetails } from "./RecoveryDetails";
 import { Badge } from "./ui";
 
 /** Settlement line shown at the top of the receipt; only a provider-confirmed capture reads as paid. */
@@ -85,7 +87,10 @@ function deliveredLine(r: ReservationView): string {
   const sim = r.simulation;
   if (!sim) return "Not delivered (no charging run)";
   const kwh = formatKWh(Math.floor(sim.deliveredBatteryMilliWh / 1000));
-  return sim.outcome === "DELIVERED" ? `${kwh} (simulated)` : `${kwh}, charging failed (simulated)`;
+  if (sim.outcome === "DELIVERED") return `${kwh} (simulated)`;
+  return sim.shortfallBatteryMilliWh > 0
+    ? `${kwh}, ${formatShortfallWh(sim.shortfallBatteryMilliWh)} short of target (simulated)`
+    : `${kwh}, charging failed (simulated)`;
 }
 
 const SETTLEMENT_TONE = { success: "text-teal-ink", neutral: "text-ink", warn: "text-[var(--amber-ink)]", danger: "text-red" } as const;
@@ -173,6 +178,10 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
                 <Row k="Outcome" v={sim.outcome} />
                 <Row k="Delivered to battery" v={formatKWh(Math.floor(sim.deliveredBatteryMilliWh / 1000))} />
                 <Row k="Target" v={formatKWh(Math.floor(sim.targetBatteryMilliWh / 1000))} />
+                <Row
+                  k="Shortfall vs target"
+                  v={sim.shortfallBatteryMilliWh > 0 ? `${formatShortfallWh(sim.shortfallBatteryMilliWh)} short (SYNTHETIC ledger)` : "None, target met (SYNTHETIC ledger)"}
+                />
                 <Row k="Energy records" v={`${sim.records.length} × 15 min, source SYNTHETIC`} />
                 <Row k="Triggered by" v={sim.triggeredBy} />
               </dl>
@@ -209,6 +218,11 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
               </li>
             </ul>
           </Section>
+          {r.recovery && (
+            <Section title="Autonomous recovery (SYNTHETIC disturbance)">
+              <RecoveryDetails recovery={r.recovery} timeZone={r.timeZone} />
+            </Section>
+          )}
           <Section title={`Event trail (${r.events.length})`}>
             <ol className="space-y-0.5 font-mono text-[11px] text-muted tabular [overflow-wrap:anywhere]">
               {r.events.map((e, i) => (

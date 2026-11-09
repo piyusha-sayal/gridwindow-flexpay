@@ -10,6 +10,7 @@ import { DetailPanel } from "./DetailPanel";
 import { LoadPanel } from "./LoadPanel";
 import { NightKpis } from "./NightKpis";
 import { PortTimeline } from "./PortTimeline";
+import { RecoveryPanel } from "./RecoveryPanel";
 import { ReservationTable, type OperatorAction } from "./ReservationTable";
 
 export function OperatorConsole() {
@@ -206,6 +207,9 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
           <button type="submit" className="btn btn-primary">
             Load
           </button>
+          <Link href="/operator/schedule" className="btn">
+            Schedule view
+          </Link>
           <button type="button" className="btn" onClick={onSignOut}>
             Sign out
           </button>
@@ -235,6 +239,7 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
         </>
       )}
       <LoadPanel d={d} />
+      <RecoveryPanel nightOf={d.nightOf} />
       {selectedId && <DetailPanel id={selectedId} version={version} onClose={() => setSelectedId(null)} />}
       {toast && (
         <div

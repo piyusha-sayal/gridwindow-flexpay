@@ -3,6 +3,8 @@ import { assertTransition, type PaymentState, type ProofType, type ServiceState 
 import type { SessionPlan } from "@/domain/station";
 import type { OfferTerms } from "@/domain/terms";
 import type { ProviderMode } from "@/payments/gateway";
+import { createHash } from "node:crypto";
+import type { DisturbanceRecord, DisturbanceType } from "@/domain/disturbance";
 import type { Queryable } from "./db/client";
 
 export interface ReservationRow {
@@ -56,17 +58,36 @@ export async function getReservationByOffer(q: Queryable, offerId: string): Prom
   return rows[0] ?? null;
 }
 
-export function planOf(r: Pick<ReservationRow, "id" | "port_id" | "terms">): SessionPlan {
-  return { sessionId: r.id, portId: r.port_id, plugInMs: r.terms.plugInMs, departMs: r.terms.departMs, powerW: r.terms.powerW };
+/** A session's plan. `powerW` is the effective (latest committed) schedule; it defaults to the agreed terms. */
+export function planOf(r: Pick<ReservationRow, "id" | "port_id" | "terms">, powerW: readonly number[] = r.terms.powerW): SessionPlan {
+  return { sessionId: r.id, portId: r.port_id, plugInMs: r.terms.plugInMs, departMs: r.terms.departMs, powerW };
 }
 
-/** Sessions currently holding station capacity (and port occupancy) for a night. */
+/** Latest committed schedule per reservation on a night (reservations without a recovery are absent). */
+export async function latestSchedulesOf(q: Queryable, stationId: string, nightOf: string): Promise<Map<string, number[]>> {
+  const rows = await q.query<{ reservation_id: string; power_w: number[] }>(
+    `select distinct on (v.reservation_id) v.reservation_id, v.power_w from schedule_versions v
+     join reservations r on r.id = v.reservation_id where r.station_id = $1 and r.night_of = $2
+     order by v.reservation_id, v.version desc`,
+    [stationId, nightOf],
+  );
+  return new Map(rows.map((row) => [row.reservation_id, row.power_w]));
+}
+
+/** Effective per-slot plan of one reservation: its latest schedule version, or the agreed terms if none. */
+export async function effectivePowerOf(q: Queryable, r: Pick<ReservationRow, "id" | "terms">): Promise<number[]> {
+  const rows = await q.query<{ power_w: number[] }>("select power_w from schedule_versions where reservation_id = $1 order by version desc limit 1", [r.id]);
+  return rows[0]?.power_w ?? r.terms.powerW;
+}
+
+/** Sessions currently holding station capacity (and port occupancy) for a night, at their effective plans. */
 export async function committedPlans(q: Queryable, stationId: string, nightOf: string, excludeId?: string): Promise<SessionPlan[]> {
   const rows = await q.query<ReservationRow>(
     "select id, port_id, terms from reservations where station_id = $1 and night_of = $2 and slots_committed = true and ($3::text is null or id <> $3) order by created_at, id",
     [stationId, nightOf, excludeId ?? null],
   );
-  return rows.map(planOf);
+  const latest = await latestSchedulesOf(q, stationId, nightOf);
+  return rows.map((r) => planOf(r, latest.get(r.id) ?? r.terms.powerW));
 }
 
 export async function appendEvent(q: Queryable, reservationId: string | null, type: string, source: EventSource, payload: Record<string, unknown> = {}): Promise<void> {
@@ -194,4 +215,27 @@ export async function finishOperation(q: Queryable, key: string, status: Exclude
      where idempotency_key = $1`,
     [key, status, providerRef, errorCode],
   );
+}
+
+/** Recorded disturbances for one station-night, in the order the envelope applies them. */
+export interface NightDisturbances {
+  eventIds: string[];
+  records: DisturbanceRecord[];
+}
+
+export async function nightDisturbances(q: Queryable, stationId: string, nightOf: string): Promise<NightDisturbances> {
+  const rows = await q.query<{ event_id: string; reservation_id: string; port_id: string; type: DisturbanceType; params: Record<string, number>; effective_slot: number }>(
+    `select d.event_id, d.reservation_id, r.port_id, d.type, d.params, d.effective_slot from disruption_events d
+     join reservations r on r.id = d.reservation_id where r.station_id = $1 and r.night_of = $2 order by d.created_at, d.event_id`,
+    [stationId, nightOf],
+  );
+  return {
+    eventIds: rows.map((row) => row.event_id),
+    records: rows.map((row) => ({ reservationId: row.reservation_id, portId: row.port_id, type: row.type, effectiveSlot: row.effective_slot, params: row.params })),
+  };
+}
+
+/** Identity of the disturbance set a quote was priced against. Equal digests mean the same station snapshot. */
+export function digestOfEventIds(eventIds: readonly string[]): string {
+  return createHash("sha256").update([...eventIds].sort().join(",")).digest("hex");
 }

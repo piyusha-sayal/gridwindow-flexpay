@@ -119,6 +119,7 @@ function Row({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps)
         <PaymentBadge state={s.paymentState} />
         <code className="block meta mt-0.5">{s.paymentState}</code>
         {hasCaptureConflict(s) && <span className="block meta mt-0.5 text-[var(--amber-ink)]">Provider captured. Reconcile</span>}
+        <ResolutionNote s={s} timeZone={d.timeZone} />
       </td>
       <td className="py-3">
         <Actions s={s} mock={mock} busy={busy} working={working} onAct={onAct} />
@@ -154,6 +155,7 @@ function Card({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps
         <CardField label="Payment" wide>
           <PaymentBadge state={s.paymentState} />
           <code className="block text-xs text-muted mt-0.5">{s.paymentState}</code>
+          <ResolutionNote s={s} timeZone={d.timeZone} />
         </CardField>
       </dl>
       <Actions s={s} mock={mock} busy={busy} working={working} onAct={onAct} />
@@ -223,3 +225,16 @@ function Actions({ s, mock, busy, working, onAct }: Pick<RowProps, "s" | "mock" 
 }
 
 const shortId = (id: string) => `…${id.slice(-6)}`;
+
+/** Plain-text operator deadline in station time, e.g. "Resolve by 14:30 (overdue)". Null when no flag is open. */
+export function resolutionText(s: Pick<DashboardSession, "operatorResolutionRequired" | "resolutionDeadline" | "resolutionOverdue">, timeZone: string): string | null {
+  if (!s.operatorResolutionRequired || !s.resolutionDeadline) return s.operatorResolutionRequired ? "Operator decision required" : null;
+  const time = formatLocalTime(Date.parse(s.resolutionDeadline), timeZone);
+  return `Resolve by ${time}${s.resolutionOverdue ? " (overdue)" : ""}`;
+}
+
+function ResolutionNote({ s, timeZone }: { s: DashboardSession; timeZone: string }) {
+  const text = resolutionText(s, timeZone);
+  if (!text) return null;
+  return <span className={`block meta mt-0.5 ${s.resolutionOverdue ? "text-[var(--amber-ink)] font-semibold" : ""}`}>{text}</span>;
+}

@@ -40,6 +40,8 @@ export interface SimulationInput {
   targetBatteryWh: number;
   efficiencyBp: number;
   faults: SimulationFaults;
+  /** Aggregate cap per slot (W); defaults to station.stationCapW. */
+  siteCapW?: readonly number[];
 }
 
 export function simulateSession(input: SimulationInput): SimulationResult {
@@ -50,7 +52,7 @@ export function simulateSession(input: SimulationInput): SimulationResult {
     const commandedW = input.powerW[i] ?? 0;
     if (commandedW === 0) continue;
     const inOutage = faults.outage !== undefined && i >= faults.outage.fromSlot && i < faults.outage.toSlot;
-    const siteRoom = station.stationCapW - (input.actualBaseLoadW[i] ?? 0) - (input.otherSessionsW[i] ?? 0);
+    const siteRoom = (input.siteCapW?.[i] ?? station.stationCapW) - (input.actualBaseLoadW[i] ?? 0) - (input.otherSessionsW[i] ?? 0);
     const roomW = Math.max(0, Math.floor(siteRoom / POWER_GRANULARITY_W) * POWER_GRANULARITY_W);
     const deliveredW = inOutage ? 0 : Math.min(commandedW, roomW);
     const gridWh = deliveredW / SLOTS_PER_HOUR;

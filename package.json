@@ -18,6 +18,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "benchmark": "tsx scripts/benchmark.ts",
+    "benchmark:recovery": "tsx scripts/recovery-benchmark.ts",
     "paypal:smoke": "tsx scripts/paypal-smoke.ts",
     "paypal:order": "tsx scripts/paypal-order-status.ts",
     "ai:smoke": "tsx scripts/ai-smoke.ts",
@@ -26,6 +27,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.133.0",
+    "@bryntum/scheduler-community": "8.0.0",
+    "@bryntum/scheduler-react-community": "8.0.0",
     "@electric-sql/pglite": "0.5.8",
     "@google/genai": "2.32.0",
     "next": "16.4.3",

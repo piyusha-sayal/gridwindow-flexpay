@@ -28,10 +28,10 @@ const SCENARIOS: readonly Scenario[] = [
   },
   {
     id: "C",
-    title: "Failure and recovery",
+    title: "Disturbance and recovery",
     summary: "Port B (7.2 kW), 30 kWh, 19:00 to 07:00.",
     patch: { portId: "port_b", targetBatteryKWh: "30", plugInLocal: "19:00", departLocal: "07:00", spendCap: "20.00", preference: "lowest_cost", minSavings: "", minSavingsRequired: false },
-    next: "Approve the offer, then open the Operator Console (passphrase protected), press Inject outage on this reservation and run the night. The authorization is voided and nothing is collected.",
+    next: "Approve the offer and run the synthetic night. Then, in the Operator Console (passphrase protected), record a SYNTHETIC charger power reduction on this session in the Recovery engine. The seven Scenario C steps show the real run, validation, schedule, consent, payment and FlexReceipt state.",
   },
 ];
 

@@ -104,7 +104,7 @@ export async function makeApp(): Promise<TestApp> {
 /** Clears all rows and restores clock and gateway scripting between tests. */
 export async function resetApp(app: TestApp): Promise<void> {
   await app.db.query(
-    "truncate events, energy_records, simulation_runs, webhook_inbox, provider_proofs, payment_operations, reservations, quote_sets, mock_provider_objects restart identity cascade",
+    "truncate events, energy_records, simulation_runs, webhook_inbox, provider_proofs, payment_operations, schedule_versions, recovery_runs, disruption_events, reservations, quote_sets, mock_provider_objects restart identity cascade",
   );
   app.clock.now = START_MS;
   app.gateway.overrides = {};

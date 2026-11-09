@@ -15,6 +15,7 @@ artifacts/qa/
 # Sandbox payment test records (redacted, but never committed)
 artifacts/paypal-smoke*.json
 artifacts/ai-smoke*.json
+artifacts/recovery-live*.json
 artifacts/payment-preflight*.json
 artifacts/scenario-a-certification*.json
 artifacts/scenario-b-certification*.json

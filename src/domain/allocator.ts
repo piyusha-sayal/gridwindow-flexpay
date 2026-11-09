@@ -18,13 +18,23 @@ export interface AllocationContext {
   baseLoadW: readonly number[];
   /** Already committed sessions on this grid. */
   committed: readonly SessionPlan[];
+  /** Aggregate cap per slot (W); defaults to station.stationCapW. Lowered by recorded site-cap disturbances. */
+  siteCapW?: readonly number[];
 }
 
 export type AllocationPolicy =
   | { kind: "immediate" }
   | { kind: "static_offpeak"; startLocalHour: number }
   | { kind: "greedy_tariff" }
-  | { kind: "optimized"; latestEndMs?: number; maxPowerW?: number };
+  | {
+      kind: "optimized";
+      latestEndMs?: number;
+      maxPowerW?: number;
+      /** Earliest slot index the allocation may use (energy before it is already fixed). */
+      minSlot?: number;
+      /** Per-slot port power ceiling (W), e.g. a reduced or failed charger from some slot onward. */
+      slotCapW?: readonly number[];
+    };
 
 export type InfeasibleReason =
   | "INVALID_REQUEST"
@@ -108,6 +118,7 @@ export function allocate(ctx: AllocationContext, req: ChargeRequest, policy: All
   const step = station.powerStepW;
   const endLimit = policy.kind === "optimized" && policy.latestEndMs !== undefined ? Math.min(req.departMs, policy.latestEndMs) : req.departMs;
   let allowed = slotsWithin(grid, req.plugInMs, endLimit);
+  if (policy.kind === "optimized" && policy.minSlot !== undefined) allowed = allowed.filter((i) => i >= policy.minSlot!);
   if (allowed.length === 0) return { ok: false, reason: "OUTSIDE_HORIZON", detail: "no full slot between plug-in and departure" };
   if (policy.kind === "static_offpeak") {
     const startIdx = allowed.find((i) => localParts(slotStartMs(grid, i), grid.timeZone).hour === policy.startLocalHour);
@@ -116,10 +127,13 @@ export function allocate(ctx: AllocationContext, req: ChargeRequest, policy: All
 
   const other = committedLoadW(ctx.committed, grid.slotCount);
   const portCap = Math.min(port.maxPowerW, policy.kind === "optimized" && policy.maxPowerW ? policy.maxPowerW : port.maxPowerW);
+  const slotCap = policy.kind === "optimized" ? policy.slotCapW : undefined;
   const avail = new Array<number>(grid.slotCount).fill(0);
   for (const i of allowed) {
-    const headroom = station.stationCapW - station.safetyHeadroomW - (ctx.baseLoadW[i] ?? 0) - (other[i] ?? 0);
-    avail[i] = Math.max(0, Math.floor(Math.min(portCap, headroom) / step) * step);
+    const siteCap = ctx.siteCapW?.[i] ?? station.stationCapW;
+    const headroom = siteCap - station.safetyHeadroomW - (ctx.baseLoadW[i] ?? 0) - (other[i] ?? 0);
+    const ceiling = Math.min(portCap, headroom, slotCap?.[i] ?? Number.POSITIVE_INFINITY);
+    avail[i] = Math.max(0, Math.floor(ceiling / step) * step);
   }
 
   const needGridWh = requiredGridWh(req.targetBatteryWh, req.efficiencyBp);

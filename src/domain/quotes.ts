@@ -5,7 +5,7 @@
 import { allocate, type AllocationContext, type AllocationPolicy } from "./allocator";
 import { listPriceCents, microcentsToCentsCeil, priceFlexibleOffer, validateOfferEconomics, type Contribution, type EconomicsConfig } from "./economics";
 import type { ChargeRequest } from "./station";
-import { TERMS_VERSION, termsHash, type OfferTerms } from "./terms";
+import { SETTLEMENT_POLICY_V1, TERMS_VERSION, termsHash, type OfferTerms } from "./terms";
 import { slotStartMs } from "./time";
 import { batteryMilliWhFromGridWh, slotGridWh, SLOT_MS } from "./units";
 import { validatePlans } from "./validator";
@@ -63,6 +63,8 @@ export interface QuoteSet {
    * offer that saves less. Absent or null: no mandatory minimum (a preference stays advisory).
    */
   requiredMinSavingsCents?: number | null;
+  /** Digest of the station-night disturbance set this quote was priced against (see repo digestOfEventIds). */
+  disturbanceDigest?: string;
 }
 
 /** Validated saving of an offer, from its hashed terms (never from client or model input). */
@@ -87,7 +89,14 @@ export interface QuoteParams {
   forecastLabel: string;
 }
 
-const VARIANTS: { kind: OfferKind; label: string; policy: (req: ChargeRequest, portMaxW: number, step: number) => AllocationPolicy | null }[] = [
+export interface OfferVariant {
+  kind: OfferKind;
+  label: string;
+  policy: (req: ChargeRequest, portMaxW: number, step: number) => AllocationPolicy | null;
+}
+
+/** Preference presets shared by quoting and charge recovery. */
+export const VARIANTS: OfferVariant[] = [
   { kind: "flex_lowest_cost", label: "Lowest-cost window", policy: () => ({ kind: "optimized" }) },
   {
     kind: "flex_early_finish",
@@ -189,6 +198,7 @@ export function generateQuote(p: QuoteParams): QuoteSet {
     }
     const terms: OfferTerms = {
       version: TERMS_VERSION,
+      settlementPolicy: SETTLEMENT_POLICY_V1,
       quoteSetId: p.quoteSetId,
       offerId,
       stationId: ctx.station.id,

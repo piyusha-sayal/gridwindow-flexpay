@@ -100,6 +100,20 @@ flowchart LR
 
 An authorization is a hold, not escrow. PayPal typically honors it for 3 days and it stays valid for up to 29. The app does not capture after expiry.
 
+## Autonomous Charging Recovery
+
+When a charger is limited, a site cap drops, a driver leaves early or a charger fails, the agreed plan may no longer work. The recovery engine re-plans only that session's remaining energy from the disturbance's effective slot onward. Energy already delivered stays as it was, and the price and other sessions do not change.
+
+- **What it does.** An operator records a synthetic disturbance from `/operator`. The server validates it, then runs one recovery per disturbance. It either commits a new schedule version, asks the driver to approve a change, or reports the physical constraint that blocks every schedule (for example, a failed charger cannot move energy to another port).
+- **Safety model.** Gemini, when configured, selects only among candidates the server has already validated, by server-assigned id. The server owns the schedule and the money. The agent has no payment tools and no price input. Unknown tools, extra arguments and out-of-phase calls are rejected and traced, and a model failure falls back to the deterministic path.
+- **Consent boundary.** Auto-commit only when the forecast plan reaches the agreed battery energy (a planned figure; actual delivery is decided by the synthetic ledger), the price does not rise, the departure does not move later, charging stays inside the plugged-in window, and past energy and other sessions are unchanged. A later finish, an earlier departure or a changed price needs the driver's approval on the reservation page. Approval applies only the exact proposal version, and a stale or expired proposal is refused.
+- **Fencing.** Each run holds a lease. Trace writes and schedule commits are conditional on it, so a stalled or duplicate worker cannot double-commit. Runs are bounded to three attempts.
+- **Outdated sessions and failure policy.** For new agreements the settlement policy is: "An operator-attributable, unrecoverable failure to deliver the agreed energy by the deadline is eligible for a FULL authorization void and ZERO customer charge. This may include partial physical energy delivery." Early departures and non-conclusive outcomes go to operator resolution, and nothing is captured partially or because a deadline passed. Agreements made before this policy keep the earlier rules. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- **Operator schedule.** `/operator/schedule` draws the persisted schedule with Bryntum Scheduler Community 8.0.0. The chart is read-only, and pending proposals appear as a separate lane. The accessible table beside it is the reference view. Bryntum's own grid has known axe findings (see [docs/BRYNTUM_NOTES.md](docs/BRYNTUM_NOTES.md)).
+- **Synthetic disturbance injector.** Disturbances are labeled SYNTHETIC. No real charger or grid is connected.
+- **Benchmark.** `npm run benchmark:recovery` compares leaving the plan unchanged with recovery over 200 seeded nights. It reports unfavorable and infeasible cases alongside the wins. See [docs/RECOVERY_BENCHMARK.md](docs/RECOVERY_BENCHMARK.md). These are modeled numbers, not field measurements.
+- **Limitations.** Recovery plans against forecast base load, and the replay uses realized base load, so a recovered schedule can deliver less than the static plan in some cases. Auto-commit can raise the operator's energy cost against the agreed plan; this is an open decision. Real Gemini recovery decisions and PayPal Sandbox recovery settlement have not been run. The guided demo's "Failure and recovery" scenario still uses the older outage injection (see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)).
+
 ## Architecture
 
 | Layer | Path | Responsibility |
@@ -268,6 +282,10 @@ The benchmark measures how scheduling policies behave under one set of synthetic
 | [docs/PAYPAL_CERTIFICATION.md](docs/PAYPAL_CERTIFICATION.md) | Sandbox and webhook certification procedure |
 | [docs/EXTERNAL_INTEGRATION.md](docs/EXTERNAL_INTEGRATION.md) | Runbook for Sandbox, webhooks and AI smoke tests |
 | [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md) | Third-party package licenses |
+| [docs/RECOVERY_BENCHMARK.md](docs/RECOVERY_BENCHMARK.md) | Synthetic recovery benchmark: static plan vs recovery, with unfavorable and infeasible cases |
+| [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | Under-three-minute walkthrough (MOCK mode) |
+| [docs/AWARD_EVIDENCE.md](docs/AWARD_EVIDENCE.md) | Claims, code locations and verification status for each track |
+| [docs/LICENSE_AND_SECRETS_CHECKLIST.md](docs/LICENSE_AND_SECRETS_CHECKLIST.md) | Bryntum license status and secret scan results |
 | [docs/DEVPOST.md](docs/DEVPOST.md) | Hackathon submission text |
 
 ## Credits and license

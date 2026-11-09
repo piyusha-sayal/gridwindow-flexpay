@@ -10,6 +10,7 @@ Every number below is a **labeled synthetic assumption** used for a sandbox demo
 | Charging efficiency | 92 % (grid kWh = battery kWh / 0.92) |
 | Assumed payment fee | 3.49 % + 49 ¢ (assumption; not a PayPal quote) |
 | Operating cost | 120 ¢ per session |
+| Failed-service remedy cost (MODELED: an operator cost assumption, not a customer fee, not real money, not measured) | 200 ¢ default (`FAILED_SERVICE_REMEDY_CENTS`, whole cents ≥ 0) per void under the operator-failure policy that is confirmed OPERATOR-attributed; recorded as `FAILURE_REMEDY_COST_RECORDED`, not netted into the offer economics. Not recorded for UNKNOWN, EXTERNAL or DRIVER attribution, which never void. Legacy voids keep their earlier record. |
 | Driver share of modeled energy saving | 50 % |
 | Minimum driver discount | 25 ¢ |
 | Minimum operator improvement | 1 ¢ |

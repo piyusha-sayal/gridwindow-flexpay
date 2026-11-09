@@ -3,8 +3,11 @@ import { explainOffer } from "@/domain/explain";
 import type { PaymentState, ServiceState } from "@/domain/paymentState";
 import type { QuoteSet } from "@/domain/quotes";
 import { ServiceError, type AppDeps } from "../deps";
-import { getReservation, type ReservationRow } from "../repo";
+import { effectivePowerOf, getReservation, latestSchedulesOf, type ReservationRow } from "../repo";
+import { latestRunsByReservation, pendingApprovalView, type PendingApprovalView } from "./approvalView";
+import { OPERATOR_RESOLUTION_REQUIRED } from "./outdatedSessionService";
 import { scenarioFor } from "./quoteService";
+import { buildRecoveryReceipt, type RecoveryReceipt } from "./recoveryReceipt";
 
 export function redactRef(ref: string | null): string | null {
   if (!ref) return null;
@@ -65,11 +68,19 @@ export interface ReservationView {
     targetBatteryMilliWh: number;
     triggeredBy: string;
     createdAt: string;
+    /** Synthetic ledger shortfall against the agreed battery target (0 when met). Actual delivery, not the forecast. */
+    shortfallBatteryMilliWh: number;
+    /** Whether the operator injected a synthetic charger outage into this run. */
+    outageInjected: boolean;
     records: EnergyRecordView[];
   };
   events: { type: string; source: string; occurredAt: string }[];
   canSimulate: boolean;
   authorizationExpiresAt: string | null;
+  /** Additive: autonomous recovery data; null when no disturbance was recorded. */
+  recovery: RecoveryReceipt | null;
+  /** Additive: a recovery proposal awaiting this driver's decision; null otherwise. */
+  pendingApproval: PendingApprovalView | null;
 }
 
 async function quotePayload(deps: AppDeps, quoteSetId: string): Promise<QuoteSet> {
@@ -86,7 +97,7 @@ export async function reservationView(deps: AppDeps, rid: string, viewer: { driv
     "select proof_type, provider_ref, provider_status, amount_cents, evidence_source, observed_at from provider_proofs where reservation_id = $1 order by observed_at",
     [rid],
   );
-  const runs = await deps.db.query<{ id: string; outcome: "DELIVERED" | "FAILED"; delivered_battery_mwh: number; target_battery_mwh: number; triggered_by: string; created_at: Date }>(
+  const runs = await deps.db.query<{ id: string; outcome: "DELIVERED" | "FAILED"; delivered_battery_mwh: number; target_battery_mwh: number; triggered_by: string; created_at: Date; faults: { outage?: unknown } }>(
     "select * from simulation_runs where reservation_id = $1",
     [rid],
   );
@@ -114,7 +125,7 @@ export async function reservationView(deps: AppDeps, rid: string, viewer: { driv
     targetBatteryWh: r.terms.targetBatteryWh,
     efficiencyBp: r.terms.efficiencyBp,
     gridStartMs: r.terms.gridStartMs,
-    powerW: r.terms.powerW,
+    powerW: await effectivePowerOf(deps.db, r),
     termsHash: r.terms_hash,
     economics: {
       listPriceCents: r.terms.listPriceCents,
@@ -141,6 +152,8 @@ export async function reservationView(deps: AppDeps, rid: string, viewer: { driv
           outcome: run.outcome,
           deliveredBatteryMilliWh: run.delivered_battery_mwh,
           targetBatteryMilliWh: run.target_battery_mwh,
+          shortfallBatteryMilliWh: Math.max(0, run.target_battery_mwh - run.delivered_battery_mwh),
+          outageInjected: run.faults?.outage !== undefined,
           triggeredBy: run.triggered_by,
           createdAt: run.created_at.toISOString(),
           records: records.map((x) => ({
@@ -156,6 +169,8 @@ export async function reservationView(deps: AppDeps, rid: string, viewer: { driv
     events: events.map((e) => ({ type: e.type, source: e.source, occurredAt: e.occurred_at.toISOString() })),
     canSimulate: !run && r.payment_state === "AUTHORIZED" && r.service_state === "SCHEDULED" && r.slots_committed,
     authorizationExpiresAt: r.authorization_expires_at ? r.authorization_expires_at.toISOString() : null,
+    recovery: await buildRecoveryReceipt(deps, r),
+    pendingApproval: pendingApprovalView(deps, r, await effectivePowerOf(deps.db, r), (await latestRunsByReservation(deps.db, [rid])).get(rid)),
   };
 }
 
@@ -183,6 +198,12 @@ export interface DashboardSession {
   updatedAt: string;
   /** Amount of a provider CAPTURED proof, if any; can exist while the local state disagrees. */
   providerCapturedCents: number | null;
+  /** Additive: a disturbance left this authorized session for operator resolution (no automatic capture or void). */
+  operatorResolutionRequired: boolean;
+  /** Stored resolution deadline (ISO) of the open operator flag; null when no flag or the flag predates deadlines. */
+  resolutionDeadline: string | null;
+  /** True once the stored deadline has passed. Informational only: it never moves money. */
+  resolutionOverdue: boolean;
 }
 
 export interface OperatorDashboard {
@@ -205,6 +226,7 @@ export interface OperatorDashboard {
 export async function operatorDashboard(deps: AppDeps, nightOf: string): Promise<OperatorDashboard> {
   const scenario = scenarioFor(deps.station, nightOf);
   const rows = await deps.db.query<ReservationRow>("select * from reservations where station_id = $1 and night_of = $2 order by created_at", [deps.station.id, nightOf]);
+  const schedules = await latestSchedulesOf(deps.db, deps.station.id, nightOf);
   const delivered = await deps.db.query<{ reservation_id: string; slot_index: number; delivered_w: number }>(
     "select e.reservation_id, e.slot_index, e.delivered_w from energy_records e join reservations r on r.id = e.reservation_id where r.station_id = $1 and r.night_of = $2",
     [deps.station.id, nightOf],
@@ -228,6 +250,19 @@ export async function operatorDashboard(deps: AppDeps, nightOf: string): Promise
     [deps.station.id, nightOf],
   );
   const capturedBy = new Map(captures.map((c) => [c.reservation_id, c.amount_cents]));
+  // The flag is recorded once per reservation; its first event carries the stored resolution deadline.
+  const resolutions = await deps.db.query<{ reservation_id: string; resolve_by: string | null }>(
+    `select distinct on (e.reservation_id) e.reservation_id, e.payload->>'resolveBy' as resolve_by from events e join reservations r on r.id = e.reservation_id
+     where r.station_id = $1 and r.night_of = $2 and e.type = $3 order by e.reservation_id, e.id`,
+    [deps.station.id, nightOf, OPERATOR_RESOLUTION_REQUIRED],
+  );
+  const resolutionBy = new Map(resolutions.map((x) => [x.reservation_id, x.resolve_by]));
+  const nowMs = deps.now();
+  const deadlineOf = (rid: string): { resolutionDeadline: string | null; resolutionOverdue: boolean } => {
+    const deadline = resolutionBy.get(rid) ?? null;
+    const deadlineMs = deadline ? Date.parse(deadline) : Number.NaN;
+    return { resolutionDeadline: Number.isNaN(deadlineMs) ? null : new Date(deadlineMs).toISOString(), resolutionOverdue: !Number.isNaN(deadlineMs) && nowMs >= deadlineMs };
+  };
   return {
     nightOf,
     timeZone: deps.station.timeZone,
@@ -249,7 +284,7 @@ export async function operatorDashboard(deps: AppDeps, nightOf: string): Promise
       portId: r.port_id,
       plugInMs: r.terms.plugInMs,
       departMs: r.terms.departMs,
-      powerW: r.terms.powerW,
+      powerW: schedules.get(r.id) ?? r.terms.powerW,
       deliveredW: deliveredBy.get(r.id) ?? null,
       paymentState: r.payment_state,
       serviceState: r.service_state,
@@ -266,6 +301,8 @@ export async function operatorDashboard(deps: AppDeps, nightOf: string): Promise
       lastEvent: lastEventBy.get(r.id) ?? null,
       updatedAt: r.updated_at.toISOString(),
       providerCapturedCents: capturedBy.has(r.id) ? (capturedBy.get(r.id) ?? r.amount_cents) : null,
+      operatorResolutionRequired: resolutionBy.has(r.id),
+      ...deadlineOf(r.id),
       };
     }),
     providerMode: deps.gateway.mode,
