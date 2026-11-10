@@ -217,6 +217,7 @@ Migrations run automatically on the embedded database. An external PostgreSQL (`
 | `PAYPAL_EXPECTED_MERCHANT_ID` | required in Sandbox mode; the payee every order must name |
 | `PAYPAL_WEBHOOK_ID` | ID of the registered Sandbox webhook; without it every webhook is rejected |
 | `APP_BASE_URL` | public origin of this app (return URLs, cookie `Secure`, origin checks) |
+| `ALLOWED_ORIGINS` | optional, comma-separated exact extra origins for state-changing requests (https, or http loopback only; no wildcards or paths). With a loopback `APP_BASE_URL`, `localhost`, `127.0.0.1` and `[::1]` on the same port are accepted automatically |
 | `TRUST_PROXY` | `true` only behind a trusted proxy or tunnel (rate limiting uses the last `X-Forwarded-For` hop) |
 | `SESSION_SECRET`, `OPERATOR_PASSPHRASE` | cookie signing (32+ characters) and operator sign-in (12+ characters) |
 | `DATABASE_URL`, `MIGRATION_DATABASE_URL` | optional PostgreSQL server, and an optional direct URL for migrations; otherwise embedded PGlite in `GW_DATA_DIR` |
@@ -237,6 +238,7 @@ Migrations run automatically on the embedded database. An external PostgreSQL (`
 | API returns `SERVER_MISCONFIGURED` (503) | A required variable is missing or invalid. The server log names it and never prints secrets. |
 | `Port 3000 is already in use` | Start with `npm start -- -p 3200` and set `APP_BASE_URL` to the same origin. |
 | Start over with a clean database | Stop the server and delete `.data/`, or use "Reset demo data..." in the operator console with `DEMO_TOOLS=true`. |
+| "Request origin not allowed." on See offers | The browser origin is not `APP_BASE_URL` (or a loopback alias of it, or listed in `ALLOWED_ORIGINS`). Open the app at the `APP_BASE_URL` origin, or set `APP_BASE_URL` to the origin you use (public/preview hosts must be https). |
 | Sandbox checkout cannot return to the app | `APP_BASE_URL` must be the exact origin you browse, because cookies are per origin. |
 | Webhooks never arrive | The registered URL must end in `/api/webhooks/paypal`, `PAYPAL_WEBHOOK_ID` must match, and `TRUST_PROXY=true` is needed behind a tunnel. `npm run payment:preflight` checks the local half read-only. |
 | Tests refuse to start | Test runs set `GW_ISOLATED_DB=true` and refuse hosted databases, model keys and non-mock payments by design. |

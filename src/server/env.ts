@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SYNTHETIC_ECONOMICS } from "@/domain/economics";
+import { parseAllowedOrigins } from "./origin";
 
 /**
  * Process configuration. Fails closed: any PAYPAL_ENV other than "sandbox" aborts,
@@ -15,6 +16,17 @@ const schema = z
     /** Account ID of the sandbox business account that owns the REST app; every approved order must name it as payee. */
     PAYPAL_EXPECTED_MERCHANT_ID: z.string().optional(),
     APP_BASE_URL: z.string().url().default("http://localhost:3000"),
+    /** Extra browser origins allowed for state-changing requests (comma-separated exact origins; see origin.ts). */
+    ALLOWED_ORIGINS: z
+      .string()
+      .optional()
+      .superRefine((v, ctx) => {
+        try {
+          parseAllowedOrigins(v);
+        } catch (err) {
+          ctx.addIssue({ code: "custom", message: err instanceof Error ? err.message : "invalid ALLOWED_ORIGINS" });
+        }
+      }),
     SESSION_SECRET: z.string().optional(),
     OPERATOR_PASSPHRASE: z.string().optional(),
     DATABASE_URL: z.string().optional(),

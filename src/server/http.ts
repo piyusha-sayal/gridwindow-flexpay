@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { ServiceError } from "./deps";
 import { ConfigError } from "./env";
+import { isAllowedOrigin, parseAllowedOrigins } from "./origin";
 import { getRuntime } from "./runtime";
 
 const DRIVER_COOKIE = "gw_drv";
@@ -71,8 +72,7 @@ export async function operatorLogout(): Promise<void> {
 export async function assertSameOrigin(req: Request): Promise<void> {
   const { env } = await getRuntime();
   const origin = req.headers.get("origin");
-  const allowed = new Set([new URL(env.APP_BASE_URL).origin, new URL(req.url).origin]);
-  if (!origin || !allowed.has(origin)) throw new ServiceError("BAD_ORIGIN", "Request origin not allowed.", 403);
+  if (!isAllowedOrigin(origin, env.APP_BASE_URL, req.url, parseAllowedOrigins(env.ALLOWED_ORIGINS))) throw new ServiceError("BAD_ORIGIN", "Request origin not allowed.", 403);
   // Second, independent CSRF layer: browsers label cross-site requests via Fetch Metadata.
   const site = req.headers.get("sec-fetch-site");
   if (site && site !== "same-origin" && site !== "none") throw new ServiceError("BAD_ORIGIN", "Cross-site request refused.", 403);
