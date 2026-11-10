@@ -1,334 +1,375 @@
 <div align="center">
+GridWindow FlexPay
+EV charging that works around your schedule. Payments that wait for proof.
+A smarter way to share limited charging capacity, with flexible charging windows, transparent offers, and payment capture tied to verified delivery.
 
-# GridWindow FlexPay
 
-**Smarter EV charging windows, AI-assisted offer selection, and PayPal payment authorization that is captured only after energy is delivered.**
+TypeScript
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Next.js 16](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org/)
-[![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178c6.svg)](https://www.typescriptlang.org/)
-[![Node 22+](https://img.shields.io/badge/node-%E2%89%A522-339933.svg)](https://nodejs.org/)
 
-<img src="public/images/nighttime_ev_charging_station.png" alt="Illustration of an electric SUV charging overnight at a station, with city lights and a charging progress graphic" width="720">
+![PayPal](https://img.shields.io/badge/PayPal-Sandbox-003087?logo=paypal&logoColor=white)
+
+
+
+
+
+
+Explore the experience · Run it locally · See the evidence · **Judge walkthrough** · **Architecture**
+
+
+<img src="public/images/nighttime_ev_charging_station.png" alt="Electric vehicle charging at night at a shared station" width="820">
+<sub>Working application. Synthetic charging and energy models. PayPal Sandbox or clearly labeled MOCK payments. No live charging hardware.</sub>
 
 </div>
+The idea
+Your car does not need to charge every minute it is parked. It needs to be ready when you leave.
 
-GridWindow FlexPay is a working web application for overnight EV charging at a shared site. A driver says how much energy they need, when they leave and what they will spend. A deterministic engine finds charging windows that are physically feasible and good for both sides, and the driver approves one exact offer. PayPal authorizes the amount, a simulated charging session runs, and the app captures the payment once delivery is verified. If delivery fails, it voids the authorization instead.
+That gap is an opportunity. At a shared charging site, several drivers can arrive around the same time, compete for limited power, and push demand into expensive hours. Yet some of those vehicles could charge later without inconveniencing anyone.
 
-What sets it apart is that the money follows the energy. Most pay-now checkout flows take payment before anything is delivered. Here the payment state is driven by a delivery record, and an AI assistant helps people understand offers without any authority over price, consent or payment.
+GridWindow FlexPay finds that flexibility and turns it into an offer a driver can actually understand. The driver chooses how much energy they need, when they are leaving, and what they are willing to spend. A deterministic scheduler checks the station's physical limits and builds feasible options. Flexible offers appear only when the modeled economics work for both the driver and the operator.
 
-## Screenshots
+Then comes the part that matters most: the driver approves exact terms, the payment is authorized, and capture waits until the simulated delivery record satisfies the settlement rules. If the charging session fails under the applicable policy, the authorization can be voided instead of collecting money for an undelivered session.
 
-Captured from the running app in MOCK mode with seeded synthetic data. Nothing here is a real transaction.
+AI makes the journey easier to navigate. It does not decide what the driver owes, approve terms, or touch a payment.
 
-<table>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/driver-offers.png" alt="Driver view: flexible charging offers compared with immediate charging, with modeled pricing and assumptions"></td>
-    <td width="50%"><img src="docs/screenshots/operator-console.png" alt="Operator console: reservations, site load against the power cap, and session controls"></td>
-  </tr>
-  <tr>
-    <td align="center"><sub><b>Driver:</b> offers and modeled pricing</sub></td>
-    <td align="center"><sub><b>Operator:</b> sessions and controls</sub></td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center"><img src="docs/screenshots/flexreceipt.png" alt="FlexReceipt for a successful simulated charge, showing the MOCK capture confirmation" width="48%"><br><sub><b>FlexReceipt:</b> simulated delivery and MOCK payment outcome</sub></td>
-  </tr>
-</table>
+[!IMPORTANT]
+This is a hackathon prototype and an engineering demonstration, not a commercial charging network. Energy delivery, base load, tariffs, savings, and disturbances are simulated. PayPal integrations use Sandbox funds only. See Scope and limitations.
 
-> **Scope.** Charging, building load, tariffs, fees and savings are a transparent simulation with modeled numbers. Payments run against the PayPal Sandbox or a clearly labeled MOCK provider. No real vehicle is charged and no real money moves. See [Limitations](#limitations-and-transparency).
+At a glance
+The challenge	What GridWindow does
+Multiple cars want to charge at once	Plans in 15-minute intervals against site capacity, port ratings, and efficiency
+Flexible charging is hard to explain	Shows the immediate option alongside qualifying flexible offers and their assumptions
+A cheap schedule may not actually work	Revalidates plans with an independent feasibility checker
+Drivers need control over price and timing	Requires approval of an exact, versioned offer before payment authorization
+Pay-now checkout ignores actual delivery	Separates authorization from capture and settles against delivery evidence
+Conditions change during charging	Replans remaining energy, protects delivered history, and requests consent when terms change
+AI can produce unreliable answers	Keeps models inside narrow explanation and candidate-selection boundaries
+The experience
+<table> <tr> <td width="50%" align="center"> <img src="docs/screenshots/driver-offers.png" alt="Driver-facing comparison of immediate and flexible EV charging offers" width="100%"> <br><strong>01. Choose your charging window</strong> <br><sub>Compare timing, modeled price, savings, and assumptions before approving an offer.</sub> </td> <td width="50%" align="center"> <img src="docs/screenshots/operator-console.png" alt="Operator view of charging reservations, station load, and control tools" width="100%"> <br><strong>02. Keep the site within its limits</strong> <br><sub>Inspect reservations, occupancy, load, disturbances, and payment state.</sub> </td> </tr> <tr> <td colspan="2" align="center"> <img src="docs/screenshots/flexreceipt.png" alt="FlexReceipt connecting approved terms, simulated energy delivered, and payment outcome" width="52%"> <br><strong>03. Close the loop with a FlexReceipt</strong> <br><sub>One record connects the approved offer, simulated delivery, and provider-confirmed payment result.</sub> </td> </tr> </table>
+<sub>These screenshots were taken in MOCK mode with seeded synthetic data. They do not depict real payments or physical charging.</sub>
 
-## The problem
+A complete charging journey
+The payment authorization is a hold, not escrow. Authorization does not mean capture, and an elapsed deadline is never itself a reason to charge the driver.
 
-- Overnight charging demand tends to pile up in the same expensive hours.
-- Many drivers do not care when the car charges, as long as it is ready on time.
-- A site operator has a hard power limit and has to fit every session under it.
-- A pay-now checkout cannot show that a payment depends on energy actually being delivered.
+What makes it different
+1. An offer must be physically possible
+The scheduler works in 15-minute slots and accounts for port limits, charger efficiency, occupancy, and a shared site power constraint. A separate validator checks the proposed plan before it can be used. The demo station is configured as follows:
 
-## How GridWindow approaches it
+Port	Rated charging power
+A	3.6 kW
+B	7.2 kW
+C	11 kW
+Site capacity	24 kW, shared with modeled site load
+An attractive price is not enough. If the requested energy cannot fit inside the available parked time and capacity, the app cannot present that plan as feasible.
 
-1. **Scheduling.** Each request is planned in 15-minute slots against the site's power cap, port limits and charging efficiency. An independent validator re-checks every plan.
-2. **Offers that help both sides.** A flexible offer is published only if the driver gets a discount and the operator's modeled contribution improves. Otherwise the driver sees only immediate charging.
-3. **Payment tied to delivery.** PayPal authorizes the exact approved amount first. Capture happens once, after delivery. Failure leads to a void.
-4. **Bounded AI.** The driver assistant fills in forms, explains offers and answers questions about a reservation. It has no tools. The recovery agent may only pick among server-validated candidates by id. Neither can set a price, grant consent or move money.
+2. Flexibility has to benefit both sides
+A flexible offer is published only when the driver receives a modeled discount and the operator's modeled contribution improves. Otherwise, immediate charging remains the available choice. Prices, fees, and savings are derived from the synthetic assumptions rather than generated by an AI model.
 
-## Features
+3. The approved terms are the source of truth
+The server stores the approved offer, including its amount, currency, merchant, conditions, and expiry. It recomputes payment amounts from those terms and checks the PayPal order before authorization. Neither the browser nor an AI response can silently change the bargain.
 
-### For drivers
-- Request by form or in plain language: energy needed, plug-in time, ready-by time and budget.
-- Compare immediate charging with flexible windows, with the modeled savings and the assumptions behind them shown next to each offer.
-- Approve one immutable offer: exact merchant, amount, currency and terms, with an expiry.
-- Follow the reservation through authorization, charging, capture or void.
-- A savings-goal helper recommends among the offers that already qualify. It never approves or pays.
-- A printable **FlexReceipt** joining the approved terms, the simulated delivery record and the payment states read back from the provider.
+4. The payment follows the energy
+The system records simulated energy delivery and uses it to drive settlement. It can capture a successful session once or void an eligible failed session. Compare-and-set transitions, idempotency keys, a unique settlement guard, webhook verification, and provider reconciliation protect the payment path from retries and conflicting events.
 
-### For operators
-- Passphrase-protected console with reservations and a night timeline.
-- Site load plan against the configured cap (24 kW on the demo station, whose three ports are rated 3.6, 7.2 and 11 kW), with port occupancy shown separately from electrical draw.
-- Run the simulated night, inject a charger outage, and reconcile payment state against the provider.
-- Record a SYNTHETIC disturbance (power limit, site cap, early departure or charger failure) with a fault attribution, and watch the recovery run: its steps, validation, schedule, consent and payment outcome.
-- `/operator/schedule`: persisted schedule versions and pending proposals on a read-only Bryntum timeline, with an accessible table beside it.
-- Per-reservation payment status and an event trail.
+5. Recovery respects what was already agreed
+A site cap may fall, a charger may fail, or a departure time may change. GridWindow can replan only the affected session's remaining energy. Previously delivered energy and unrelated sessions remain untouched. The system can commit a safe replacement plan or ask the driver to approve a specific change. It does not let an agent rewrite prices or settle funds.
 
-### PayPal integration
-- Orders v2 and Payments v2 over REST: authorize before charging, capture after verified delivery, void on failure.
-- Signed webhooks are verified against the unaltered raw body, correlated to a reservation and de-duplicated.
-- The server recomputes every amount from the stored offer and checks the order's payee, amount and currency before authorizing.
-- Reconciliation reads the provider's state back rather than trusting the browser.
+Built for two sides of the charging experience
+<table> <tr><th width="50%">For drivers</th><th width="50%">For operators</th></tr> <tr><td> <ul> <li>Enter requirements using a form or plain language.</li> <li>Compare immediate charging against qualifying flexible windows.</li> <li>See modeled savings and the assumptions used.</li> <li>Approve one exact offer before checkout.</li> <li>Track authorization, simulated charging, capture, or void.</li> <li>Use a savings-goal helper that recommends, but never approves.</li> <li>Print a FlexReceipt showing the agreed and delivered outcome.</li> </ul> </td><td> <ul> <li>Sign in to a passphrase-protected operator console.</li> <li>Inspect reservations, port occupancy, and the site load plan.</li> <li>Run a simulated night and inspect payment events.</li> <li>Inject a labeled synthetic outage or disturbance.</li> <li>Review recovery candidates, consent gates, and schedule versions.</li> <li>Reconcile settlement state with the payment provider.</li> <li>Explore a read-only schedule timeline and accessible table.</li> </ul> </td></tr> </table>
+Recovery when the original plan stops working
+The autonomous recovery workflow is deliberately bounded. It is not a free-running agent making operational or financial decisions.
 
-### AI and optimization
-- Google Gemini (through the Google Gen AI SDK) when `GEMINI_API_KEY` is set. An Anthropic key is also supported.
-- Without a key, or on any provider failure, a labeled deterministic parser and explainer runs instead. The app works fully either way.
-- Every number the model shows is checked against backend facts, and unverifiable answers are replaced with deterministic text.
+What the guardrails actually mean:
 
-## How it works
+Already delivered energy is never replanned. Other reservations stay unchanged.
+Automatic changes must satisfy the agreed energy target, preserve the departure deadline, stay inside the plug-in window, and avoid a higher price.
+Changes needing consent require the driver's approval of the exact proposal version. Expired or stale approvals are rejected.
+Recovery executions are lease-fenced and limited to three attempts. A stalled worker cannot commit the same change twice.
+The model, when available, may select a server-validated candidate ID. It cannot invent a candidate, change a quote, authorize a payment, or call an unknown tool.
+For qualifying unrecoverable operator-attributable failures under the newer agreement policy, the authorization is voided in full and the customer is charged zero, even if some physical energy was simulated as delivered. Other outcomes can require operator resolution.
+<details> <summary><strong>Read the recovery edge cases and known gaps</strong></summary>
+Recovery uses forecast base load, while replay uses realized synthetic load. Some recovered schedules therefore deliver less than planned. An auto-committed recovery can also raise the operator's modeled energy cost, provided the defined minimum margin still holds.
 
-```mermaid
-flowchart LR
-  A[Driver request] --> B[Feasible windows and offers]
-  B --> C[Driver approves one offer]
-  C --> D[PayPal authorizes the amount]
-  D --> E{Simulated charging}
-  E -->|delivered| F[Capture once]
-  E -->|outage| G[Void the authorization]
-  F --> H[FlexReceipt]
-  G --> H
-```
+A live Gemini recovery attempt returned an HTTP 504 and used the deterministic fallback. That run does not establish a completed live-model recovery decision. PayPal Sandbox recovery settlement has not yet been tested.
 
-1. The driver submits energy, times and a budget.
-2. The engine evaluates feasible windows and publishes only offers that pass the economic rules.
-3. The driver approves the exact terms, and PayPal authorizes that amount. Nothing is collected yet.
-4. The simulated session runs, or an operator injects an outage.
-5. Delivered energy leads to a single capture. A failure leads to a void.
+Guided demo Scenario C exercises the recovery path. The operator console's Inject outage button still exercises the older simulated outage flow. The two should not be presented as the same scenario.
 
-An authorization is a hold, not escrow. PayPal typically honors it for 3 days and it stays valid for up to 29. The app does not capture after expiry.
+Full details: Recovery benchmark · Findings · Architecture.
 
-## Autonomous Charging Recovery
+</details>
+AI helps explain. Deterministic code decides.
+GridWindow can use Google Gemini through the Google Gen AI SDK, or a supported Anthropic configuration. With no key, or when a provider fails, the application uses a clearly labeled deterministic parser and explainer.
 
-When a charger is limited, a site cap drops, a driver leaves early or a charger fails, the agreed plan may no longer work. The recovery engine re-plans only that session's remaining energy from the disturbance's effective slot onward. Energy already delivered stays as it was, and the price and other sessions do not change.
+Responsibility	AI assistant	Server-owned logic
+Interpret a driver's plain-language request	Yes	Validates inputs
+Explain offers and reservation status	Yes	Supplies and verifies facts
+Suggest an existing eligible offer	Yes	Calculates eligibility and price
+Select a recovery candidate by validated ID	Bounded	Generates and checks candidates
+Set or change an offer's amount	No	Yes
+Approve a driver's consent	No	Enforces explicit approval
+Authorize, capture, or void money	No	Yes, through the gateway
+Numbers shown in model-generated explanations are checked against backend facts. Unsupported answers are replaced by deterministic text. This design makes the app usable even if the model service is down.
 
-- **What it does.** An operator records a synthetic disturbance from `/operator`. The server validates it, then runs one recovery per disturbance. It either commits a new schedule version, asks the driver to approve a change, or reports the physical constraint that blocks every schedule (for example, a failed charger cannot move energy to another port).
-- **Safety model.** Gemini, when configured, selects only among candidates the server has already validated, by server-assigned id. The server owns the schedule and the money. The agent has no payment tools and no price input. Unknown tools, extra arguments and out-of-phase calls are rejected and traced, and a model failure falls back to the deterministic path.
-- **Consent boundary.** Auto-commit only when the forecast plan reaches the agreed battery energy (a planned figure; actual delivery is decided by the synthetic ledger), the price does not rise, the departure does not move later, charging stays inside the plugged-in window, and past energy and other sessions are unchanged. A later finish, an earlier departure or a changed price needs the driver's approval on the reservation page. Approval applies only the exact proposal version, and a stale or expired proposal is refused.
-- **Fencing.** Each run holds a lease. Trace writes and schedule commits are conditional on it, so a stalled or duplicate worker cannot double-commit. Runs are bounded to three attempts.
-- **Outdated sessions and failure policy.** For new agreements the settlement policy is: "An operator-attributable, unrecoverable failure to deliver the agreed energy by the deadline is eligible for a FULL authorization void and ZERO customer charge. This may include partial physical energy delivery." Early departures and non-conclusive outcomes go to operator resolution, and nothing is captured partially or because a deadline passed. Agreements made before this policy keep the earlier rules. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-- **Operator schedule.** `/operator/schedule` draws the persisted schedule with Bryntum Scheduler Community 8.0.0. The chart is read-only, and pending proposals appear as a separate lane. The accessible table beside it is the reference view. Bryntum's own grid has known axe findings (see [docs/BRYNTUM_NOTES.md](docs/BRYNTUM_NOTES.md)).
-- **Synthetic disturbance injector.** Disturbances are labeled SYNTHETIC. No real charger or grid is connected.
-- **Benchmark.** `npm run benchmark:recovery` compares leaving the plan unchanged with recovery over 200 seeded nights. It reports unfavorable and infeasible cases alongside the wins. See [docs/RECOVERY_BENCHMARK.md](docs/RECOVERY_BENCHMARK.md). These are modeled numbers, not field measurements.
-- **Limitations.** Recovery plans against forecast base load, and the replay uses realized base load, so a recovered schedule can deliver less than the static plan in some cases. Auto-commit can raise the operator's energy cost against the agreed plan, but only while the operator's 1 c minimum margin holds (see [docs/RECOVERY_BENCHMARK_FINDINGS.md](docs/RECOVERY_BENCHMARK_FINDINGS.md)). One live Gemini recovery attempt returned HTTP 504 and fell back to the deterministic path, so a live model decision is not demonstrated. PayPal Sandbox recovery settlement has not been run. Guided demo Scenario C uses the recovery path; the operator's **Inject outage** button still uses the older simulator outage.
+Quick start
+No PayPal account, AI API key, hosted database, or webhook tunnel is required. MOCK mode uses an embedded PGlite database and a clearly labeled payment simulator.
 
-## Architecture
+Requirements: Node.js 22+, npm, and Git. The initial production build downloads Geist fonts and needs internet access.
 
-| Layer | Path | Responsibility |
-|---|---|---|
-| Domain | `src/domain/` | Pure, deterministic logic in integer units (cents, W, Wh): allocator, independent validator, economics, quotes and terms hash, simulator, payment state machine, benchmark |
-| Payments | `src/payments/` | `PaymentGateway` contract with `PayPalSandboxGateway` (REST) and `MockGateway` |
-| Server | `src/server/` | Database client and migrations, repositories, services (quote, checkout, settlement, reconcile, webhook), env guard, HTTP security helpers |
-| App | `src/app/` | Next.js App Router pages and API routes |
-
-**Stack.** Next.js 16, React 19, strict TypeScript, Zod, PostgreSQL via embedded PGlite by default (or a PostgreSQL server through `DATABASE_URL`, same migrations), Vitest and Playwright.
-
-**Safety properties.** Compare-and-set state transitions. A unique settlement index makes capture-after-void impossible. `PayPal-Request-Id` idempotency. Webhook verification against the raw body. Append-only event and energy tables. Startup refuses any `PAYPAL_ENV` other than `sandbox`.
-
-More detail is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-
-## Quick start (MOCK mode, no credentials)
-
-This needs no PayPal, Gemini or Neon account and no webhook tunnel. It uses the built-in MOCK payment provider and an embedded database that is created on first start.
-
-Requirements: Node.js 22 or newer and git. `npm run build` downloads the Geist fonts from Google Fonts once, so it needs network access.
-
-**macOS, Linux or Git Bash**
-
-```bash
+<details open> <summary><strong>macOS, Linux, or Git Bash</strong></summary>
 git clone https://github.com/piyusha-sayal/gridwindow-flexpay.git
 cd gridwindow-flexpay
 npm ci
 npm run build
+
 PAYMENT_MODE=mock PAYPAL_ENV=sandbox DEMO_TOOLS=true \
 APP_BASE_URL=http://localhost:3000 \
 SESSION_SECRET=local-demo-session-secret-change-me-0123456789 \
 OPERATOR_PASSPHRASE=local-demo-operator \
 npm start
-```
-
-**Windows PowerShell**
-
-```powershell
+</details><details> <summary><strong>Windows PowerShell</strong></summary>
 git clone https://github.com/piyusha-sayal/gridwindow-flexpay.git
 cd gridwindow-flexpay
 npm ci
 npm run build
-$env:PAYMENT_MODE="mock"; $env:PAYPAL_ENV="sandbox"; $env:DEMO_TOOLS="true"
+
+$env:PAYMENT_MODE="mock"
+$env:PAYPAL_ENV="sandbox"
+$env:DEMO_TOOLS="true"
 $env:APP_BASE_URL="http://localhost:3000"
 $env:SESSION_SECRET="local-demo-session-secret-change-me-0123456789"
 $env:OPERATOR_PASSPHRASE="local-demo-operator"
 npm start
-```
+</details>
+Open http://localhost:3000. The credentials shown here are local throwaway examples. Choose different values for any shared environment. The session secret must contain at least 32 characters and the operator passphrase at least 12.
 
-Then open <http://localhost:3000>. The values above are throwaway local placeholders, not secrets. `SESSION_SECRET` must be at least 32 characters and `OPERATOR_PASSPHRASE` at least 12, or the operator console stays disabled.
+For a persistent local configuration, copy .env.example to .env.local. To work with a development server, use npm run dev instead of the production start command. Embedded data lives under .data/.
 
-| Route | What you see |
-|---|---|
-| `/` | Landing page with an interactive pricing scheduler |
-| `/drive` | Smart Charge: your needs, plan comparison, consent and PayPal approval |
-| `/reservations/<id>` | Payment status, simulated night and FlexReceipt |
-| `/operator` | Operator console (sign in with the passphrase) |
-| `/operator/schedule` | Operator schedule: Bryntum timeline (read-only) and accessible table |
-| `/rewards` | Rewards & Payments: this session's commitments and verified payment states |
-| `/impact-lab` | Interactive Charge now vs Smart Flex scenarios and the 500-scenario synthetic study |
-| `/how-it-works` | Four-step walkthrough and FAQ |
+Where to go first
+Page	What to explore
+/	Landing page and interactive pricing scheduler
+/drive	Smart Charge request, offer comparison, and approval
+/reservations/<id>	Session progress, settlement status, and FlexReceipt
+/operator	Operator console and synthetic disturbances
+/operator/schedule	Schedule versions, pending proposals, read-only timeline, and accessible table
+/rewards	Rewards, payment commitments, and provider-confirmed states
+/impact-lab	Interactive scenarios and synthetic benchmark
+/how-it-works	Guided explanation and FAQ
+Three ways to evaluate it
+Try a normal session: open /drive, compare offers, approve one, and complete the simulated delivery in MOCK mode.
+Test a failure: open /operator, inject the legacy outage scenario, and inspect the payment outcome and event trail.
+Test recovery: follow Scenario C in the judge walkthrough, then inspect the updated schedule and consent outcome.
+For a shorter presentation, use the under-three-minute demo script.
 
-For a guided evaluation, follow the [judge walkthrough](docs/JUDGES.md) and the [demo script](docs/DEMO_SCRIPT.md). For a persistent local setup, the repository includes an `.env.example` template to copy to `.env.local` (`cp .env.example .env.local`, or `Copy-Item .env.example .env.local` in PowerShell). Data is stored under `.data/`. Delete that folder to start over.
+Architecture
+Layer	Location	Responsibility
+Domain	src/domain/	Deterministic scheduling, feasibility checks, economics, terms hashes, simulation, payment states, benchmarks
+Payment providers	src/payments/	PaymentGateway, MockGateway, PayPalSandboxGateway
+Server	src/server/	Database, migrations, repositories, quote/checkout/settlement services, webhooks, reconciliation, security helpers
+Web app	src/app/	Next.js pages and API routes
+Core stack: Next.js 16, React 19, strict TypeScript, Zod, PostgreSQL-compatible persistence via embedded PGlite or a PostgreSQL server, Vitest, and Playwright.
 
-For development, `npm run dev` starts the Next.js dev server. The `npm start` commands above run the production build.
+Financial and scheduling values use integer units such as cents, watts, and watt-hours, rather than relying on floating-point arithmetic for critical calculations.
 
-### Running the tests
+<details> <summary><strong>Payment safety and state integrity</strong></summary>
+The app refuses to start if PAYPAL_ENV is not sandbox.
+The backend recomputes amounts from stored approved terms and checks merchant, currency, and amount before authorization.
+State changes use compare-and-set conditions to prevent invalid transitions.
+Payment requests use PayPal-Request-Id idempotency keys.
+A unique settlement index guards against contradictory capture and void outcomes.
+PayPal webhooks are signature-verified against the original raw body, correlated to reservations, and de-duplicated.
+Reconciliation reads payment status from PayPal rather than trusting browser state.
+Append-only energy and event records make the outcome traceable.
+The settlement sweep runs every five minutes without a UI trigger.
+See Architecture and PayPal certification.
 
-Run these after `npm ci`. The Playwright suite needs a production build and a Chromium install.
+</details><details> <summary><strong>Configuration reference</strong></summary>
+Variable	Usage
+PAYMENT_MODE	mock by default, or paypal_sandbox
+PAYPAL_ENV	Must be sandbox
+PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET	Backend-only PayPal Sandbox credentials
+PAYPAL_EXPECTED_MERCHANT_ID	Required merchant identity in Sandbox mode
+PAYPAL_WEBHOOK_ID	Registered Sandbox webhook ID; required for webhook acceptance
+APP_BASE_URL	Exact app origin for return URLs, cookies, and origin validation
+ALLOWED_ORIGINS	Optional exact extra origins for state-changing requests; no wildcards or paths
+TRUST_PROXY	Use true only behind a trusted proxy or tunnel
+SESSION_SECRET	Session-cookie secret, minimum 32 characters
+OPERATOR_PASSPHRASE	Operator sign-in passphrase, minimum 12 characters
+DATABASE_URL	Optional external PostgreSQL connection; otherwise use embedded PGlite
+MIGRATION_DATABASE_URL	Optional direct database URL for migrations
+GW_AUTO_MIGRATE	For disposable local data only; never enable for hosted or persistent databases
+GEMINI_API_KEY, GEMINI_MODEL	Optional Gemini integration
+ANTHROPIC_API_KEY, AI_PROVIDER, AI_MODEL	Optional Anthropic/provider settings
+DEMO_TOOLS	Enables seed and reset tools in local MOCK mode without DATABASE_URL
+GW_ISOLATED_DB	Test isolation guard set by test runners
+FAILED_SERVICE_REMEDY_CENTS	Modeled operator remedy cost for an eligible failure, default 200 cents
+The documented default Gemini model is gemini-3.6-flash. Never commit real credentials. With a loopback APP_BASE_URL, same-port localhost, 127.0.0.1, and [::1] aliases are accepted automatically.
 
-```bash
-npm run typecheck        # tsc --noEmit (strict)
-npm run lint             # eslint
-npm test                 # Vitest: unit and integration, embedded database
+</details><details> <summary><strong>Database and migration rules</strong></summary>
+Embedded PGlite initializes and migrates automatically. External PostgreSQL databases do not migrate at application startup. A schema mismatch prevents startup until migrations are applied deliberately.
+
+npm run db:migrate -- --status
+npm run db:migrate -- --plan
+npm run db:migrate -- --apply --confirm-database <fingerprint>
+Only run --apply after reviewing the plan and confirming the exact target database. See Migrations.
+
+</details>
+What we tested
+This is the documented release verification snapshot, not a claim that a live CI system has retested every newer local change.
+
+Verification	Recorded outcome
+Strict TypeScript and ESLint	0 errors, 0 problems
+Vitest, unit and integration	806 passed, 12 gated skips
+PostgreSQL 18.1 on a disposable local server	11 passed, 1 restart-test skip
+Playwright, 21 spec files	0 failures, 6 intentional skips
+Production build	Pass
+Client-bundle secret scan	Pass
+Production dependency audit	0 vulnerabilities reported at verification time
+Recovery benchmark repeatability	Two deterministic runs matched
+The 12 skipped Vitest checks require a disposable TEST_DATABASE_URL pointing to real PostgreSQL. The restart check also needs TEST_PG_RESTART_CMD. Playwright has six intentional mobile and tablet keyboard-journey skips. Test runners isolate data and refuse hosted services and non-MOCK payments.
+
+npm run typecheck
+npm run lint
+npm test
 npm run build
 npx playwright install chromium
-npm run test:e2e         # Playwright: desktop, tablet and mobile
-npm run benchmark        # deterministic synthetic 500-night benchmark
-npm run benchmark:recovery  # deterministic synthetic 200-seed recovery benchmark
-npm run release:scan     # secret scan of the client build
-```
+npm run test:e2e
+npm run benchmark
+npm run benchmark:recovery
+npm run release:scan
+npm audit --omit=dev
+For the complete claim-by-claim record, including blocked and untested items, see Award evidence and Skipped tests.
 
-Vitest skips 12 tests unless `TEST_DATABASE_URL` points to a disposable PostgreSQL server (`TEST_PG_RESTART_CMD` adds the restart test). Those tests are the real-PostgreSQL checks. Run them only against a throwaway database. The test runners set `GW_ISOLATED_DB=true` and refuse hosted databases and non-mock payments. Playwright skips 6 keyboard-journey tests on the mobile and tablet projects by design.
+Two real PayPal Sandbox paths
+Unlike a MOCK-only payment demonstration, two scenarios were exercised with the genuine PayPal Sandbox API and Sandbox buyer funds.
 
-### Database migrations
+Scenario	Recorded behavior	Result
+Successful simulated charge · Nov 6, 2026	USD 14.82 authorized; 30.015 kWh simulated against a 30 kWh target	One capture reported completed by PayPal
+Simulated charger outage · Nov 7, 2026	USD 14.19 authorized; 0 kWh simulated as delivered	Authorization voided, no capture, USD 0.00 collected
+Four webhook event types were verified through PayPal's signature-checking flow. The initial webhook URL omitted /api/webhooks/paypal, so early events needed to be resent after the URL was corrected. That correction and the resulting processed events are recorded in the evidence log.
 
-Migrations run automatically on the embedded database. An external PostgreSQL (`DATABASE_URL`, including Neon) is never migrated at startup. The app refuses to open a database whose schema does not match this build. Use `npm run db:migrate -- --status`, `--plan` and `--apply --confirm-database <fingerprint>` as described in [docs/MIGRATIONS.md](docs/MIGRATIONS.md). Do not set `GW_AUTO_MIGRATE=true` for a persistent database.
+No real money moved and no real EV charged. PayPal Sandbox recovery settlement has not been demonstrated.
 
-<details>
-<summary>Environment variables</summary>
+<details> <summary><strong>Reproduce the PayPal Sandbox integration</strong></summary>
+Create a Sandbox REST app and Sandbox buyer account in the PayPal Developer Dashboard.
 
-| Variable | Purpose |
-|---|---|
-| `PAYMENT_MODE` | `mock` (default) or `paypal_sandbox` |
-| `GW_AUTO_MIGRATE` | `true` applies pending migrations at startup. For disposable local databases only; never for Neon or any persistent database |
-| `FAILED_SERVICE_REMEDY_CENTS` | MODELED operator remedy cost recorded with an operator-failure void (default 200 cents). Not a PayPal fee |
-| `PAYPAL_ENV` | must be `sandbox`; anything else stops startup |
-| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | Sandbox REST app credentials (backend only) |
-| `PAYPAL_EXPECTED_MERCHANT_ID` | required in Sandbox mode; the payee every order must name |
-| `PAYPAL_WEBHOOK_ID` | ID of the registered Sandbox webhook; without it every webhook is rejected |
-| `APP_BASE_URL` | public origin of this app (return URLs, cookie `Secure`, origin checks) |
-| `ALLOWED_ORIGINS` | optional, comma-separated exact extra origins for state-changing requests (https, or http loopback only; no wildcards or paths). With a loopback `APP_BASE_URL`, `localhost`, `127.0.0.1` and `[::1]` on the same port are accepted automatically |
-| `TRUST_PROXY` | `true` only behind a trusted proxy or tunnel (rate limiting uses the last `X-Forwarded-For` hop) |
-| `SESSION_SECRET`, `OPERATOR_PASSPHRASE` | cookie signing (32+ characters) and operator sign-in (12+ characters) |
-| `DATABASE_URL`, `MIGRATION_DATABASE_URL` | optional PostgreSQL server, and an optional direct URL for migrations; otherwise embedded PGlite in `GW_DATA_DIR` |
-| `GEMINI_API_KEY`, `GEMINI_MODEL`, `ANTHROPIC_API_KEY`, `AI_MODEL`, `AI_PROVIDER` | optional AI wording; default Gemini model is `gemini-3.6-flash` |
-| `DEMO_TOOLS` | `true` adds seed and reset tools to the operator console (MOCK mode, no `DATABASE_URL`) |
-| `GW_ISOLATED_DB` | set by the test runners; refuses to start if hosted services are configured |
+Set PAYMENT_MODE=paypal_sandbox, PAYPAL_ENV=sandbox, PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_EXPECTED_MERCHANT_ID, and the exact APP_BASE_URL in .env.local.
 
-</details>
+Inspect the planned smoke test without network access:
 
-<details>
-<summary>Troubleshooting</summary>
+npm run paypal:smoke
+When ready to create Sandbox orders, run:
 
-| Symptom | Cause and fix |
-|---|---|
-| `npm` crashes on an old global version | Use Node 22 or newer with its bundled npm (`npm -v` 10 or higher). |
-| `npm run build` fails while fetching fonts | The build downloads the Geist fonts once and needs network access. |
-| Operator page says the console is not configured | `OPERATOR_PASSPHRASE` is missing or shorter than 12 characters. |
-| API returns `SERVER_MISCONFIGURED` (503) | A required variable is missing or invalid. The server log names it and never prints secrets. |
-| `Port 3000 is already in use` | Start with `npm start -- -p 3200` and set `APP_BASE_URL` to the same origin. |
-| Start over with a clean database | Stop the server and delete `.data/`, or use "Reset demo data..." in the operator console with `DEMO_TOOLS=true`. |
-| "Request origin not allowed." on See offers | The browser origin is not `APP_BASE_URL` (or a loopback alias of it, or listed in `ALLOWED_ORIGINS`). Open the app at the `APP_BASE_URL` origin, or set `APP_BASE_URL` to the origin you use (public/preview hosts must be https). |
-| Sandbox checkout cannot return to the app | `APP_BASE_URL` must be the exact origin you browse, because cookies are per origin. |
-| Webhooks never arrive | The registered URL must end in `/api/webhooks/paypal`, `PAYPAL_WEBHOOK_ID` must match, and `TRUST_PROXY=true` is needed behind a tunnel. `npm run payment:preflight` checks the local half read-only. |
-| Tests refuse to start | Test runs set `GW_ISOLATED_DB=true` and refuse hosted databases, model keys and non-mock payments by design. |
+npm run paypal:smoke -- --approve-sandbox-orders
+This exercises an authorize/capture and an authorize/void path using USD 1.23 Sandbox orders.
+
+For verified webhook delivery, configure a public HTTPS endpoint ending in /api/webhooks/paypal and set PAYPAL_WEBHOOK_ID.
+
+Use PayPal certification and the external integration runbook for the complete procedure.
 
 </details>
+Benchmark: show the wins and the misses
+The scheduling benchmark replays 500 seeded synthetic nights and 1,500 requests across four policies. Every generated plan goes through the independent feasibility validator.
 
-## PayPal Sandbox integration
+Scheduling policy	Requests served / 1,500	Mean modeled energy cost / session	Mean site peak
+Charge immediately	1,246	$10.61	22.1 kW
+Static off-peak start	1,024	$6.01	20.2 kW
+Greedy cheapest tariff	1,243	$6.86	21.9 kW
+GridWindow optimizer	1,254	$5.44	17.6 kW
+The independent validator reported zero feasibility-validation failures for these runs. The optimized policy produced the lowest mean modeled energy cost and mean site peak in this particular synthetic benchmark, while serving the most requests.
 
-The development team ran two full scenarios through the app against the genuine PayPal Sandbox, using a Sandbox buyer account and Sandbox money. Details and limits are in [docs/EVIDENCE.md](docs/EVIDENCE.md).
+What did not go well:
 
-| Scenario | What happened | Outcome |
-|---|---|---|
-| **A. Successful charging** (2026-11-06) | Buyer approval, authorization of USD 14.82, simulated delivery of 30.015 kWh against a 30 kWh target, one capture | Provider reported the capture completed. Webhooks for approval, authorization and capture were verified and processed. |
-| **B. Charging outage** (2026-11-07) | Same approval flow, authorization of USD 14.19, operator-injected outage, 0 kWh delivered | Provider reported the authorization voided, with no capture and USD 0.00 collected. The void webhook was verified and processed. |
+246 of 1,500 requests were infeasible even for the optimizer because the energy could not fit within the parking time and station constraints.
+Compared request by request, the optimizer cost more than immediate charging in 62 comparisons, more than static off-peak in 49, and more than greedy tariff in 14. These are 125 unfavorable pairwise comparisons, not 125 unique sessions.
+Benchmark values depend on the chosen synthetic load, prices, and station assumptions. They are not measured utility savings or real-world performance guarantees.
+The source outputs are in `artifacts/benchmark/summary.json` and the companion requests.csv. The interactive comparison is available inside the app at /impact-lab.
 
-Four webhook event types were verified live with PayPal's signature check over the raw body. The first two events initially went to a webhook registered without the `/api/webhooks/paypal` path, so they were not processed. After the URL was corrected, each was resent once and processed. This is recorded in the evidence page.
+A separate 200-seed recovery benchmark compares the original schedule with the recovery workflow, including unsuccessful and infeasible cases. See Recovery benchmark.
 
-No real customer funds were involved, and the "delivery" was the built-in simulator, not live charging hardware. Judges can reproduce Sandbox mode only with their own Sandbox app credentials:
+Scope and limitations
+Area	What is demonstrated	What is not claimed
+Charging	A schedule and simulated energy-delivery ledger	Live EV hardware control or metered utility delivery
+Site economics	Transparent synthetic tariffs, fees, modeled savings, and contribution	Verified customer savings or utility bill reductions
+Payments	MOCK and authentic PayPal Sandbox authorization/capture/void	Production payments or escrow
+Recovery	Guarded rescheduling and explicit consent boundaries in simulation	Field-tested resilience or completed PayPal Sandbox recovery settlement
+AI	Optional interpretation, explanation, and bounded candidate selection	AI control of prices, consent, or funds
+Identity	Pseudonymous driver sessions and a demo operator passphrase	Production-grade identity and access management
+Scheduling UI	Read-only Bryntum timeline plus an accessible reference table	Fully editable scheduling UI or complete vendor-grid accessibility
+Further details that matter to reviewers:
 
-1. Create a Sandbox REST app and a Sandbox buyer account in the PayPal Developer Dashboard.
-2. In `.env.local`, set `PAYMENT_MODE=paypal_sandbox`, `PAYPAL_ENV=sandbox`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_EXPECTED_MERCHANT_ID` and `APP_BASE_URL`. Never commit these values.
-3. Run `npm run paypal:smoke` to print the plan without any network call. Add `-- --approve-sandbox-orders` to run one authorize and capture plus one authorize and void of USD 1.23 each.
-4. Webhooks are optional. They need a public HTTPS URL ending in `/api/webhooks/paypal` and `PAYPAL_WEBHOOK_ID`; see [docs/PAYPAL_CERTIFICATION.md](docs/PAYPAL_CERTIFICATION.md) and [docs/EXTERNAL_INTEGRATION.md](docs/EXTERNAL_INTEGRATION.md).
+Synthetic disturbances are labeled as such. The system labels recovery decisions MODEL_DECISION only when a trace supports live-model involvement; otherwise it reports DETERMINISTIC_FALLBACK.
+Bryntum Scheduler Community 8.0.0 has known accessibility findings in its own grid DOM. The adjacent accessible table is the reference view. The bundled Bryntum license text has not yet been independently checked by the project. See Bryntum notes and third-party notices.
+The free Gemini tier may allow provider use of prompts to improve products. Do not enter personal or sensitive information into this demo.
+This prototype is not ready for deployment as a real charging service or production payment system.
+Troubleshooting
+<details> <summary><strong>Common local setup issues</strong></summary>
+Symptom	What to check
+Old npm crashes	Install Node.js 22+ and use its bundled npm 10+
+Build fails while downloading fonts	The first build needs network access for Geist fonts
+Operator console is not configured	Set OPERATOR_PASSPHRASE to at least 12 characters
+SERVER_MISCONFIGURED (503)	Inspect the server log for the missing or invalid setting; secret values are not printed
+Port 3000 is occupied	Start with npm start -- -p 3200 and update APP_BASE_URL to http://localhost:3200
+Request origin not allowed	Open the exact APP_BASE_URL origin or configure permitted ALLOWED_ORIGINS
+PayPal return fails	Match APP_BASE_URL to the browser origin; cookies are origin-bound
+Webhooks do not arrive	Check the /api/webhooks/paypal path, PAYPAL_WEBHOOK_ID, and trusted proxy settings
+Tests refuse hosted services	Test isolation intentionally blocks hosted databases, model keys, and non-MOCK payments
+Need a fresh local demo	Stop the server and delete .data/, or use the demo reset with DEMO_TOOLS=true
+For public preview origins, use HTTPS. ALLOWED_ORIGINS accepts exact origins only, with no wildcard or path. Set TRUST_PROXY=true only when requests come through a trusted tunnel or proxy.
 
-## Testing and benchmark
+</details>
+Documentation and deeper dives
+Start here	Why it matters
+Judge walkthrough
+Credential-free evaluation path and optional integrations
+Demo script
+Under-three-minute presentation sequence
+Architecture
+Trust boundaries, state machines, and data flow
+Award evidence
+Claim-by-claim status, including gaps
+Evidence log
+Sanitized Sandbox and model test records
+Economics
+Assumptions, offer rules, worked calculations, and physics checks
+Recovery benchmark
+200-seed recovery comparisons
+Recovery findings
+Shortfalls and operator margin tradeoffs
+<details> <summary><strong>More technical references</strong></summary>
+Reference	Topic
+PayPal certification
+Sandbox and webhook checks
+External integration
+PayPal and AI runbook
+External preflight
+Required approvals for integration testing
+Migrations
+Database migration procedure
+Bryntum notes
+Time zone, accessibility, and licensing review
+Skipped tests
+Test inventory and gating
+Third-party dependencies
+Package licenses
+License and secrets checklist
+License and client-bundle scan checks
+Devpost draft
+Hackathon submission copy
+</details>
+Creators
+Piyusha Sayal and Satyam Pandey
 
-Results on the final combined-release tree:
+Built to explore a practical question: What if EV charging was scheduled around the driver's actual deadline, and payment depended on what the charger could prove it delivered?
 
-| Check | Result |
-|---|---|
-| TypeScript strict check (`tsc --noEmit`) and ESLint | 0 errors, 0 problems |
-| Vitest (unit and integration, including adversarial payment cases on embedded PostgreSQL) | 806 passed, 12 skipped (the skipped tests are the gated real-PostgreSQL checks) |
-| Real-PostgreSQL checks on a disposable local PostgreSQL 18.1 server (separate run) | 11 passed, 1 skipped (restart test needs `TEST_PG_RESTART_CMD`) |
-| Playwright (21 spec files, one worker, isolated data; axe accessibility and keyboard tests) | 0 failed, 6 skipped by design |
-| Production builds | pass |
-| `npm run release:scan` (secret and configured-value scan of the client bundle) | PASS |
-| `npm audit --omit=dev` | 0 vulnerabilities |
-| `npm run benchmark:recovery` | deterministic (two runs identical) |
+Released under the MIT License. Copyright © 2026 Piyusha Sayal and Satyam Pandey. Third-party dependencies retain their respective licenses. Geist fonts use the SIL Open Font License.
 
-Run them yourself with the commands in [Running the tests](#running-the-tests). See [docs/AWARD_EVIDENCE.md](docs/AWARD_EVIDENCE.md) for what each result does and does not show, and [docs/JUDGES.md](docs/JUDGES.md) for the judge walkthrough.
+<div align="center">
+Plan carefully. Charge flexibly. Settle against delivery.
 
-### The benchmark
+Back to top · Run the demo · Review the evidence · Open issues
 
-`npm run benchmark` replays 500 seeded synthetic nights (1,500 requests) against four policies: charge immediately, a static off-peak start, a greedy cheapest-tariff policy, and the optimizer. An independent validator re-checks every plan, and it reported 0 failures. Results are in [`artifacts/benchmark/summary.json`](artifacts/benchmark/summary.json) and `requests.csv`, and are shown in the Impact Lab at `/impact-lab`.
+</div>
 
-| Policy | Served of 1,500 | Mean modeled energy cost per session | Mean site peak |
-|---|---|---|---|
-| Immediate | 1,246 | $10.61 | 22.1 kW |
-| Static off-peak | 1,024 | $6.01 | 20.2 kW |
-| Greedy tariff | 1,243 | $6.86 | 21.9 kW |
-| Optimized | 1,254 | $5.44 | 17.6 kW |
 
-The optimizer was not better on every request. Compared request by request, it cost more than immediate charging in 62 cases, more than static off-peak in 49 and more than greedy tariff in 14, which is 125 unfavorable comparisons in total. 246 of the 1,500 requests are infeasible even for the optimizer (the port and site cannot deliver the requested energy in the parked time), and those are excluded from the pairwise comparisons. The pairwise table is on the benchmark page.
 
-The benchmark measures how scheduling policies behave under one set of synthetic tariffs, loads and a fixed demo station. It does not measure real utility costs, real vehicles or real grid benefit, and the numbers should not be read as predicted savings.
 
-## Limitations and transparency
-
-- Charging, energy delivery, building load and forecasts come from a simulator. No vehicle is charged.
-- Tariffs, fees, costs and savings are modeled from assumptions that are shown with every offer. They are not measured results.
-- Payments use the PayPal Sandbox or a MOCK provider that says so on screen. A PayPal authorization is a hold, not escrow. Recovery settlement has not been run in PayPal Sandbox.
-- Disturbances are SYNTHETIC, injected by the operator. Recovery decisions are labeled MODEL_DECISION only when the run record shows a live model decided. Otherwise they are labeled DETERMINISTIC_FALLBACK.
-- Bryntum's timeline is read-only. Its own grid has known accessibility violations (vendor DOM), so the accessible table is the reference view. The Bryntum license text inside the installed package has not been checked by the project; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-- The settlement sweep runs every 5 minutes in the background, with no UI trigger.
-- The AI interprets and explains. It cannot set prices, give consent, or authorize, capture or void a payment. Free-tier Gemini traffic may be used by Google to improve its products, so do not enter personal data.
-- Driver and operator identities are pseudonymous demo sessions, not production authentication.
-- This is not a production utility or commercial charging deployment.
-
-## Documentation
-
-| Document | Contents |
-|---|---|
-| [docs/JUDGES.md](docs/JUDGES.md) | Credential-free walkthrough and what needs credentials |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layers, trust boundaries, payment states, evidence map |
-| [docs/EVIDENCE.md](docs/EVIDENCE.md) | Sanitized record of the Sandbox and Gemini runs, with known limits |
-| [docs/08_ECONOMICS.md](docs/08_ECONOMICS.md) | Synthetic assumptions, offer rules, worked example, physics checks |
-| [docs/PAYPAL_CERTIFICATION.md](docs/PAYPAL_CERTIFICATION.md) | Sandbox and webhook certification procedure |
-| [docs/EXTERNAL_INTEGRATION.md](docs/EXTERNAL_INTEGRATION.md) | Runbook for Sandbox, webhooks and AI smoke tests |
-| [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md) | Third-party package licenses |
-| [docs/RECOVERY_BENCHMARK.md](docs/RECOVERY_BENCHMARK.md) | Synthetic recovery benchmark: static plan vs recovery, with unfavorable and infeasible cases |
-| [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | Under-three-minute walkthrough (MOCK mode) with click path and pre-demo checklist |
-| [docs/AWARD_EVIDENCE.md](docs/AWARD_EVIDENCE.md) | PASS, FAIL, BLOCKED and NOT TESTED status per claim (Bryntum, Agentic Commerce, PayPal + AI) |
-| [docs/MIGRATIONS.md](docs/MIGRATIONS.md) | Migration behaviour by database and the confirmed apply procedure |
-| [docs/BRYNTUM_NOTES.md](docs/BRYNTUM_NOTES.md) | Bryntum verification: time zones, accessibility findings, licensing |
-| [docs/RECOVERY_BENCHMARK_FINDINGS.md](docs/RECOVERY_BENCHMARK_FINDINGS.md) | Investigation of recovery shortfalls and operator-margin results |
-| [docs/EXTERNAL_PREFLIGHT.md](docs/EXTERNAL_PREFLIGHT.md) | Required approvals for live Gemini, PayPal Sandbox and Neon runs |
-| [docs/SKIPPED_TESTS.md](docs/SKIPPED_TESTS.md) | Inventory of skipped tests and their gates |
-| [docs/LICENSE_AND_SECRETS_CHECKLIST.md](docs/LICENSE_AND_SECRETS_CHECKLIST.md) | Bryntum license status and secret scan results |
-| [docs/DEVPOST.md](docs/DEVPOST.md) | Hackathon submission text (draft) |
-
-## Credits and license
-
-Created by Piyusha Sayal and Satyam Pandey. Released under the [MIT License](LICENSE), Copyright (c) 2026 Piyusha Sayal and Satyam Pandey. Geist fonts (SIL Open Font License) are loaded from Google Fonts at build time. No third-party images or datasets are included.
