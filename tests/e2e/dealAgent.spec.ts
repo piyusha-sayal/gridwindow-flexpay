@@ -16,7 +16,7 @@ async function fillFromWords(page: Page, words: string) {
   await expect(page.getByLabel("Charging request in words")).toHaveAttribute("placeholder", "Find me 30 kWh before 7 AM and save at least $4.");
   await page.getByLabel("Charging request in words").fill(words);
   await page.getByRole("button", { name: "Fill form" }).click();
-  await expect(page.getByText(/Deterministic fallback|AI ·/).first()).toBeVisible();
+  await expect(page.getByText(/Deterministic fallback|AI ·/).first()).toBeAttached();
 }
 
 /**

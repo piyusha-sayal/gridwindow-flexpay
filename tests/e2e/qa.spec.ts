@@ -63,7 +63,7 @@ test.describe("keyboard-only journeys", () => {
     await page.keyboard.press("Tab");
     expect((await focused(page)).name).toBe("Fill form");
     await page.keyboard.press("Enter");
-    await expect(page.getByText(/Deterministic fallback \(no AI\)/)).toBeVisible();
+    await expect(page.getByText(/Deterministic fallback \(no AI\)/)).toBeAttached();
 
     // A future night, so the run never depends on wall-clock time (after midnight the default night's
     // window may already have started and the approval-deadline guard would correctly refuse it).
@@ -90,7 +90,7 @@ test.describe("keyboard-only journeys", () => {
 
     await tabUntil(page, (f) => f.name.startsWith("Why is it cheaper?"));
     await page.keyboard.press("Enter");
-    await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeVisible();
+    await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeAttached();
 
     await tabUntil(page, (f) => f.name === "Review and approve");
     await page.keyboard.press("Enter");
@@ -242,7 +242,7 @@ test("layout and full axe report per viewport (all impacts)", async ({ page }, i
   await page.getByRole("button", { name: "See offers" }).click();
   await expect(page.getByRole("heading", { name: /flexible offer|cannot be met/ })).toBeVisible();
   await page.getByRole("button", { name: "Why is it cheaper?" }).first().click();
-  await expect(page.getByText(/Deterministic fallback/).first()).toBeVisible();
+  await expect(page.getByText(/Deterministic fallback/).first()).toBeAttached();
   await audit("drive-offers-terms");
   await page.getByRole("button", { name: "Review and approve" }).click();
   await audit("drive-approve-terms");

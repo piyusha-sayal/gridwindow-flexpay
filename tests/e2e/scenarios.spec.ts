@@ -57,7 +57,7 @@ test("Scenario A: flexible agreement → mock authorization → simulated charge
   await expect(page.getByText("Feasible · validated").first()).toBeVisible();
   // Grounded explanation: without model credentials the deterministic fallback is labeled as such.
   await page.getByRole("button", { name: "Why is it cheaper?" }).first().click();
-  await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeVisible();
+  await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeAttached();
   await page.getByRole("button", { name: "Review and approve" }).click();
   await expect(page.getByText("Merchant", { exact: true })).toBeVisible();
   await expect(page.getByText("MOCK payment · simulated").first()).toBeVisible();

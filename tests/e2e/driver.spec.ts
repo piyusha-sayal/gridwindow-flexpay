@@ -66,7 +66,7 @@ test("natural-language box only fills form fields", async ({ page }) => {
   await expect(page.getByLabel("Ready by (next morning)")).toHaveValue("06:30");
   await expect(page.getByLabel("Budget (USD)")).toHaveValue("12.00");
   await expect(page.getByRole("radio", { name: /^Port B/ })).toBeChecked();
-  await expect(page.getByText(/Deterministic fallback \(no AI\)/)).toBeVisible();
+  await expect(page.getByText(/Deterministic fallback \(no AI\)/)).toBeAttached();
 });
 
 test("wizard keeps its state across reload and moves between steps with browser back/forward", async ({ page }, info) => {

@@ -4,6 +4,7 @@ import type { DealEvaluation } from "@/domain/dealAgent";
 import { meetsRequiredSaving, type PricedOffer, type QuoteSet } from "@/domain/quotes";
 import { formatLocalTime } from "@/domain/time";
 import { formatKWh, formatUsd, SLOT_MS } from "@/domain/units";
+import { PREFERENCES } from "./driverTypes";
 import { AxisTicks, PowerBars, quoteAxis, TariffStrip } from "./NightAxis";
 
 const REJECTION_COPY: Record<string, string> = {
@@ -143,7 +144,6 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
                       {blocked && <span className="badge no-dot tone-warn">Below your required {formatUsd(quote.requiredMinSavingsCents!)} saving · change requirements to choose</span>}
                       {belowPreference && <span className="badge no-dot tone-warn">Below your preferred {formatUsd(preferredMinSavingsCents!)} saving</span>}
                       {o.kind === recommendedKind && <span className="badge no-dot tone-info">Your preference</span>}
-                      {o.kind === "flex_gentle" && <span className="badge no-dot tone-neutral">{t.maxPowerW / 1000} kW peak</span>}
                       {tiedHigherPeak && <span className="badge no-dot tone-info">Same price, lower peak power.</span>}
                     </span>
                   </span>
@@ -160,7 +160,7 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
                   </span>
                 </span>
               </label>
-              {o.kind === "flex_gentle" && <GentleWhy peakKw={t.maxPowerW / 1000} portKw={maxW / 1000} tiedHigherPeak={tiedHigherPeak} />}
+              <PlanFit offer={o} quote={quote} recommendedKind={recommendedKind} tz={tz} />
               </div>
             );
           })}
@@ -190,22 +190,51 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
   );
 }
 
-/** Short, grounded explanation of the real lower-power schedule. Makes no battery-health or extra-saving claims. */
-function GentleWhy({ peakKw, portKw, tiedHigherPeak }: { peakKw: number; portKw: number; tiedHigherPeak: boolean }) {
+/**
+ * At most three plain-language points about one offer, each derived from the quote itself: what it delivers and when,
+ * how it matches the driver's preference, and the one trade-off against the other offers. No savings are claimed here.
+ */
+export function planFitPoints(offer: PricedOffer, quote: QuoteSet, recommendedKind: PricedOffer["kind"], tz: string): string[] {
+  const t = offerTraits(offer);
+  const all = quote.offers.map((o) => ({ price: o.priceCents, traits: offerTraits(o) }));
+  const others = quote.offers.filter((o) => o.offerId !== offer.offerId);
+  const preference = PREFERENCES.find((p) => p.kind === recommendedKind)?.label.toLowerCase();
+  const meetsDeadline = offer.chargeEndMs <= quote.request.departMs;
+
+  const delivery = `Delivers ${formatKWh(quote.request.targetBatteryWh)}${meetsDeadline ? `, ready by ${formatLocalTime(t.readyByMs, tz)} and before you leave at ${formatLocalTime(quote.request.departMs, tz)}` : ""}.`;
+
+  const lowest = lowestPriceOfferIds(quote.offers);
+  const earliestReady = Math.min(...all.map((a) => a.traits.readyByMs));
+  const fit: string[] = [];
+  if (offer.kind === recommendedKind && preference) fit.push(`Matches your ${preference} preference.`);
+  if (offer.kind === "flex_lowest_cost" && quote.offers.length > 1 && lowest.has(offer.offerId)) fit.push(lowest.size > 1 ? "Tied for the lowest price." : `Lowest price of the ${quote.offers.length} offers.`);
+  if (offer.kind === "flex_early_finish" && quote.offers.length > 1 && t.readyByMs === earliestReady) fit.push("Earliest ready time of the offers.");
+  if (offer.kind === "flex_gentle") fit.push(`Never draws more than ${t.maxPowerW / 1000} kW on a ${quote.capacity.portMaxPowerW / 1000} kW port.`);
+
+  const minSlots = Math.min(...all.map((a) => a.traits.chargingSlots));
+  const minPrice = Math.min(...all.map((a) => a.price));
+  const candidates: Record<string, string | null> = {
+    longer: t.chargingSlots > minSlots ? `Takes ${hoursMinutes(t.chargingSlots)} of charging, against ${hoursMinutes(minSlots)} for the shortest offer.` : null,
+    pricier: offer.priceCents > minPrice ? `Costs ${formatUsd(offer.priceCents - minPrice)} more than the lowest-priced offer.` : null,
+    later: t.readyByMs > earliestReady ? `Ready ${Math.round((t.readyByMs - earliestReady) / 60_000)} min after the earliest offer.` : null,
+  };
+  const order = offer.kind === "flex_gentle" ? ["longer", "pricier", "later"] : offer.kind === "flex_early_finish" ? ["pricier", "longer", "later"] : ["later", "longer", "pricier"];
+  const tradeoff = order.map((k) => candidates[k]).find((c): c is string => c !== null) ?? (others.length === 0 ? "This is the only offer that fits your request." : "No meaningful trade-off against the other offers shown.");
+
+  return [delivery, ...(fit.length ? [fit.join(" ")] : []), tradeoff];
+}
+
+/** Collapsed by default: the customer sees the offer first and opens the reasoning only if wanted. */
+function PlanFit({ offer, quote, recommendedKind, tz }: { offer: PricedOffer; quote: QuoteSet; recommendedKind: PricedOffer["kind"]; tz: string }) {
+  const points = planFitPoints(offer, quote, recommendedKind, tz);
   return (
-    <div className="px-4 pb-3 pt-1 min-[760px]:px-5 text-[13px] text-text-2 space-y-1.5">
-      <p>Lower-power charging that reduces peak demand while still meeting your departure deadline.</p>
-      <details>
-        <summary className="cursor-pointer text-teal-ink underline underline-offset-4">Why choose this plan?</summary>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>
-            Full power on this port is up to {portKw} kW. This plan never draws more than {peakKw} kW, so it takes longer to deliver the same energy.
-          </li>
-          <li>It only appears when the slower schedule still delivers your energy before you leave.</li>
-          <li>Lower instantaneous power means less load on the site when several cars charge at once.</li>
-          <li>{tiedHigherPeak ? "Same price, lower peak power than another offer." : "Its price can differ from the other offers because it uses different time slots."} It is not automatically cheaper.</li>
-        </ul>
-      </details>
-    </div>
+    <details className="px-4 pb-3 pt-1 min-[760px]:px-5 text-[13px] text-text-2">
+      <summary className="cursor-pointer text-teal-ink underline underline-offset-4">Why this plan fits</summary>
+      <ul className="mt-2 list-disc space-y-1 pl-5">
+        {points.map((p) => (
+          <li key={p}>{p}</li>
+        ))}
+      </ul>
+    </details>
   );
 }

@@ -91,12 +91,16 @@ const FALLBACK_COPY: Record<string, string> = {
   REQUEST_REJECTED: "AI service rejected the request",
 };
 
-/** Always tells the user whether text came from the model or the deterministic fallback. */
+/**
+ * Provenance stays one click away instead of a banner: the text says whether a model wrote this or the
+ * deterministic fallback did, so a fallback answer is never presented as an AI answer.
+ */
 export function AiSourceBadge({ src }: { src: AiSource }) {
-  return src.source === "MODEL" ? (
-    <Badge tone="info">AI · {src.model} · numbers verified against backend</Badge>
-  ) : (
-    <Badge tone="neutral">Deterministic fallback (no AI) · {FALLBACK_COPY[src.reason] ?? src.reason}</Badge>
+  return (
+    <details className="text-[12px] text-muted">
+      <summary className="cursor-pointer underline underline-offset-4">How this was generated</summary>
+      <p className="mt-1">{src.source === "MODEL" ? `AI · ${src.model} · numbers verified against backend` : `Deterministic fallback (no AI) · ${FALLBACK_COPY[src.reason] ?? src.reason}`}</p>
+    </details>
   );
 }
 

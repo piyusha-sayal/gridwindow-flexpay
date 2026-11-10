@@ -53,7 +53,7 @@ test("demo rehearsal (MOCK): timed per DEMO_PLAN", async ({ page }) => {
   await step("driver request → offers (port A; the seed occupies B and C)", () => requestOffers(page, "A", night));
   await step("grounded explanation (fallback)", async () => {
     await page.getByRole("button", { name: "Why is it cheaper?" }).first().click();
-    await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeVisible();
+    await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeAttached();
   });
   await step("consent → MOCK checkout → authorized", async () => {
     await page.getByRole("button", { name: "Review and approve" }).click();

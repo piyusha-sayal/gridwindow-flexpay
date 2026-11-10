@@ -5,7 +5,8 @@ import { AiSourceBadge, type AiSource } from "@/components/ui";
 import type { ParsedRequest } from "@/domain/nlRequest";
 import { AxisTicks, FIXED_NIGHT_AXIS, pctOf } from "./NightAxis";
 import { GuidedDemo } from "./GuidedDemo";
-import { PREFERENCES, type DriverConfig, type FieldErrors, type FormState } from "./driverTypes";
+import { ChoiceGroup } from "./ChoiceGroup";
+import { PORT_GUIDE, PREFERENCES, PREFERENCE_GUIDE, type DriverConfig, type FieldErrors, type FormState } from "./driverTypes";
 import { AXIS_MINUTES, formatDuration, summarizeRequest } from "./requestSummary";
 
 export type ParseResult = { parsed: ParsedRequest } & AiSource;
@@ -129,23 +130,28 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
           <ParkedStrip form={form} portMaxPowerW={port?.maxPowerW ?? 0} />
         </Row>
 
-        <Row label={<span id="port-label">Port</span>} hintId="portId-hint" hint="Where you're parked. Your car occupies it the whole time.">
-          <div role="radiogroup" aria-labelledby="port-label" aria-describedby="portId-hint" className="flex flex-wrap gap-2">
-            {config.station.ports.map((p) => {
-              const on = form.portId === p.id;
-              return (
-                <label
-                  key={p.id}
-                  className={`relative flex-[1_1_110px] min-h-[72px] cursor-pointer rounded-[var(--r-input)] border px-4 py-2.5 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-ink ${on ? "border-ink bg-ink text-white" : "border-line-strong bg-surface hover:border-ink"}`}
-                >
-                  <input id={`port-${p.id}`} type="radio" name="port" value={p.id} checked={on} onChange={() => onUpdate({ portId: p.id })} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
-                  <span className="block text-[16px] font-semibold">Port {p.label}</span>
-                  <span className={`block font-mono text-[11px] tracking-[0.06em] uppercase ${on ? "text-on-navy-muted" : "text-muted"}`}>Up to {p.maxPowerW / 1000} kW</span>
-                  {p.tier && <span className={`block text-[12px] ${on ? "text-on-navy-muted" : "text-muted"}`}>{p.tier}</span>}
-                </label>
-              );
+        <Row label={<span id="port-label">Port</span>} hintId="portId-hint" hint="Where you park. Your car occupies it the whole time.">
+          <ChoiceGroup
+            name="port"
+            labelledBy="port-label"
+            describedBy="portId-hint"
+            value={form.portId}
+            inputId={(id) => `port-${id}`}
+            onChange={(id) => onUpdate({ portId: id })}
+            choices={config.station.ports.map((p) => {
+              const guide = PORT_GUIDE[p.id];
+              return {
+                id: p.id,
+                label: `Port ${p.label}`,
+                meta: [`Up to ${p.maxPowerW / 1000} kW`, ...(p.tier ? [p.tier] : [])],
+                summary: guide?.summary ?? p.tier ?? "",
+                benefitTitle: "Why choose this port?",
+                benefit: guide?.benefit ?? "Rated power is shown above.",
+                tradeoffTitle: "Why might it not suit you?",
+                tradeoff: guide?.tradeoff ?? "Check that the rated power can deliver your energy before your deadline.",
+              };
             })}
-          </div>
+          />
         </Row>
 
         <Row label={<label htmlFor="cap">Budget<span className="sr-only"> (USD)</span></label>} hintId="spendCap-hint" hint="The most you'll pay. Offers above it aren't shown.">
@@ -153,24 +159,33 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
           {err("spendCap")}
         </Row>
 
-        <Row label={<label htmlFor="minsave">Minimum saving<span className="sr-only"> (USD, optional)</span></label>} hintId="minSavings-hint" hint="Optional. Versus charging now. A preference unless you require it; a required saving blocks approving any offer that saves less.">
+        <Row label={<label htmlFor="minsave">Minimum saving<span className="sr-only"> (USD, optional)</span></label>} hintId="minSavings-hint" hint="Optional. Compared with charging now.">
           <UsdInput id="minsave" invalid={!!errors.minSavings} value={form.minSavings} placeholder="any" onChange={(v) => onUpdate({ minSavings: v })} {...field("minSavings")} />
           <label className="mt-2 flex items-start gap-2 text-[14px] text-text-2 cursor-pointer">
             <input id="minsave-required" type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--ink)]" checked={form.minSavingsRequired} onChange={(e) => onUpdate({ minSavingsRequired: e.target.checked })} />
-            <span>Require this saving: don&apos;t let me approve an offer that saves less</span>
+            <span>Require this saving. Offers that save less cannot be approved.</span>
           </label>
           {err("minSavings")}
         </Row>
 
         <Row label={<span id="pref-label">Preference</span>} hintId="preference-hint" hint="Highlights a matching offer. Every offer meets your deadline.">
-          <div className="seg" role="radiogroup" aria-labelledby="pref-label" aria-describedby="preference-hint">
-            {PREFERENCES.map((p) => (
-              <label key={p.value}>
-                <input type="radio" name="preference" value={p.value} checked={form.preference === p.value} onChange={() => onUpdate({ preference: p.value })} />
-                {p.label}
-              </label>
-            ))}
-          </div>
+          <ChoiceGroup
+            name="preference"
+            labelledBy="pref-label"
+            describedBy="preference-hint"
+            value={form.preference}
+            onChange={(id) => onUpdate({ preference: id as FormState["preference"] })}
+            choices={PREFERENCES.map((p) => ({
+              id: p.value,
+              label: p.label,
+              meta: [],
+              summary: PREFERENCE_GUIDE[p.value].summary,
+              benefitTitle: "What it does",
+              benefit: PREFERENCE_GUIDE[p.value].benefit,
+              tradeoffTitle: "Trade-off",
+              tradeoff: PREFERENCE_GUIDE[p.value].tradeoff,
+            }))}
+          />
         </Row>
 
         <div className="flex flex-wrap items-center gap-4 border-t border-line pt-6">

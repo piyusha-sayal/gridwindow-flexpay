@@ -83,13 +83,16 @@ export default function HowItWorksPage() {
         <HowItWorksSteps />
       </section>
 
-      <section aria-labelledby="faq" className="space-y-4 max-w-[820px]">
-        <h2 id="faq" className="text-[22px] font-semibold tracking-[-0.01em]">Frequently asked questions</h2>
-        <div className="space-y-3">
+      <section aria-labelledby="faq" className="space-y-5">
+        <h2 id="faq" className="text-[clamp(24px,2.8vw,30px)] font-semibold tracking-[-0.01em]">Frequently asked questions</h2>
+        <div className="grid items-start gap-3 min-[1000px]:grid-cols-2">
           {FAQ.map((item) => (
-            <details key={item.question} className="card p-4 group">
-              <summary className="cursor-pointer font-semibold">{item.question}</summary>
-              <div className="mt-3 space-y-2 text-text-2">
+            <details key={item.question} className="card group px-5 py-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-semibold [&::-webkit-details-marker]:hidden">
+                {item.question}
+                <span aria-hidden="true" className="font-mono text-[20px] leading-none text-teal-ink transition-transform group-open:rotate-45">+</span>
+              </summary>
+              <div className="mt-3 space-y-2 border-t border-line pt-3 text-[15px] leading-relaxed text-text-2">
                 {item.answer.map((line) => (
                   <p key={line}>{line}</p>
                 ))}

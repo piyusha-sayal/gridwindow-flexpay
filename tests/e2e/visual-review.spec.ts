@@ -93,9 +93,9 @@ test("state gallery: validation, infeasible, terms, authorized, captured, pendin
 
   await requestOffers(page, nightAt(40), "A");
   await expect(page.getByText(/^(Lowest price of \d offers|Tied lowest price \(\d of \d offers\))$/).first()).toBeVisible();
-  await expect(page.getByText("Ready by").first()).toBeVisible();
+  await expect(page.getByText("Ready by").locator("visible=true").first()).toBeVisible();
   await page.getByRole("button", { name: "Why is it cheaper?" }).first().click();
-  await expect(page.getByText(/Deterministic fallback/).first()).toBeVisible();
+  await expect(page.getByText(/Deterministic fallback/).first()).toBeAttached();
   await shot(page, "state-04-offers-with-explanation");
   await page.getByRole("button", { name: "Review and approve" }).click();
   await page.getByRole("checkbox").check();

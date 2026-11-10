@@ -39,6 +39,44 @@ export const PREFERENCES: { value: ChargePreference; label: string; kind: Priced
   { value: "gentle", label: "Gentle charging", kind: "flex_gentle" },
 ];
 
+/** Plain-language guidance for the three station ports (copy only; capacities and feasibility come from the server). */
+export const PORT_GUIDE: Record<string, { summary: string; benefit: string; tradeoff: string }> = {
+  port_a: {
+    summary: "Lower power, suitable for longer charging stays.",
+    benefit: "A good fit when you will be parked long enough for a slower charge.",
+    tradeoff: "May not reach a large energy target before a tight deadline.",
+  },
+  port_b: {
+    summary: "Balanced charging speed and power demand.",
+    benefit: "A middle option when you want some room in both speed and timing.",
+    tradeoff: "May be too slow for a very large energy target in a short stay.",
+  },
+  port_c: {
+    summary: "Faster energy delivery for tighter deadlines.",
+    benefit: "A good fit when you need more energy in less time.",
+    tradeoff: "Draws more site power at once, so it is not always the best fit for a long, relaxed stay.",
+  },
+};
+
+/** What each charging preference prioritizes and what it can cost you (copy only; ranking is unchanged). */
+export const PREFERENCE_GUIDE: Record<ChargePreference, { summary: string; benefit: string; tradeoff: string }> = {
+  lowest_cost: {
+    summary: "Prioritizes the lowest-priced eligible option.",
+    benefit: "Highlights the offer with the lowest price among those that meet your deadline.",
+    tradeoff: "It may not finish earliest.",
+  },
+  early_finish: {
+    summary: "Prioritizes earlier completion when feasible.",
+    benefit: "Highlights an offer that is ready sooner when your parking window allows it.",
+    tradeoff: "Price and power profile may differ from other offers.",
+  },
+  gentle: {
+    summary: "Reduces instantaneous power while meeting the deadline when feasible.",
+    benefit: "Highlights an offer with a lower peak charging power.",
+    tradeoff: "It may require longer charging time.",
+  },
+};
+
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 const toMinutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
 

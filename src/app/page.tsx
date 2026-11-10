@@ -178,16 +178,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
-      <section aria-labelledby="cta" className="card card-navy px-6 py-10 text-center space-y-5">
-        <h2 id="cta" className="text-[clamp(26px,3.2vw,36px)]">
-          Ready to plan tonight&apos;s charge?
-        </h2>
-        <p className="mx-auto max-w-[520px] opacity-90">It takes about a minute. You approve every term before anything is authorized.</p>
-        <Link href="/drive" className="btn btn-primary px-6 py-3">
-          Plan My Charge
-        </Link>
-      </section>
     </div>
   );
 }
