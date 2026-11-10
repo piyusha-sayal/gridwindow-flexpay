@@ -26,7 +26,10 @@ import { BudgetExceededError, MeteredLlm } from "./aiSmokeFlow";
 import { boundedToolVerdict, pickLiveEnv, skippedModelReasons, summarizeTrace, type BoundedVerdict } from "./recoveryLiveFlow";
 
 const APPROVAL_FLAG = "--approve-gemini-calls";
-const MAX_REQUESTS = 6;
+/** Default cap on model requests in one run; `--max-requests=N` can only lower it. */
+const DEFAULT_MAX_REQUESTS = 6;
+const requestFlag = Number(process.argv.find((a) => a.startsWith("--max-requests="))?.slice("--max-requests=".length));
+const MAX_REQUESTS = Number.isInteger(requestFlag) && requestFlag >= 1 ? Math.min(requestFlag, DEFAULT_MAX_REQUESTS) : DEFAULT_MAX_REQUESTS;
 const BUDGET_USD = 0.25;
 /** Budgeting only: a conservative planning rate. The Gemini free tier is priced at $0 and the paid tariff was not verified. */
 const PLANNING_PRICE = { inPerMTok: 10, outPerMTok: 50 };
