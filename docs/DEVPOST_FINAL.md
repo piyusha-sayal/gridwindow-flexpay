@@ -3,13 +3,13 @@
 Final submission text. Every sentence is limited to what the repository, the tests and the captured screenshots support. Statements that would need live Gemini or PayPal Sandbox proof are written in their evidence-free form; the owner-decision checklist at the end says what to upgrade, and when. Not submitted.
 
 ## Title
-GridWindow FlexPay: a charging promise that repairs itself, safely
+GridWindow FlexPay: repairing disrupted EV charging promises, safely and honestly
 
 ## Central differentiation
 Constraint-aware EV charging recovery combined with explicit customer consent and verifiable financial settlement: a disrupted charging promise is repaired only with a plan the deterministic engine has proven valid, only within what the driver consented to, and money moves only on delivered-energy evidence.
 
 ## Tagline
-When a charger slows down, an agent-style recovery workflow finds a fix, a deterministic validator proves it, the driver consents if needed, Bryntum shows the new schedule, and money moves only after energy is delivered.
+When a charger slows down, a recovery workflow looks for a valid fix (not every disruption can be repaired), a deterministic validator proves it, the driver consents if needed, Bryntum shows the new schedule, and money moves only after energy is delivered.
 
 ## Inspiration
 Overnight charging sites cap total power, so drivers are offered cheaper flexible windows. That only works if the driver trusts the promise: if the charger slows or fails, the schedule must be repaired honestly and nobody should pay for energy they did not get.
