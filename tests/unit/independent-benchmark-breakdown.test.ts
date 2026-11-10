@@ -92,3 +92,52 @@ describe("independent benchmark breakdown (SYNTHETIC)", () => {
     expect(stats.operatorEconomicsCents.appliedBelowMinimumMargin).toBe(0);
   });
 });
+
+describe("impact-statement reconciliation (SYNTHETIC): which numbers overlap and what each denominator is", () => {
+  const disturbed = app.filter((s) => !s.staticColumn.satisfied && s.affected);
+  const infeasible = (s: ApplicableScenario) => s.auto.infeasible && s.approval.infeasible;
+  const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+
+  it("the four outcome classes of the 4,672 disturbed-and-missed scenarios are disjoint and add to 4,672", () => {
+    const recoveredAuto = disturbed.filter((s) => s.auto.satisfied);
+    const recoveredApproval = disturbed.filter((s) => !s.auto.satisfied && s.approval.satisfied);
+    const noFeasible = disturbed.filter((s) => !s.auto.satisfied && !s.approval.satisfied && infeasible(s));
+    const partial = disturbed.filter((s) => !s.auto.satisfied && !s.approval.satisfied && !infeasible(s));
+    expect([disturbed.length, recoveredAuto.length, recoveredApproval.length, noFeasible.length, partial.length]).toEqual([4672, 56, 648, 3832, 136]);
+    expect(recoveredAuto.length + recoveredApproval.length).toBe(704);
+  });
+
+  it("charger failures (1,455) are a subset of the 3,832 no-feasible-recovery cases, not an addition to them", () => {
+    const failures = disturbed.filter((s) => s.type === "CHARGER_FAILURE");
+    expect(failures).toHaveLength(1455);
+    expect(failures.every((s) => !s.auto.satisfied && !s.approval.satisfied && infeasible(s))).toBe(true);
+  });
+
+  it("the raw 'infeasible' flag counts 3,882 = 3,832 disturbance misses + 3 pre-existing misses + 47 scenarios that still met the target", () => {
+    const flagged = app.filter(infeasible);
+    expect(flagged).toHaveLength(3882);
+    const disturbedMisses = flagged.filter((s) => !s.staticColumn.satisfied && s.affected && !s.approval.satisfied);
+    const preexistingMisses = flagged.filter((s) => !s.staticColumn.satisfied && !s.affected);
+    const metOrUnaffected = flagged.filter((s) => s.staticColumn.satisfied || s.approval.satisfied);
+    expect([disturbedMisses.length, preexistingMisses.length, metOrUnaffected.length]).toEqual([3832, 3, 47]);
+  });
+
+  it("the +2.6% delivered-energy figure is over all 5,789 applicable scenarios; over the 4,672 disturbed ones it is larger", () => {
+    const all = (pick: (s: ApplicableScenario) => number) => sum(app.map(pick));
+    const dist = (pick: (s: ApplicableScenario) => number) => sum(app.filter((s) => s.affected).map(pick));
+    const pctAll = ((all((s) => s.approval.deliveredMilliWh) - all((s) => s.staticColumn.deliveredMilliWh)) / all((s) => s.staticColumn.deliveredMilliWh)) * 100;
+    const pctDist = ((dist((s) => s.approval.deliveredMilliWh) - dist((s) => s.staticColumn.deliveredMilliWh)) / dist((s) => s.staticColumn.deliveredMilliWh)) * 100;
+    console.warn("QA_RECON pctAll", pctAll.toFixed(2), "pctDisturbed", pctDist.toFixed(2), "affected", app.filter((s) => s.affected).length);
+    expect(pctAll).toBeGreaterThan(2.5);
+    expect(pctAll).toBeLessThan(2.7);
+  });
+
+  it("repaired is not the same as finished on time: how many of the 704 finish after the agreed ready-by", () => {
+    const repaired = disturbed.filter((s) => s.auto.satisfied || s.approval.satisfied);
+    const later = repaired.filter((s) => (s.auto.satisfied ? s.auto.laterFinish : s.approval.laterFinish));
+    console.warn("QA_RECON repaired", repaired.length, "repairedButFinishLater", later.length);
+    expect(repaired).toHaveLength(704);
+    expect(later).toHaveLength(592); // repaired = energy target met; most only by finishing after the agreed ready-by, with consent
+    expect(repaired.length - later.length).toBe(112);
+  });
+});
