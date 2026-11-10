@@ -1,3 +1,5 @@
+> Superseded for the final submission by `docs/DEVPOST_FINAL.md` (this draft predates the recovery engine, Bryntum scheduler and the current test counts).
+
 # Devpost submission text
 
 ## Title

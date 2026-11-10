@@ -1,0 +1,53 @@
+{
+  "label": "SYNTHETIC",
+  "REAL_GEMINI": "NOT RUN (needs user approval; earlier live attempt returned HTTP 504)",
+  "MOCK_GEMINI": {
+    "eventId": "qa-agent-mock-0001",
+    "runId": "rrun_5c37f3cc_4",
+    "status": "COMMITTED",
+    "tools": [
+      "1:DETERMINISTIC:orchestrator:INFO",
+      "2:GEMINI:requestRecoveryCandidates:OK",
+      "3:GEMINI:validateRecoveryPlan:OK",
+      "4:GEMINI:proposeRecovery:OK",
+      "5:GEMINI:commitPermittedRecovery:OK",
+      "6:GEMINI:explainRecoveryOutcome:OK",
+      "7:DETERMINISTIC:requestRecoveryCandidates:REJECTED",
+      "8:DETERMINISTIC:validateRecoveryPlan:REJECTED"
+    ],
+    "consent": "AUTO_WITHIN_PRE_APPROVED_BOUNDS",
+    "finalPayment": "CAPTURED",
+    "explanationSource": "MODEL"
+  },
+  "DETERMINISTIC_FALLBACK_after_model_timeout": {
+    "eventId": "qa-agent-fallback-0001",
+    "runId": "rrun_18fc950d_10",
+    "status": "COMMITTED",
+    "aiUsed": false,
+    "tools": [
+      "1:DETERMINISTIC:orchestrator:INFO",
+      "2:DETERMINISTIC:orchestrator:INFO",
+      "3:DETERMINISTIC:requestRecoveryCandidates:OK",
+      "4:DETERMINISTIC:validateRecoveryPlan:OK",
+      "5:DETERMINISTIC:validateRecoveryPlan:OK",
+      "6:DETERMINISTIC:proposeRecovery:OK",
+      "7:DETERMINISTIC:commitPermittedRecovery:OK"
+    ]
+  },
+  "HOSTILE_MODEL_OUTPUT": {
+    "eventId": "qa-agent-hostile-0001",
+    "runId": "rrun_321d524f_15",
+    "status": "COMMITTED",
+    "refused": [
+      "2:capturePayment:REJECTED:UNKNOWN_TOOL: No such tool.",
+      "4:proposeRecovery:REJECTED:INVALID_ARGS: Arguments do not match this tool.",
+      "5:validateRecoveryPlan:REJECTED:INVALID_ARGS: Arguments do not match this tool.",
+      "6:noop:REJECTED:UNKNOWN_TOOL: No such tool.",
+      "7:noop:REJECTED:UNKNOWN_TOOL: No such tool.",
+      "8:noop:REJECTED:UNKNOWN_TOOL: No such tool.",
+      "9:noop:REJECTED:UNKNOWN_TOOL: No such tool."
+    ],
+    "paymentCallsAdded": 0,
+    "paymentStateAfter": "AUTHORIZED"
+  }
+}

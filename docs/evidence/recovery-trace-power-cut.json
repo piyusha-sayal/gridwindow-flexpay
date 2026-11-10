@@ -1,0 +1,131 @@
+{
+  "label": "SYNTHETIC",
+  "decisionSource": "DETERMINISTIC_FALLBACK",
+  "reservationId": "res_yHmi22DdXJSMnet4",
+  "eventId": "qa-evidence-evt-0002",
+  "eventType": "CHARGER_POWER_REDUCTION",
+  "params": {
+    "maxPowerW": 4800,
+    "effectiveSlot": 16
+  },
+  "runId": "rrun_5a6GegpWraEt4KK6",
+  "runStatus": "NEEDS_APPROVAL",
+  "consent": {
+    "kind": "NEEDS_APPROVAL",
+    "reason": "A charger power limit at 22:00 on charger B. The fix moves your departure or finish time, so it needs your approval. Nothing changes until you approve it. The agreed price of $13.03 is unchanged.",
+    "candidates": [
+      {
+        "id": "c1",
+        "chosen": false,
+        "reason": "charging would finish later than the agreed ready-by time",
+        "status": "PROPOSED",
+        "consent": "NEEDS_DRIVER_APPROVAL",
+        "finishAt": "07:00",
+        "preference": "flex_lowest_cost",
+        "priceCents": 1303,
+        "energyCostCents": 495
+      },
+      {
+        "id": "c2",
+        "chosen": true,
+        "reason": "charging would finish later than the agreed ready-by time",
+        "status": "PROPOSED",
+        "consent": "NEEDS_DRIVER_APPROVAL",
+        "finishAt": "06:00",
+        "preference": "flex_early_finish",
+        "priceCents": 1303,
+        "energyCostCents": 518
+      },
+      {
+        "id": null,
+        "chosen": false,
+        "reason": "INSUFFICIENT_CAPACITY: short by 209 grid Wh under optimized",
+        "status": "REJECTED",
+        "consent": null,
+        "finishAt": null,
+        "preference": "flex_gentle",
+        "priceCents": null,
+        "energyCostCents": null
+      }
+    ],
+    "effectiveAt": "22:00",
+    "effectiveSlot": 16,
+    "versionCommitted": null
+  },
+  "toolTrace": [
+    {
+      "at": "2026-11-10T01:00:34.900Z",
+      "seq": 1,
+      "tool": "orchestrator",
+      "actor": "DETERMINISTIC",
+      "input": {
+        "attempt": 1
+      },
+      "detail": "started",
+      "outcome": "INFO"
+    },
+    {
+      "at": "2026-11-10T01:00:34.913Z",
+      "seq": 2,
+      "tool": "orchestrator",
+      "actor": "DETERMINISTIC",
+      "input": {},
+      "detail": "no model configured; deterministic path",
+      "outcome": "INFO"
+    },
+    {
+      "at": "2026-11-10T01:00:34.922Z",
+      "seq": 3,
+      "tool": "requestRecoveryCandidates",
+      "actor": "DETERMINISTIC",
+      "input": {},
+      "detail": "2 feasible candidate(s)",
+      "outcome": "OK"
+    },
+    {
+      "at": "2026-11-10T01:00:34.924Z",
+      "seq": 4,
+      "tool": "validateRecoveryPlan",
+      "actor": "DETERMINISTIC",
+      "input": {
+        "candidateId": "c1"
+      },
+      "detail": "validated, consent NEEDS_DRIVER_APPROVAL",
+      "outcome": "OK"
+    },
+    {
+      "at": "2026-11-10T01:00:34.926Z",
+      "seq": 5,
+      "tool": "validateRecoveryPlan",
+      "actor": "DETERMINISTIC",
+      "input": {
+        "candidateId": "c2"
+      },
+      "detail": "validated, consent NEEDS_DRIVER_APPROVAL",
+      "outcome": "OK"
+    },
+    {
+      "at": "2026-11-10T01:00:34.928Z",
+      "seq": 6,
+      "tool": "proposeRecovery",
+      "actor": "DETERMINISTIC",
+      "input": {
+        "candidateId": "c2"
+      },
+      "detail": "proposed c2 (NEEDS_DRIVER_APPROVAL)",
+      "outcome": "OK"
+    },
+    {
+      "at": "2026-11-10T01:00:34.931Z",
+      "seq": 7,
+      "tool": "requestDriverApproval",
+      "actor": "DETERMINISTIC",
+      "input": {},
+      "detail": "driver approval requested for c2",
+      "outcome": "OK"
+    }
+  ],
+  "committedVersion": 1,
+  "serviceState": "DELIVERED",
+  "paymentState": "CAPTURED"
+}

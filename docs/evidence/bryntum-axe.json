@@ -1,0 +1,24 @@
+{
+  "axeVersion": "@axe-core/playwright 4.13.0",
+  "vendorDom": [
+    {
+      "id": "aria-required-children",
+      "impact": "critical",
+      "nodes": 2,
+      "help": "Certain ARIA roles must contain particular children"
+    },
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "nodes": 2,
+      "help": "Elements must meet minimum color contrast ratio thresholds"
+    },
+    {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "nodes": 1,
+      "help": "Scrollable region must have keyboard access"
+    }
+  ],
+  "outsideBryntum": []
+}

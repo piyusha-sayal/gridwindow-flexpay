@@ -103,3 +103,65 @@ Screenshots from this run are in `artifacts/screenshots/` (git-ignored). A manua
 2. QA-1 needs a decision from the owner before any run with a real `DATABASE_URL`.
 3. Live Gemini and PayPal sandbox evidence: NEEDS USER APPROVAL.
 4. Demo video and Devpost submission: NEEDS USER APPROVAL (existing drafts: `docs/DEMO_SCRIPT.md`, `docs/DEVPOST.md`).
+
+---
+
+# Update 2 (2026-11-09, final award certification)
+
+Head before this update: `f089afc` (QA-1 fix). Same isolation rules as above (all external-service variables blanked, MOCK provider, throwaway databases).
+
+## Final regression (all executed; logs in `artifacts/qa/final/`, git-ignored)
+
+| Gate | Result | Evidence |
+|---|---|---|
+| `npm ci` | PASS | clean install |
+| `npx tsc --noEmit` | PASS | exit 0 |
+| `npx eslint .` | PASS | exit 0 |
+| `npx vitest run` | PASS: 668 passed, 10 skipped (678) | 66 files passed, 1 skipped (env-gated real PostgreSQL) |
+| `npx playwright test --workers=1` | PASS: 99 passed, 6 skipped, 0 failed | 4.4 min; the 6 skips are desktop-only keyboard journeys on mobile/tablet; 4 of the passes are intentional expected-fail (`test.fail`) tests that document QA-3 |
+| `npm run build` | PASS | exit 0 |
+| `npm run release:scan` | PASS | `.next/static` and `.env.example` clean |
+| `npm audit --omit=dev` | PASS: 0 vulnerabilities | |
+| `npm run benchmark:recovery` x2 | PASS: identical SHA-256 | c1e21454...6f3a |
+| Real PostgreSQL integration (9 tests) | NOT TESTED | no PostgreSQL available locally; PGlite (embedded PostgreSQL) integration passes |
+| Secret scan of the diff | PASS | no key, token or connection-string shapes |
+| Licenses (128 production packages from the lockfile) | PASS with review items | MIT 68, Apache-2.0 27, BSD-3-Clause 12, ISC 4, others 17; 14 optional `@img/sharp-*` binaries are LGPL-3.0-or-later (installed by Next image optimization, not copied into the repository; see `docs/THIRD_PARTY.md`); Bryntum MIT text verified, owner to confirm edition |
+
+Tests added in this update (all new files, no existing test changed or weakened): `tests/unit/migrationSafety.test.ts` (12), `tests/integration/independent-ratelimit.test.ts` (4), `tests/integration/independent-agent-evidence.test.ts` (3), `tests/unit/independent-benchmark-breakdown.test.ts` (1), `tests/e2e/independent-bryntum-tz.spec.ts`, `independent-bryntum-a11y.spec.ts`, `independent-recovery-evidence.spec.ts`.
+
+## QA-1: RESOLVED (commit f089afc)
+- Red first: `tests/unit/migrationSafety.test.ts` run on the unmodified code failed 11 of 12 tests; the decisive failure was `openPostgres(<hosted url>)` resolving instead of refusing and sending DDL (`create table ... schema_migrations`).
+- Fix (`src/server/db/client.ts`, `src/server/runtime.ts`): a non-loopback database is verified read-only at startup and never migrated; pending migrations raise `SchemaNotReadyError` (mapped to a configuration error) naming what is missing and the deliberate command; a migration URL is ignored at startup. Loopback databases keep automatic migration (all existing tests unchanged).
+- Deliberate command: `npm run db:migrate -- --confirm-target=<host/db> --expect-latest=<migration id> [--apply]`. Dry run by default; refuses a mismatched target, a mismatched build version, or a database newer than the build; no credentials printed; reads the URL from the process environment only.
+- Green: 12 of 12 new tests; full suite 668 passed. The CLI refusals were also exercised against a fake non-resolvable hosted URL (mismatch and missing flags both exit 1 before any connection).
+- Not done by design: no connection to the real Neon database, no migration applied anywhere external.
+- Operational consequence: an external database must be migrated deliberately before the app will start against it.
+
+## QA-2: REPRODUCED, correction proposed (not applied: outside the authorized scope)
+- Test: `tests/integration/independent-ratelimit.test.ts`. Without `TRUST_PROXY`, five wrong guesses from five different addresses make the real operator's correct passphrase return 429 (shared bucket). The lockout lasts one 60 s window. With `TRUST_PROXY=true` an attacker's address no longer blocks another address, but the global 30/min login cap still lets any caller who sends 30 attempts a minute keep the operator out.
+- Impact: availability only (operator console login). Brute force stays bounded either way.
+- Minimal correction: (1) document and enforce `TRUST_PROXY=true` for any deployed environment; (2) count only failed attempts against the per-client limit so a correct passphrase from an unthrottled client is not refused, and keep the global cap on failures only. Needs separate authorization.
+
+## New findings
+| ID | Severity | Finding | Evidence |
+|---|---|---|---|
+| QA-3 | Medium (demo/UX) | Bryntum time axis follows the browser zone; the table and labels use the station zone. Bars are correct; tick labels disagree for an operator outside Pacific time | `docs/BRYNTUM_EVIDENCE.md`, `evidence/bryntum-axis-by-browser-zone.json`, four `test.fail` tests |
+| QA-4 | Low (copy accuracy) | After the driver approves a recovery, the card is titled "Recovered automatically" and still says "Nothing changes until you approve it" | `evidence/14-flexreceipt.png`, `src/components/recoveryCopy.ts` |
+| QA-5 | Info | Proposal text says "An earlier departure at 18:00" where 18:00 is the disturbance's effective time, not the new departure (06:00) | `evidence/recovery-trace.json` outcome reason |
+| QA-6 | Info | Resource labels clipped in the Bryntum port column ("Port A (3.6 k") | `evidence/05-updated-bryntum-schedule.png` |
+
+No critical or high-severity security or payment defect was found. Confirmed by test: operator and driver boundaries, single capture, no capture after void, webhook forgery/duplicates, lease fencing, hostile model output, stale and expired approvals, migration data preservation.
+
+## Status by area
+| Area | Status |
+|---|---|
+| Recovery correctness (event -> run -> validation -> consent -> commit -> Bryntum -> persistence) | PASS (two browser journeys, structured traces) |
+| Bryntum sponsor readiness | PASS with QA-3 and vendor a11y findings disclosed |
+| Agentic Commerce readiness | PASS for DETERMINISTIC_FALLBACK and MOCK_GEMINI; REAL_GEMINI NOT TESTED / NEEDS USER APPROVAL |
+| PayPal + AI readiness | PASS locally (MOCK provider); Sandbox capture/void NEEDS USER APPROVAL |
+| Benchmark and impact | PASS (reproduced and broken down; synthetic only) |
+| Real PostgreSQL concurrency | NOT TESTED (no server available) |
+| Demo video, Devpost submission | NEEDS USER APPROVAL |
+
+## Documents produced
+`docs/BRYNTUM_EVIDENCE.md`, `docs/AGENTIC_COMMERCE_EVIDENCE.md`, `docs/PAYPAL_AI_EVIDENCE.md`, `docs/IMPACT_SUMMARY.md`, `docs/ARCHITECTURE_SUMMARY.md`, `docs/FINAL_DEMO_SCRIPT.md`, `docs/DEMO_RUNBOOK.md` (includes the shot checklist), `docs/DEVPOST_FINAL.md`, and `docs/evidence/` (screenshots and JSON traces).

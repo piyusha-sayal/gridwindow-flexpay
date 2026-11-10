@@ -1,0 +1,92 @@
+{
+  "label": "SYNTHETIC",
+  "seeds": "1..200",
+  "scenarios": 5820,
+  "notApplicable": 31,
+  "applicable": 5789,
+  "controlUndisturbedPlansMeetingTarget": {
+    "satisfied": 480,
+    "of": 485
+  },
+  "disturbanceAffected": 4672,
+  "unaffected": 1117,
+  "targetMissed": {
+    "static": 4677,
+    "auto": 4621,
+    "approval": 3975
+  },
+  "staticMissCauses": {
+    "preexistingNotCausedByDisturbance": 5,
+    "causedByDisturbance": 4672
+  },
+  "disturbedOutcomeClasses": {
+    "RECOVERED_WITH_DRIVER_APPROVAL": 648,
+    "NO_FEASIBLE_RECOVERY": 3832,
+    "PARTIAL_OR_UNRECOVERED_OTHER": 136,
+    "RECOVERED_AUTO": 56
+  },
+  "recoveryAttempts": {
+    "autoApplied": 71,
+    "approvalApplied": 839,
+    "needDriverApproval": 1350
+  },
+  "deliveredEnergyMilliWh": {
+    "static": 119776372280,
+    "auto": 119892500200,
+    "approval": 122942752840
+  },
+  "shortfallMilliWh": {
+    "static": 51489359720,
+    "auto": 51373882800,
+    "approval": 48331305160
+  },
+  "laterFinishThanAgreed": {
+    "auto": 0,
+    "approval": 665
+  },
+  "operatorEconomicsCents": {
+    "autoAppliedCostRaising": 56,
+    "autoEnergyCostIncreaseTotal": 5862,
+    "approvalEnergyCostIncreaseTotal": 28256,
+    "minMarginVsBaselineAuto": 1,
+    "minMarginVsBaselineApproval": 1,
+    "appliedBelowMinimumMargin": 0
+  },
+  "customerModeledCost": "agreed price unchanged in every applied recovery (price is taken from the accepted terms)",
+  "capacityViolations": "not a recorded column: recovery commits pass the deterministic capacity validator, so a violating plan cannot be applied (see commitScheduleVersion tests)",
+  "byDisturbanceType": {
+    "CHARGER_POWER_REDUCTION": {
+      "n": 1455,
+      "missedStatic": 1402,
+      "missedAuto": 1348,
+      "missedApproval": 799,
+      "noFeasible": 803
+    },
+    "SITE_CAP_REDUCTION": {
+      "n": 1455,
+      "missedStatic": 1066,
+      "missedAuto": 1064,
+      "missedApproval": 1021,
+      "noFeasible": 907
+    },
+    "EARLY_DEPARTURE": {
+      "n": 1424,
+      "missedStatic": 754,
+      "missedAuto": 754,
+      "missedApproval": 700,
+      "noFeasible": 717
+    },
+    "CHARGER_FAILURE": {
+      "n": 1455,
+      "missedStatic": 1455,
+      "missedAuto": 1455,
+      "missedApproval": 1455,
+      "noFeasible": 1455
+    }
+  },
+  "knownShortfallSeeds": [
+    91,
+    134,
+    152
+  ]
+}

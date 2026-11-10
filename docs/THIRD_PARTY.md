@@ -25,3 +25,6 @@ Geist and Geist Mono are loaded from Google Fonts by `next/font` at build time u
 ## Services
 
 PayPal Sandbox, Google Gemini (optional) and Anthropic (optional) are used through their public APIs under their own terms. Free-tier Gemini content may be used by Google to improve its products, so do not enter personal data into the assistant.
+
+## Bryntum Scheduler (Community)
+`@bryntum/scheduler-community` 8.0.0 and `@bryntum/scheduler-react-community` 8.0.0. The installed package's `LICENSE` file is the MIT text, "Copyright (c) 2009-2026 Bryntum AB", and `package.json` declares `MIT` (checked 2026-11-09). Bryntum's website describes end-user and OEM licenses and does not name a Community edition; the owner should confirm this package is the intended one before submission.
