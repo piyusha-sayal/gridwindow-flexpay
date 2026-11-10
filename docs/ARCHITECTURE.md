@@ -122,6 +122,10 @@ In MOCK payment mode the payment step says "MOCK PAYMENT PROVIDER". It is not Pa
 
 **Migrations and schema refusal.** Migrations run on PGlite on open, in the disposable test helpers, and only when `GW_AUTO_MIGRATE=true`. An external database is never migrated at startup. `openPostgres` throws `SchemaNotReadyError` when the ledger has pending, unknown or drifted migrations, and the runtime serves errors until the schema matches. The apply path is `npm run db:migrate` with `--status`, `--plan` and `--apply --confirm-database <fingerprint>`. See [MIGRATIONS.md](MIGRATIONS.md). Migrations 003 to 005 are not yet applied to the hosted Neon database.
 
+**Late and orphan authorizations.** A checkout in flight can create a PayPal authorization after the reservation has already failed or been cancelled. Reconciliation and the five-minute sweep therefore also select FAILED and CANCELLED rows that hold a provider order id but no authorization id. The sweep reads provider truth with one `getOrder` call per row per pass (bounded by the batch size), stores the authorization id under the row lock, and voids it. A repeated checkout return reads provider state instead of authorizing twice when the AUTHORIZE operation already succeeded. State-change events (conflict, provider unavailable, orphan void failure) are written once per distinct state through `appendEventOnce`. Covered by `tests/integration/authorizationRace.test.ts` (PGlite and real PostgreSQL).
+
+**Migration target fingerprint.** `npm run db:migrate` prints a 12-hex fingerprint of the target host, port and database name (credentials and query options excluded). `--apply` refuses unless `--confirm-database` equals it, so two databases on one server cannot be confused.
+
 **Services map (`src/server/services/`).**
 
 | File | Responsibility |

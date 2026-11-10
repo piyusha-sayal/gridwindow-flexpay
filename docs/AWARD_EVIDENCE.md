@@ -11,7 +11,7 @@ Status labels:
 
 Evidence kinds: **MOCK** means the built-in MOCK payment provider, a scripted model, or a seeded synthetic run. **Provider** means a real PayPal Sandbox or Gemini call. MOCK results are not live validation.
 
-Final combined-tree results used below: TypeScript 0 errors; ESLint 0; Vitest 740 passed, 12 skipped (the 12 are the gated real-PostgreSQL tests in `tests/integration/postgres.test.ts`; with `TEST_DATABASE_URL` set on a disposable local PostgreSQL 18.1 they ran and 11 passed, 1 skipped for the restart test); Playwright 16 spec files run one at a time with one worker and isolated data: 0 failed, 6 skipped (keyboard-journey tests on mobile and tablet by design); both production builds pass; `release:scan` PASS; `npm audit --omit=dev` 0 vulnerabilities; the recovery benchmark is deterministic across two runs.
+Final combined-tree results used below: TypeScript 0 errors; ESLint 0; Vitest 806 passed, 12 skipped (the 12 are the gated real-PostgreSQL tests in `tests/integration/postgres.test.ts`; with `TEST_DATABASE_URL` set on a disposable local PostgreSQL 18.1 they ran and 11 passed, 1 skipped for the restart test); Playwright 16 spec files run one at a time with one worker and isolated data: 0 failed, 6 skipped (keyboard-journey tests on mobile and tablet by design); both production builds pass; `release:scan` PASS; `npm audit --omit=dev` 0 vulnerabilities; the recovery benchmark is deterministic across two runs.
 
 ---
 

@@ -46,7 +46,7 @@ Live evidence (Gemini, 2026-11-05, free-tier key, synthetic fixtures, before the
 - Making a disturbance re-plan respect what the driver already agreed, including energy already delivered and the price.
 
 ## Accomplishments
-- Final combined-branch checks: TypeScript and ESLint clean; Vitest 740 passed, 12 skipped; Playwright 0 failed, 6 skipped; both production builds pass; release scan passes; no production dependency vulnerabilities reported by `npm audit`.
+- Final combined-branch checks: TypeScript and ESLint clean; Vitest 806 passed, 12 skipped; Playwright 0 failed, 6 skipped; both production builds pass; release scan passes; no production dependency vulnerabilities reported by `npm audit`.
 - The gated real-PostgreSQL tests passed on a disposable local PostgreSQL 18.1 server (11 passed, 1 skipped for the restart test).
 - A recovery benchmark over 200 seeded synthetic nights, deterministic across runs. It reports unfavorable and infeasible cases next to the wins.
 

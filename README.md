@@ -268,9 +268,9 @@ Results on the final combined-release tree:
 | Check | Result |
 |---|---|
 | TypeScript strict check (`tsc --noEmit`) and ESLint | 0 errors, 0 problems |
-| Vitest (unit and integration, including adversarial payment cases on embedded PostgreSQL) | 740 passed, 12 skipped (the skipped tests are the gated real-PostgreSQL checks) |
+| Vitest (unit and integration, including adversarial payment cases on embedded PostgreSQL) | 806 passed, 12 skipped (the skipped tests are the gated real-PostgreSQL checks) |
 | Real-PostgreSQL checks on a disposable local PostgreSQL 18.1 server (separate run) | 11 passed, 1 skipped (restart test needs `TEST_PG_RESTART_CMD`) |
-| Playwright (16 spec files, one worker, isolated data; axe accessibility and keyboard tests) | 0 failed, 6 skipped by design |
+| Playwright (21 spec files, one worker, isolated data; axe accessibility and keyboard tests) | 0 failed, 6 skipped by design |
 | Production builds | pass |
 | `npm run release:scan` (secret and configured-value scan of the client bundle) | PASS |
 | `npm audit --omit=dev` | 0 vulnerabilities |

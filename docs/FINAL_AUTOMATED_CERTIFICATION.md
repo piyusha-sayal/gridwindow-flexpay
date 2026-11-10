@@ -54,3 +54,17 @@ Operator authorization, driver session isolation, input validation, CSRF/origin 
 
 ## External certification still required (NEEDS USER APPROVAL)
 One bounded real Gemini retry (the earlier attempt returned HTTP 504); up to two PayPal Sandbox transactions with manual buyer approval; Neon migrations 003-005 after a backup or branch; deployment, public release and Devpost. Until then a live Gemini decision, recovery-linked Sandbox evidence and the Neon schema are BLOCKED / NOT TESTED.
+
+## Addendum: final completion run (same branch, later commit)
+Re-run on the final source after the fixes below: `npm ci`, `tsc` and `eslint` clean; Vitest **806 passed, 12 skipped, 0 failed** (802 + 4 new copy tests); real PostgreSQL **47 passed** (serial, disposable cluster, then deleted); Playwright **21 spec files, 0 failed, 6 skipped** (`qa.spec.ts`), one worker per spec; default and `.next-release` builds, `release:scan`, `npm audit --omit=dev` (0 vulnerabilities) all PASS; recovery benchmark twice byte-identical and unchanged from the committed file.
+
+Fixed in this run:
+- **QA-4 (copy):** after the driver approves a change the receipt no longer says "Recovered automatically" or "Nothing changes until you approve it". The run heading reads "Approved by you and applied" and the narrative says "You approved this change, so it was applied" (stored data unchanged; derived when the receipt is built). Regression: `tests/unit/recoveryCopy.test.ts` and an assertion in `recoveryDriver.spec.ts`.
+- **QA-5 (copy):** an early-departure explanation now names the new departure ("Your departure moved to 06:00 ...") instead of the event time. Regression: `recoveryCopy.test.ts`.
+- **QA-6:** the Bryntum Port column is 200 px wide (the clipped-text sweep passes). Screenshots still not visually inspected by the agent.
+- Bryntum licence: registry metadata and lockfile evidence recorded in `docs/LICENSE_AND_SECRETS_CHECKLIST.md`; the in-package LICENSE file was not read (deny rule, not circumvented).
+- Docs: `ARCHITECTURE.md` (late/orphan authorizations, fingerprint), `MIGRATIONS.md`, `README.md` and evidence counts, new `docs/DEPLOYMENT_RUNBOOK.md` (prepared, not executed).
+
+Unchanged by design: the Kolkata-style half-hour browser-zone tick residual (documented, 2 expected-failure tests), the Bryntum vendor axe findings, and QA-2 (an anonymous caller can briefly lock the operator login; forged forwarding headers cannot bypass the limiter).
+
+Checkpoints NOT executed (NEEDS USER APPROVAL): live Gemini call, PayPal Sandbox transactions, any Neon connection or migration, deployment.

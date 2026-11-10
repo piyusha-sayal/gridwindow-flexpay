@@ -40,3 +40,8 @@
 
 - Owner review required for the Bryntum license line before any public release.
 - No secrets in the repository: supported by the scans above, not by a full history scan (`git log -p` was not searched).
+
+## Bryntum licence verification (2026-11-09, registry metadata only)
+- `npm view @bryntum/scheduler-community@8.0.0 license` and `npm view @bryntum/scheduler-react-community@8.0.0 license` both return `MIT`.
+- `package-lock.json` pins both at 8.0.0 with `"license": "MIT"` and an `integrity` hash equal to the registry's `dist.integrity` for `scheduler-community` (`sha512-NcvzQqTy...rREw==`).
+- Not verified: the LICENSE file shipped inside the installed package (reading `node_modules` is denied in this environment and was not circumvented), and Bryntum's own licence page, which lists only End-User and OEM terms. No Bryntum purchase, trial key or commercial licence is used. `THIRD_PARTY_NOTICES.md` carries the MIT notice; the owner should open the package LICENSE once before submission.
