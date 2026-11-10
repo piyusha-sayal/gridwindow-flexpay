@@ -86,3 +86,35 @@ export function resolveLiveModel(argv: readonly string[], fileModel: string | un
   const flag = argv.find((a) => a.startsWith("--model="))?.slice("--model=".length).trim();
   return flag || fileModel?.trim() || processModel?.trim() || defaultModel;
 }
+
+const DECISION_TOOL_NAMES = ["proposeRecovery", "commitPermittedRecovery", "requestDriverApproval"];
+const TERMINAL_RUN_STATUSES = ["COMMITTED", "NEEDS_APPROVAL", "INFEASIBLE"];
+
+export interface FallbackVerdict {
+  verdict: "PASS" | "FAIL" | "NOT TESTED";
+  note: string;
+}
+
+/**
+ * Did the system fall back correctly after a provider failure? Judged from the persisted run, not from `aiUsed`:
+ * `aiUsed` means a model step took part (for example a successful readStationState), which is genuine and is kept.
+ * The fallback is correct when the run reached a terminal status, the trace records why the model was skipped, and,
+ * for a run that decided, a decision step exists. Who made the final decision is reported separately (`decision`,
+ * from runProvenance): a model that chose and then failed on a later step is still a MODEL_DECISION.
+ */
+export function fallbackVerdict(input: {
+  failedCalls: number;
+  status: string | null;
+  trace: readonly TraceEntryLike[];
+  decision: "MODEL_DECISION" | "DETERMINISTIC_FALLBACK";
+}): FallbackVerdict {
+  const modelSuccessTools = modelSteps(input.trace).filter((e) => e.outcome === "OK").map((e) => e.tool);
+  const skipped = skippedModelReasons(input.trace);
+  const facts = `failed provider calls: ${input.failedCalls}; model participation: ${modelSuccessTools.length} successful step(s) [${modelSuccessTools.join(", ") || "none"}]; final decision source: ${input.decision}; model skipped: ${skipped.join(", ") || "not recorded"}`;
+  if (input.failedCalls === 0) return { verdict: "NOT TESTED", note: `no provider call failed; ${facts}` };
+  if (input.status === null || !TERMINAL_RUN_STATUSES.includes(input.status)) return { verdict: "FAIL", note: `run did not reach a terminal status (${input.status ?? "none"}); ${facts}` };
+  if (skipped.length === 0) return { verdict: "FAIL", note: `the trace does not record why the model was skipped; ${facts}` };
+  const decided = input.status !== "INFEASIBLE";
+  if (decided && !input.trace.some((e) => DECISION_TOOL_NAMES.includes(e.tool) && e.outcome === "OK")) return { verdict: "FAIL", note: `terminal without a decision step; ${facts}` };
+  return { verdict: "PASS", note: facts };
+}

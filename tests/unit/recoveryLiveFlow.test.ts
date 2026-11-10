@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { argsDigest, boundedToolVerdict, pickLiveEnv, resolveLiveModel, resolveRequestCap, skippedModelReasons, summarizeTrace, type TraceEntryLike } from "../../scripts/recoveryLiveFlow";
+import { argsDigest, boundedToolVerdict, fallbackVerdict, pickLiveEnv, resolveLiveModel, resolveRequestCap, skippedModelReasons, summarizeTrace, type TraceEntryLike } from "../../scripts/recoveryLiveFlow";
 
 const step = (over: Partial<TraceEntryLike>): TraceEntryLike => ({ seq: 1, tool: "requestRecoveryCandidates", actor: "GEMINI", input: {}, outcome: "OK", detail: "ok", ...over });
 
@@ -84,5 +84,32 @@ describe("--model", () => {
     expect(resolveLiveModel([], undefined, "from-env", D)).toBe("from-env");
     expect(resolveLiveModel([], " ", undefined, D)).toBe(D);
     expect(resolveLiveModel(["--model="], undefined, undefined, D)).toBe(D);
+  });
+});
+
+describe("fallbackVerdict (pure: judged from status, trace and decision source, not from aiUsed)", () => {
+  const skip = (reason = "UNAVAILABLE"): TraceEntryLike => step({ seq: 3, tool: "orchestrator", actor: "DETERMINISTIC", outcome: "INFO", detail: `model not used for this step: ${reason}` });
+  const decideDet = (): TraceEntryLike[] => [step({ seq: 7, tool: "proposeRecovery", actor: "DETERMINISTIC" }), step({ seq: 8, tool: "commitPermittedRecovery", actor: "DETERMINISTIC" })];
+
+  it("PASS after partial model participation, reporting both facts", () => {
+    const v = fallbackVerdict({ failedCalls: 1, status: "COMMITTED", trace: [step({ tool: "readStationState" }), skip(), ...decideDet()], decision: "DETERMINISTIC_FALLBACK" });
+    expect(v.verdict).toBe("PASS");
+    expect(v.note).toContain("1 successful step(s) [readStationState]");
+    expect(v.note).toContain("final decision source: DETERMINISTIC_FALLBACK");
+  });
+  it("PASS when the model never answered", () => {
+    expect(fallbackVerdict({ failedCalls: 1, status: "COMMITTED", trace: [skip(), ...decideDet()], decision: "DETERMINISTIC_FALLBACK" }).verdict).toBe("PASS");
+  });
+  it("NOT TESTED when no provider call failed (a fully model-driven run has no fallback to judge)", () => {
+    expect(fallbackVerdict({ failedCalls: 0, status: "COMMITTED", trace: [step({ tool: "proposeRecovery" })], decision: "MODEL_DECISION" }).verdict).toBe("NOT TESTED");
+  });
+  it("FAIL when the run is not terminal, when the skip is not recorded, or when a decided run has no decision step", () => {
+    expect(fallbackVerdict({ failedCalls: 1, status: "RUNNING", trace: [skip()], decision: "DETERMINISTIC_FALLBACK" }).verdict).toBe("FAIL");
+    expect(fallbackVerdict({ failedCalls: 1, status: "COMMITTED", trace: decideDet(), decision: "DETERMINISTIC_FALLBACK" }).verdict).toBe("FAIL");
+    expect(fallbackVerdict({ failedCalls: 1, status: "COMMITTED", trace: [skip()], decision: "DETERMINISTIC_FALLBACK" }).verdict).toBe("FAIL");
+    expect(fallbackVerdict({ failedCalls: 1, status: null, trace: [skip()], decision: "DETERMINISTIC_FALLBACK" }).verdict).toBe("FAIL");
+  });
+  it("an INFEASIBLE run needs no decision step", () => {
+    expect(fallbackVerdict({ failedCalls: 1, status: "INFEASIBLE", trace: [skip()], decision: "DETERMINISTIC_FALLBACK" }).verdict).toBe("PASS");
   });
 });

@@ -15,6 +15,8 @@ import { reservationView } from "@/server/services/viewService";
 import { runSimulation } from "@/server/services/settlementService";
 import { PROPOSAL_TTL_MS } from "@/server/services/scheduleService";
 import { ScriptedLlm, ok } from "../unit/scriptedLlm";
+import { runProvenance } from "@/server/services/recoveryProvenance";
+import { fallbackVerdict } from "../../scripts/recoveryLiveFlow";
 import { makeApp, NIGHT, request, resetApp, type TestApp } from "./helpers";
 
 const DRIVER = "drv_orch_1";
@@ -431,3 +433,80 @@ describe("authorization boundaries", () => {
   });
 });
 
+describe("live-run fallback verdict: model participation is kept, the final decision source is judged from the persisted run", () => {
+  /** Scripted provider: serves the given tool calls in order, then fails every further request with UNAVAILABLE. */
+  function thenFails(...calls: [string, Record<string, unknown>?][]): { llm: ScriptedLlm; failures: () => number } {
+    const queue = calls.map(([tool, args = {}]) => ({ tool, argsJson: JSON.stringify(args) }));
+    let failed = 0;
+    const llm = new ScriptedLlm((): LlmResult<unknown> => {
+      const next = queue.shift();
+      if (next) return ok(next);
+      failed += 1;
+      return { ok: false, reason: "UNAVAILABLE" };
+    });
+    return { llm, failures: () => failed };
+  }
+  const judge = (run: Awaited<ReturnType<typeof runRecovery>>, failedCalls: number) =>
+    fallbackVerdict({ failedCalls, status: run.status, trace: run.trace, decision: runProvenance({ aiUsed: run.aiUsed, trace: run.trace }).decision });
+
+  it("the model succeeds on a read step, then the provider fails: aiUsed stays true, the decision is deterministic, the fallback verdict is PASS", async () => {
+    const rid = await scheduled(DRIVER, {}, "flex_gentle");
+    const { llm, failures } = thenFails(["readStationState"]);
+    app.deps.llm = llm;
+    const { event } = await recordDisruption(app.deps, { eventId: "evt_fv_partial", reservationId: rid, type: "CHARGER_POWER_REDUCTION", params: { maxPowerW: 7_200 }, effectiveSlot: EVENING_SLOT });
+    const run = await runRecovery(app.deps, event.eventId);
+    expect(run.status).toBe("COMMITTED");
+    expect(run.aiUsed).toBe(true); // genuine Gemini participation is not erased
+    expect(run.trace.filter((t) => t.actor === "GEMINI" && t.outcome === "OK").map((t) => t.tool)).toEqual(["readStationState"]);
+    expect(runProvenance({ aiUsed: run.aiUsed, trace: run.trace }).decision).toBe("DETERMINISTIC_FALLBACK");
+    expect(run.trace.filter((t) => ["proposeRecovery", "commitPermittedRecovery"].includes(t.tool) && t.outcome === "OK").every((t) => t.actor === "DETERMINISTIC")).toBe(true);
+    const verdict = judge(run, failures());
+    expect(failures()).toBe(1);
+    expect(verdict.verdict).toBe("PASS");
+    expect(verdict.note).toContain("1 successful step(s) [readStationState]");
+    expect(verdict.note).toContain("final decision source: DETERMINISTIC_FALLBACK");
+  });
+
+  it("the model never responds: no participation, deterministic decision, verdict PASS", async () => {
+    const rid = await scheduled(DRIVER, {}, "flex_gentle");
+    const { llm, failures } = thenFails();
+    app.deps.llm = llm;
+    const { event } = await recordDisruption(app.deps, { eventId: "evt_fv_never", reservationId: rid, type: "CHARGER_POWER_REDUCTION", params: { maxPowerW: 7_200 }, effectiveSlot: EVENING_SLOT });
+    const run = await runRecovery(app.deps, event.eventId);
+    expect(run.status).toBe("COMMITTED");
+    expect(run.aiUsed).toBe(false);
+    expect(runProvenance({ aiUsed: run.aiUsed, trace: run.trace }).decision).toBe("DETERMINISTIC_FALLBACK");
+    const verdict = judge(run, failures());
+    expect(verdict.verdict).toBe("PASS");
+    expect(verdict.note).toContain("0 successful step(s)");
+  });
+
+  it("a fully model-driven recovery is a MODEL_DECISION and there was no failure to fall back from (NOT TESTED)", async () => {
+    const rid = await scheduled(DRIVER, {}, "flex_gentle");
+    const { llm, failures } = thenFails(
+      ["requestRecoveryCandidates"],
+      ["validateRecoveryPlan", { candidateId: "c1" }],
+      ["proposeRecovery", { candidateId: "c1" }],
+      ["commitPermittedRecovery"],
+      ["explainRecoveryOutcome", { text: "The charger limit applies from that time, and the agreed price stays the same." }],
+    );
+    app.deps.llm = llm;
+    const { event } = await recordDisruption(app.deps, { eventId: "evt_fv_full", reservationId: rid, type: "CHARGER_POWER_REDUCTION", params: { maxPowerW: 7_200 }, effectiveSlot: EVENING_SLOT });
+    const run = await runRecovery(app.deps, event.eventId);
+    expect(run.status).toBe("COMMITTED");
+    expect(runProvenance({ aiUsed: run.aiUsed, trace: run.trace }).decision).toBe("MODEL_DECISION");
+    expect(failures()).toBe(0);
+    expect(judge(run, failures()).verdict).toBe("NOT TESTED");
+  });
+
+  it("the model decides and then fails on the explanation step: the decision stays MODEL_DECISION and the fallback verdict is PASS", async () => {
+    const rid = await scheduled(DRIVER, {}, "flex_gentle");
+    const { llm, failures } = thenFails(["requestRecoveryCandidates"], ["validateRecoveryPlan", { candidateId: "c1" }], ["proposeRecovery", { candidateId: "c1" }], ["commitPermittedRecovery"]);
+    app.deps.llm = llm;
+    const { event } = await recordDisruption(app.deps, { eventId: "evt_fv_late", reservationId: rid, type: "CHARGER_POWER_REDUCTION", params: { maxPowerW: 7_200 }, effectiveSlot: EVENING_SLOT });
+    const run = await runRecovery(app.deps, event.eventId);
+    expect(run.status).toBe("COMMITTED");
+    expect(runProvenance({ aiUsed: run.aiUsed, trace: run.trace }).decision).toBe("MODEL_DECISION");
+    expect(judge(run, failures()).verdict).toBe("PASS");
+  });
+});

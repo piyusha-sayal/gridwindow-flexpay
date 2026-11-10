@@ -23,7 +23,7 @@ import { runRecovery } from "../src/server/services/scheduleService";
 import type { RecoveryRunView } from "../src/server/services/recoveryRuns";
 import { MockGateway } from "../src/payments/mockGateway";
 import { BudgetExceededError, MeteredLlm } from "./aiSmokeFlow";
-import { boundedToolVerdict, pickLiveEnv, resolveLiveModel, resolveRequestCap, skippedModelReasons, summarizeTrace, type BoundedVerdict } from "./recoveryLiveFlow";
+import { boundedToolVerdict, fallbackVerdict, pickLiveEnv, resolveLiveModel, resolveRequestCap, skippedModelReasons, summarizeTrace, type BoundedVerdict } from "./recoveryLiveFlow";
 
 const APPROVAL_FLAG = "--approve-gemini-calls";
 const MAX_REQUESTS = resolveRequestCap(process.argv);
@@ -36,7 +36,6 @@ const DRIVER = "drv_live_1";
 const EVENT_ID = "evt_live_0001";
 const START_MS = Date.parse("2026-11-05T20:00:00Z");
 const MIN_USABLE_CANDIDATES = 2;
-const TERMINAL = new Set(["COMMITTED", "NEEDS_APPROVAL", "INFEASIBLE"]);
 
 const log = (msg: string) => process.stdout.write(`${msg}\n`);
 
@@ -196,7 +195,7 @@ function buildVerdicts(live: LiveResult, rehearsal: { proposed: number }) {
     chosenCandidatePassedValidation: verdict(validatedInTrace ? "PASS" : chosen ? "FAIL" : "BLOCKED", chosen ? `chosen ${chosen.preference} (${chosen.consent}), validated in trace: ${validatedInTrace}` : "no candidate was chosen"),
     consentRespected: verdict(chosen === null ? "BLOCKED" : consentMatches ? "PASS" : "FAIL", `status ${run?.status ?? "none"}`),
     requestCapEnforced: verdict(live.meter.calls.length <= MAX_REQUESTS ? "PASS" : "FAIL", `requests sent ${live.meter.calls.length}, refused by meter ${live.refusedByMeter}`),
-    modelFailureFallsBack: verdict(failedCalls.length === 0 ? "NOT TESTED" : run && TERMINAL.has(run.status) && !run.aiUsed ? "PASS" : "FAIL", `failed provider calls: ${failedCalls.length}; aiUsed: ${run?.aiUsed ?? false}`),
+    modelFailureFallsBack: fallbackVerdict({ failedCalls: failedCalls.length, status: run?.status ?? null, trace, decision: runProvenance({ aiUsed: run?.aiUsed ?? false, trace }).decision }),
     invalidOrInjectedOutputFallsBack: verdict("NOT TESTED", `live adversarial probe not run; rejected model steps observed: ${trace.filter((e) => e.actor === "GEMINI" && e.outcome === "REJECTED").length}; rehearsal usable candidates: ${rehearsal.proposed}`),
   };
 }
