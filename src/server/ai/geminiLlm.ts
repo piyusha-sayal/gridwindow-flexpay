@@ -103,9 +103,17 @@ export class GeminiLlm implements StructuredLlm {
   }
 }
 
+/**
+ * @google/genai ships separate ESM and CJS builds, each with its own ApiError class, so `instanceof` is false when the
+ * client and this adapter were loaded through different builds and the HTTP status would be lost. Match the shape too.
+ */
+function isApiError(err: unknown): err is ApiError {
+  return err instanceof ApiError || (err instanceof Error && err.name === "ApiError" && typeof (err as { status?: unknown }).status === "number");
+}
+
 /** Sanitized: the error class, HTTP status and provider status word only; never the message, which may echo request content. */
 export function classifyFailure(err: unknown): { reason: LlmFailure; diagnostic: LlmDiagnostic } {
-  if (err instanceof ApiError) {
+  if (isApiError(err)) {
     const reason = classifyHttpStatus(err.status);
     const providerStatus = providerStatusWord(err.message);
     return { reason, diagnostic: { category: reason, errorName: err.name, httpStatus: err.status, ...(providerStatus ? { providerStatus } : {}) } };

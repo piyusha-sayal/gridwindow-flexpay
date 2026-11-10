@@ -1,4 +1,5 @@
 /** Read models for the UI. Provider references are redacted; no secrets or buyer identity are stored or shown. */
+import { aiStatusOf, type AiStatus } from "../ai/aiStatus";
 import { explainOffer } from "@/domain/explain";
 import type { PaymentState, ServiceState } from "@/domain/paymentState";
 import type { QuoteSet } from "@/domain/quotes";
@@ -221,6 +222,7 @@ export interface OperatorDashboard {
   tariff: { label: string; bands: { fromHour: number; toHour: number; mcPerKWh: number }[]; congestionSurchargeMcPerKWh: number };
   sessions: DashboardSession[];
   providerMode: string;
+  ai: AiStatus;
 }
 
 export async function operatorDashboard(deps: AppDeps, nightOf: string): Promise<OperatorDashboard> {
@@ -306,5 +308,6 @@ export async function operatorDashboard(deps: AppDeps, nightOf: string): Promise
       };
     }),
     providerMode: deps.gateway.mode,
+    ai: aiStatusOf(deps.llm),
   };
 }

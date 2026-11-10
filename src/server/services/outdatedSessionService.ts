@@ -23,6 +23,7 @@ import { appendEvent, committedPlans, effectivePowerOf, getReservation, planOf, 
 import { MAX_ATTEMPTS, planningFor } from "./recoveryOrchestrator";
 import { recoverReservation } from "./recoveryService";
 import { commitCapacityOrVoid } from "./checkoutService";
+import { expireAbandonedCheckouts } from "./checkoutExpiryService";
 import { reconcileReservation } from "./reconcileService";
 import { latestRunsByReservation } from "./approvalView";
 import { nightContext } from "./scheduleService";
@@ -223,13 +224,15 @@ export async function resolveOutdatedSession(deps: AppDeps, rid: string): Promis
  * whose authorization id was never stored (the authorize response was lost), so those rows stay in the rotation too.
  */
 const SWEEP_SELECT = `select id from reservations
-  where payment_state = 'AUTHORIZED'
+  where provider_mode = $3
+    and (payment_state = 'AUTHORIZED'
      or (payment_state = 'NEEDS_RECONCILIATION'
          and (paypal_order_id is not null or paypal_authorization_id is not null or paypal_capture_id is not null)
          and (authorization_expires_at is null or authorization_expires_at > $2::timestamptz))
      or (payment_state in ('FAILED', 'CANCELLED') and paypal_capture_id is null
-         and (paypal_order_id is not null or paypal_authorization_id is not null)
-         and not exists (select 1 from events e where e.reservation_id = reservations.id and e.type = 'ORPHAN_AUTHORIZATION_VOIDED'))
+         and (paypal_authorization_id is not null
+              or exists (select 1 from payment_operations o where o.reservation_id = reservations.id and o.kind = 'AUTHORIZE'))
+         and not exists (select 1 from events e where e.reservation_id = reservations.id and e.type = 'ORPHAN_AUTHORIZATION_VOIDED')))
   order by sweep_checked_at asc nulls first, updated_at, id
   limit $1`;
 
@@ -269,7 +272,8 @@ async function checkOne(deps: AppDeps, rid: string): Promise<boolean> {
 }
 
 async function runSweep(deps: AppDeps, limit: number): Promise<SweepResult> {
-  const rows = await deps.db.query<{ id: string }>(SWEEP_SELECT, [limit, new Date(deps.now()).toISOString()]);
+  await expireAbandonedCheckouts(deps).catch((err: unknown) => console.warn("[gridwindow] checkout expiry sweep failed:", err instanceof Error ? err.name : "UNKNOWN"));
+  const rows = await deps.db.query<{ id: string }>(SWEEP_SELECT, [limit, new Date(deps.now()).toISOString(), deps.gateway.mode]);
   let failed = 0;
   for (const { id } of rows) {
     if (!(await checkOne(deps, id))) failed += 1;

@@ -6,6 +6,7 @@
  */
 import { ProviderError } from "@/payments/gateway";
 import type { AppDeps } from "../deps";
+import { assertProviderScope } from "../providerScope";
 import { appendEvent, appendEventOnce, claimOperation, finishOperation, getReservation, leaseOperation, recordProof, SettlementConflictError, type EventSource, type ReservationRow } from "../repo";
 import { commitCapacityOrVoid } from "./checkoutService";
 import { awaitingOrder, resumeOrderCreation } from "./orderCreationService";
@@ -41,6 +42,7 @@ async function voidOrphanAuthorization(deps: AppDeps, rid: string, authorization
 export async function recoverReservation(deps: AppDeps, rid: string, source: EventSource): Promise<{ reservation: ReservationRow; providerReachable: boolean }> {
   const current = await getReservation(deps.db, rid);
   if (!current) throw new Error(`reservation ${rid} not found`);
+  assertProviderScope(deps, current);
   if (awaitingOrder(current)) {
     const r = await resumeOrderCreation(deps, rid, source);
     return { reservation: r, providerReachable: true };
@@ -61,10 +63,11 @@ export async function recoverReservation(deps: AppDeps, rid: string, source: Eve
 export async function recoverPendingReservations(deps: AppDeps, limit = 50): Promise<{ attempted: number; failed: number }> {
   const rows = await deps.db.query<{ id: string }>(
     `select id from reservations
-     where payment_state in ('QUOTE_ACCEPTED','NEEDS_RECONCILIATION','CAPTURE_PENDING')
-        or (payment_state = 'AUTHORIZED' and service_state in ('DELIVERED','FAILED','CANCELLED'))
+     where provider_mode = $2
+       and (payment_state in ('QUOTE_ACCEPTED','NEEDS_RECONCILIATION','CAPTURE_PENDING')
+        or (payment_state = 'AUTHORIZED' and service_state in ('DELIVERED','FAILED','CANCELLED')))
      order by updated_at limit $1`,
-    [limit],
+    [limit, deps.gateway.mode],
   );
   let failed = 0;
   for (const { id } of rows) {

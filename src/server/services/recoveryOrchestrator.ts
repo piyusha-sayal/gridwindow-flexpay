@@ -167,6 +167,7 @@ class RunWorker {
   private lease: Date | null;
   private seq: number;
   private aiUsed = false;
+  private servingProvider: string | null = null;
   private explanation: { text: string; source: "MODEL" | "DETERMINISTIC" } | null = null;
   private readonly deadline: number;
   private readonly attempt: number;
@@ -207,6 +208,7 @@ class RunWorker {
 
   async execute(): Promise<RecoveryRunView> {
     try {
+      this.servingProvider = this.llm?.provider ?? null;
       await this.log("orchestrator", "DETERMINISTIC", { attempt: this.attempt, modelProvider: this.llm?.provider ?? null }, "INFO", this.resumed ? `resumed on attempt ${this.attempt}` : "started");
       const state = await loadRunState(this.deps, this.event);
       if (!state) return await this.finish("FAILED", "The session is not an active scheduled session.");
@@ -246,6 +248,7 @@ class RunWorker {
       const res = await withTimeout(this.callModel(state, transcript, MAX_TOOL_STEPS - step), remaining);
       if (res === TIMED_OUT) return this.skipModel("TIMEOUT");
       if (!res.ok) return this.skipModel(res.reason);
+      await this.recordServingProvider(res.provider);
       const parsed = STEP_SCHEMA.safeParse(res.value);
       if (!parsed.success) return this.skipModel("INVALID_OUTPUT");
       const call = parseModelCall(parsed.data);
@@ -269,6 +272,13 @@ class RunWorker {
       if (state.infeasibleReason || this.explanation) return;
     }
     await this.log("orchestrator", "DETERMINISTIC", {}, "INFO", "model step limit reached");
+  }
+
+  /** A failover wrapper may answer with a different provider than the one recorded at start; the trace names the one that did. */
+  private async recordServingProvider(provider: string | undefined): Promise<void> {
+    if (!provider || provider === this.servingProvider) return;
+    this.servingProvider = provider;
+    await this.log("orchestrator", "DETERMINISTIC", { modelProvider: provider }, "INFO", `model answered via ${provider}`);
   }
 
   private callModel(state: RunState, transcript: readonly TranscriptItem[], stepsLeft: number): Promise<LlmResult<z.infer<typeof STEP_SCHEMA>>> {

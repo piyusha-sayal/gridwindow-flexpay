@@ -185,7 +185,7 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
       <header className="flex flex-wrap items-end justify-between gap-5">
         <div className="space-y-2">
           <p className="meta">
-            {d.ports.length} ports · provider {d.providerMode === "PAYPAL_SANDBOX" ? "PayPal Sandbox" : "MOCK (simulated)"} · synthetic site and tariff
+            {d.ports.length} ports · provider {d.providerMode === "PAYPAL_SANDBOX" ? "PayPal Sandbox" : "MOCK (simulated)"} · {d.ai.label} · synthetic site and tariff
           </p>
           <h1 className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(30px,4.2vw,44px)]">
             {when} at {site}

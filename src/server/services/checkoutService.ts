@@ -10,6 +10,7 @@ import { approvalDeadlineMs, settlementPolicyOf, termsHash } from "@/domain/term
 import { validateWithEnvelope } from "@/domain/disturbance";
 import { ProviderError } from "@/payments/gateway";
 import { ServiceError, type AppDeps } from "../deps";
+import { assertProviderScope } from "../providerScope";
 import {
   appendEvent,
   claimOperation,
@@ -177,6 +178,7 @@ async function loadForReturn(deps: AppDeps, driverSession: string, rid: string, 
   if (!r || r.driver_session !== driverSession || !safeEqualHex(sha256(state), r.checkout_state_hash)) {
     throw new ServiceError("CHECKOUT_STATE_INVALID", "Checkout session could not be verified.", 403);
   }
+  assertProviderScope(deps, r);
   return r;
 }
 
@@ -223,6 +225,7 @@ export async function handleCheckoutReturn(deps: AppDeps, driverSession: string,
 
 async function authorizeAndCommit(deps: AppDeps, rid: string): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;
+  assertProviderScope(deps, r);
   const claimed = await claimOperation(deps.db, rid, "AUTHORIZE", { termsHash: r.terms_hash, amountCents: r.amount_cents });
   // An earlier attempt already authorized: never send a second financial request, read the provider truth instead.
   if (claimed.op.status === "SUCCEEDED") return (await recoverReservation(deps, rid, "RECONCILER")).reservation;
@@ -275,6 +278,7 @@ function awaitingCapacity(r: ReservationRow): boolean {
  */
 export async function commitCapacityOrVoid(deps: AppDeps, rid: string): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;
+  assertProviderScope(deps, r);
   if (!awaitingCapacity(r)) return r;
   const release = await deps.db.tx(async (q) => {
     const locked = await getReservationForUpdate(q, rid);

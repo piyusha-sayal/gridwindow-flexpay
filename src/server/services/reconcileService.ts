@@ -6,6 +6,7 @@
 import { canTransition, isTerminal, paymentStateForCapture, type PaymentState, type ProofType } from "@/domain/paymentState";
 import { ProviderError, type ProviderAuthorization, type ProviderCapture } from "@/payments/gateway";
 import type { AppDeps } from "../deps";
+import { assertProviderScope } from "../providerScope";
 import {
   appendEvent,
   appendEventOnce,
@@ -107,7 +108,8 @@ async function keepAuthorization(deps: AppDeps, rid: string, authorizationId: st
 export async function reconcileDetailed(deps: AppDeps, rid: string, source: EventSource): Promise<ReconcileOutcome> {
   const r = await getReservation(deps.db, rid);
   if (!r) throw new Error(`reservation ${rid} not found`);
-  const done = (reservation: ReservationRow, providerReachable = true, orphanAuthorizationId: string | null = null): ReconcileOutcome => ({
+  assertProviderScope(deps, r);
+  const done =(reservation: ReservationRow, providerReachable = true, orphanAuthorizationId: string | null = null): ReconcileOutcome => ({
     reservation,
     providerReachable,
     orphanAuthorizationId,

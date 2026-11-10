@@ -39,6 +39,29 @@ describe("provider errors are not collapsed into UNAVAILABLE", () => {
     expect(JSON.stringify(diagnostic)).not.toContain(SECRET_PROMPT);
   });
 
+  it.each(cases)("HTTP %i from an ApiError of another module copy (ESM vs CJS build) is still %s", (status, reason) => {
+    // The SDK ships separate ESM and CJS builds with distinct ApiError classes; instanceof must not decide the classification.
+    class ForeignApiError extends Error {
+      constructor(message: string, readonly status: number) {
+        super(message);
+        this.name = "ApiError";
+      }
+    }
+    const body = JSON.stringify({ error: { code: status, message: `leaks ${SECRET_PROMPT}`, status: status === 429 ? "RESOURCE_EXHAUSTED" : "INVALID_ARGUMENT" } });
+    const err = new ForeignApiError(body, status);
+    expect(err instanceof ApiError).toBe(false);
+    const { reason: got, diagnostic } = classifyFailure(err);
+    expect(got).toBe(reason);
+    expect(diagnostic).toMatchObject({ category: reason, errorName: "ApiError", httpStatus: status });
+    expect(JSON.stringify(diagnostic)).not.toContain(SECRET_PROMPT);
+  });
+
+  it("does not treat an unrelated error named ApiError without a numeric status as an HTTP failure", () => {
+    const err = new Error("x");
+    err.name = "ApiError";
+    expect(classifyFailure(err).diagnostic).toEqual({ category: "CLIENT_ERROR", errorName: "ApiError" });
+  });
+
   it("keeps only the enum-like provider status word", () => {
     expect(providerStatusWord('{"error":{"code":429,"message":"quota","status":"RESOURCE_EXHAUSTED"}}')).toBe("RESOURCE_EXHAUSTED");
     expect(providerStatusWord("no status here")).toBeUndefined();

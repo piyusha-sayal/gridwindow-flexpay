@@ -52,14 +52,36 @@ export interface LlmUsage {
 }
 
 /** `usage` is present whenever the provider returned a response (billed tokens), even if it was rejected. */
-export type LlmResult<T> = { ok: true; value: T; model: string; usage?: LlmUsage } | { ok: false; reason: LlmFailure; usage?: LlmUsage; diagnostic?: LlmDiagnostic };
+export type LlmResult<T> = { ok: true; value: T; model: string; /** Adapter that actually answered; set by the failover wrapper. */ provider?: ModelProvider; usage?: LlmUsage } | { ok: false; reason: LlmFailure; usage?: LlmUsage; diagnostic?: LlmDiagnostic };
 
 /** Which adapter answered. Recorded on every recovery run so a test fixture can never be shown as a live model. */
-export type ModelProvider = "gemini" | "anthropic" | "test-fixture";
+export type ModelProvider = "gemini" | "anthropic" | "openrouter" | "test-fixture";
+
+/** One sanitized provider attempt: no prompt, no model text, no key, no raw provider message. */
+export interface AiAttempt {
+  at: number;
+  provider: ModelProvider;
+  model: string;
+  outcome: "OK" | LlmFailure;
+  latencyMs: number;
+  inputTokens?: number;
+  outputTokens?: number;
+}
+
+/** Operator-facing summary of recent provider attempts. */
+export interface AiHealth {
+  /** OK: primary answered last. DEGRADED: the fallback answered last. DOWN: the last attempt failed everywhere. IDLE: no attempt yet. */
+  state: "OK" | "DEGRADED" | "DOWN" | "IDLE";
+  primary: { provider: ModelProvider; model: string };
+  fallback: { provider: ModelProvider; model: string } | null;
+  recent: AiAttempt[];
+}
 
 export interface StructuredLlm {
   readonly provider: ModelProvider;
   readonly model: string;
+  /** Present only on wrappers that track provider attempts. */
+  health?(): AiHealth;
   generate<S extends z.ZodType>(req: { system: string; user: string; schema: S; maxTokens: number }): Promise<LlmResult<z.infer<S>>>;
 }
 

@@ -11,6 +11,7 @@
  */
 import { PAYPAL_REQUEST_ID_RETENTION_MS, ProviderError, type CreateOrderInput } from "@/payments/gateway";
 import type { AppDeps } from "../deps";
+import { assertProviderScope } from "../providerScope";
 import {
   appendEvent,
   finishOperation,
@@ -78,6 +79,7 @@ async function fail(deps: AppDeps, r: ReservationRow, key: string, code: string,
  */
 export async function attemptCreateOrder(deps: AppDeps, rid: string, op: OperationRow): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;
+  assertProviderScope(deps, r);
   if (!awaitingOrder(r)) return r;
   if (!boundToOffer(r, op)) return fail(deps, r, op.idempotency_key, "BINDING_MISMATCH", null);
 
@@ -118,6 +120,7 @@ export async function attemptCreateOrder(deps: AppDeps, rid: string, op: Operati
 export async function resumeOrderCreation(deps: AppDeps, rid: string, source: EventSource): Promise<ReservationRow> {
   const r = await getReservation(deps.db, rid);
   if (!r) throw new Error(`reservation ${rid} not found`);
+  assertProviderScope(deps, r);
   if (!awaitingOrder(r)) return r;
   const op = await createOrderOperation(deps, rid);
   if (!op) {

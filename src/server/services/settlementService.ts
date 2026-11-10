@@ -9,6 +9,7 @@ import { SETTLEMENT_POLICY_V1, settlementPolicyOf } from "@/domain/terms";
 import { simulateSession, type SimulationFaults } from "@/domain/simulator";
 import { ProviderError } from "@/payments/gateway";
 import { ServiceError, type AppDeps } from "../deps";
+import { assertProviderScope } from "../providerScope";
 import {
   appendEvent,
   claimOperation,
@@ -36,6 +37,7 @@ export async function runSimulation(deps: AppDeps, rid: string, actor: Simulatio
   const r = await getReservation(deps.db, rid);
   if (!r || (actor.kind === "DRIVER" && r.driver_session !== actor.session)) throw new ServiceError("NOT_FOUND", "Reservation not found.", 404);
   if (actor.kind === "DRIVER" && faults.outage) throw new ServiceError("FORBIDDEN", "Only the operator can inject faults.", 403);
+  assertProviderScope(deps, r);
   const existingRun = await deps.db.query("select id from simulation_runs where reservation_id = $1", [rid]);
   // One run per reservation; a repeat call only finishes a settlement that was interrupted.
   if (existingRun.length > 0) return settleFromExistingRun(deps, rid);
@@ -135,6 +137,7 @@ async function settleFromLedger(deps: AppDeps, r: ReservationRow, deliveredMilli
 /** Completes capture/void for a reservation whose synthetic run is recorded but not yet settled. */
 export async function settleFromExistingRun(deps: AppDeps, rid: string): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;
+  assertProviderScope(deps, r);
   if (r.payment_state !== "AUTHORIZED") return r;
   const runs = await deps.db.query<{ delivered_battery_mwh: number; faults: { outage?: unknown } | null }>(
     "select delivered_battery_mwh, faults from simulation_runs where reservation_id = $1",
@@ -185,6 +188,7 @@ async function leaseSettlement(deps: AppDeps, r: ReservationRow, kind: "CAPTURE"
  */
 export async function captureAuthorization(deps: AppDeps, rid: string): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;
+  assertProviderScope(deps, r);
   if (r.payment_state !== "AUTHORIZED" || r.service_state !== "DELIVERED" || !r.paypal_authorization_id) return r;
   if (r.authorization_expires_at && deps.now() >= r.authorization_expires_at.getTime()) {
     // Capture eligibility lapsed: a new charge needs renewed buyer consent, never an automatic retry.
@@ -217,6 +221,7 @@ export async function captureAuthorization(deps: AppDeps, rid: string): Promise<
 /** Voids the authorization once (service failure or capacity conflict). Never a refund. */
 export async function voidAuthorization(deps: AppDeps, rid: string, reason: string): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;
+  assertProviderScope(deps, r);
   if (r.payment_state !== "AUTHORIZED" || !r.paypal_authorization_id) return r;
   const key = await leaseSettlement(deps, r, "VOID");
   if (!key) return r;

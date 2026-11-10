@@ -16,6 +16,7 @@ const DECISION_TOOLS = new Set(["proposeRecovery", "commitPermittedRecovery", "r
 const MODEL_NAME: Record<ModelProvider, string> = {
   gemini: "Gemini (live model)",
   anthropic: "Anthropic (live model)",
+  openrouter: "OpenRouter fallback model (live model)",
   "test-fixture": "MOCK MODEL (test fixture)",
 };
 
@@ -32,15 +33,19 @@ export interface RunProvenance {
   reason: string;
 }
 
-/** The model provider the orchestrator recorded when the run started, if any. */
+/**
+ * The model provider the orchestrator recorded last: at start, and again whenever a failover wrapper answered with a
+ * different provider, so the label names the provider that actually produced the decision.
+ */
 export function recordedModelProvider(trace: readonly RunTraceEntry[]): ModelProvider | null {
+  let recorded: ModelProvider | null = null;
   for (const entry of trace) {
     const input = entry.input;
     if (entry.tool !== "orchestrator" || typeof input !== "object" || input === null || !("modelProvider" in input)) continue;
     const value = input.modelProvider;
-    if (typeof value === "string" && value in MODEL_NAME) return value as ModelProvider;
+    if (typeof value === "string" && value in MODEL_NAME) recorded = value as ModelProvider;
   }
-  return null;
+  return recorded;
 }
 
 function fallbackReason(trace: readonly RunTraceEntry[]): string {

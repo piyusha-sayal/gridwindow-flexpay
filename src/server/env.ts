@@ -40,6 +40,14 @@ const schema = z
     AI_PROVIDER: z.enum(["gemini", "anthropic"]).optional(),
     GEMINI_API_KEY: z.string().optional(),
     GEMINI_MODEL: z.string().min(1).max(64).optional(),
+    /** Optional second provider used once when the primary model has a transient failure. Never required. */
+    OPENROUTER_API_KEY: z.string().optional(),
+    OPENROUTER_MODEL: z
+      .string()
+      .regex(/^[A-Za-z0-9._~-]+\/[A-Za-z0-9._:~-]+$/, "OPENROUTER_MODEL must look like vendor/model")
+      .max(100)
+      .optional(),
+    AI_FALLBACK_PROVIDER: z.enum(["openrouter"]).optional(),
     /** Set by automated test runners: forbids any hosted database URL (see runtime.openDb). */
     GW_ISOLATED_DB: z.enum(["true"]).optional(),
     DEMO_TOOLS: z.enum(["true", "false"]).optional(),
@@ -98,6 +106,7 @@ export function assertIsolatedRun(env: AppEnv): void {
     env.MIGRATION_DATABASE_URL && "MIGRATION_DATABASE_URL",
     env.GEMINI_API_KEY && "GEMINI_API_KEY",
     env.ANTHROPIC_API_KEY && "ANTHROPIC_API_KEY",
+    env.OPENROUTER_API_KEY && "OPENROUTER_API_KEY",
     env.PAYMENT_MODE !== "mock" && "PAYMENT_MODE (must be mock)",
   ].filter(Boolean);
   if (leaks.length > 0) throw new ConfigError(`GW_ISOLATED_DB is set but the environment reaches external services: ${leaks.join(", ")}.`);
