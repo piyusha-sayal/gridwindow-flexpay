@@ -1,3 +1,5 @@
+> Superseded for the final submission by `docs/DEVPOST_FINAL.md` (this draft predates the recovery engine, Bryntum scheduler and the current test counts).
+
 # Devpost submission text
 
 Status: draft text for the owner to review. Nothing here is submitted. Claims follow `docs/AWARD_EVIDENCE.md`.

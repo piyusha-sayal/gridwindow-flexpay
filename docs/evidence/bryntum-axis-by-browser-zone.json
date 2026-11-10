@@ -1,0 +1,134 @@
+{
+  "label": "SYNTHETIC",
+  "stationZone": "America/Los_Angeles",
+  "observed": {
+    "2027-03-13|America/Los_Angeles": {
+      "axis": [
+        "Sat 03/13",
+        "Sun 03/14",
+        "6 PM",
+        "7 PM",
+        "8 PM",
+        "9 PM",
+        "10 PM",
+        "11 PM",
+        "12 AM",
+        "1 AM",
+        "3 AM",
+        "4 AM",
+        "5 AM",
+        "6 AM",
+        "7 AM",
+        "8 AM",
+        "9 AM"
+      ],
+      "firstTableRow": "Port B res_ICsiA1ZcD-X00gbw 18:30 06:30 06:30 v1 (agreed) 45.67 45.67 7.2"
+    },
+    "2027-03-13|UTC": {
+      "axis": [
+        "Sun 03/14",
+        "2 AM",
+        "3 AM",
+        "4 AM",
+        "5 AM",
+        "6 AM",
+        "7 AM",
+        "8 AM",
+        "9 AM",
+        "10 AM",
+        "11 AM",
+        "12 PM",
+        "1 PM",
+        "2 PM",
+        "3 PM",
+        "4 PM"
+      ],
+      "firstTableRow": "Port B res_ICsiA1ZcD-X00gbw 18:30 06:30 06:30 v1 (agreed) 45.67 45.67 7.2"
+    },
+    "2027-03-13|Asia/Kolkata": {
+      "axis": [
+        "Sun 03/14",
+        "7 AM",
+        "8 AM",
+        "9 AM",
+        "10 AM",
+        "11 AM",
+        "12 PM",
+        "1 PM",
+        "2 PM",
+        "3 PM",
+        "4 PM",
+        "5 PM",
+        "6 PM",
+        "7 PM",
+        "8 PM",
+        "9 PM"
+      ],
+      "firstTableRow": "Port B res_ICsiA1ZcD-X00gbw 18:30 06:30 06:30 v1 (agreed) 45.67 45.67 7.2"
+    },
+    "2027-11-06|America/Los_Angeles": {
+      "axis": [
+        "Sat 11/06",
+        "Sun 11/07",
+        "6 PM",
+        "7 PM",
+        "8 PM",
+        "9 PM",
+        "10 PM",
+        "11 PM",
+        "12 AM",
+        "1 AM",
+        "1 AM",
+        "2 AM",
+        "3 AM",
+        "4 AM",
+        "5 AM",
+        "6 AM",
+        "7 AM"
+      ],
+      "firstTableRow": "Port B res_Ly1gFNt25oJlFVvl 18:30 06:30 06:30 v1 (agreed) 45.67 45.67 7.2"
+    },
+    "2027-11-06|Asia/Kolkata": {
+      "axis": [
+        "Sun 11/07",
+        "6 AM",
+        "7 AM",
+        "8 AM",
+        "9 AM",
+        "10 AM",
+        "11 AM",
+        "12 PM",
+        "1 PM",
+        "2 PM",
+        "3 PM",
+        "4 PM",
+        "5 PM",
+        "6 PM",
+        "7 PM",
+        "8 PM"
+      ],
+      "firstTableRow": "Port B res_Ly1gFNt25oJlFVvl 18:30 06:30 06:30 v1 (agreed) 45.67 45.67 7.2"
+    },
+    "2027-11-06|UTC": {
+      "axis": [
+        "Sun 11/07",
+        "1 AM",
+        "2 AM",
+        "3 AM",
+        "4 AM",
+        "5 AM",
+        "6 AM",
+        "7 AM",
+        "8 AM",
+        "9 AM",
+        "10 AM",
+        "11 AM",
+        "12 PM",
+        "1 PM",
+        "2 PM",
+        "3 PM"
+      ],
+      "firstTableRow": "Port B res_Ly1gFNt25oJlFVvl 18:30 06:30 06:30 v1 (agreed) 45.67 45.67 7.2"
+    }
+  }
+}
