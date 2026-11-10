@@ -122,6 +122,7 @@ function effectiveAtMs(state: RunState): number {
 export function narrativeFacts(state: RunState): NarrativeFacts {
   const tz = state.ctx.station.timeZone;
   return {
+    eventKind: state.eventType,
     eventLabel: EVENT_LABELS[state.eventType],
     chargerLabel: portLabelOf(state),
     effectiveAt: formatLocalTime(effectiveAtMs(state), tz),

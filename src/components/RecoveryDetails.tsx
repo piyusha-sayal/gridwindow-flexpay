@@ -2,7 +2,7 @@ import { formatLocalTime } from "@/domain/time";
 import { formatKWh } from "@/domain/units";
 import { SIMULATED_EVENT_LABEL } from "@/server/services/recoveryProvenance";
 import type { RecoveryReceipt } from "@/server/services/recoveryReceipt";
-import { ATTRIBUTION_LABEL, DISTURBANCE_LABEL, FORECAST_NOTE, formatShortfallWh, RUN_STATUS_LABEL } from "./recoveryCopy";
+import { ATTRIBUTION_LABEL, DISTURBANCE_LABEL, FORECAST_NOTE, formatShortfallWh, runStatusLabel } from "./recoveryCopy";
 import { Badge } from "./ui";
 
 /** Actual synthetic delivery against the target. Shows the shortfall in plain words; a forecast never appears here. */
@@ -66,7 +66,7 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
                 {d.provenance === "SYNTHETIC" && <Badge tone="neutral">{SIMULATED_EVENT_LABEL}</Badge>}
               </>
               <span className="meta">{ATTRIBUTION_LABEL[d.attribution]}</span>
-              {d.runStatus && <span className="meta">{RUN_STATUS_LABEL[d.runStatus]}</span>}
+              {d.runStatus && <span className="meta">{runStatusLabel(d.runStatus, recovery.runs.find((r) => r.eventId === d.eventId)?.consent)}</span>}
             </li>
           ))}
         </ul>
@@ -74,7 +74,7 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
 
       {recovery.runs.map((run) => (
         <div key={run.runId} className="space-y-2">
-          <h3 className="font-semibold">Recovery run · {RUN_STATUS_LABEL[run.status]}</h3>
+          <h3 className="font-semibold">Recovery run · {runStatusLabel(run.status, run.consent)}</h3>
           <p className="meta">
             Decided by: {run.provenance.decisionLabel}. {run.provenance.reason}
           </p>

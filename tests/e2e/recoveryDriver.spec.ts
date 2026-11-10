@@ -92,7 +92,11 @@ test.describe("driver recovery", () => {
     await expect(page.getByRole("heading", { name: "FlexReceipt" })).toBeVisible();
     const receipt = page.getByRole("region", { name: "FlexReceipt" });
     await receipt.getByText("Autonomous recovery (SYNTHETIC disturbance)", { exact: true }).click();
-    await expect(receipt.getByText("Approved by you", { exact: false })).toBeVisible();
+    await expect(receipt.getByText("Consent: Approved by you", { exact: false })).toBeVisible();
+    await expect(receipt.getByRole("heading", { name: "Recovery run · Approved by you and applied" })).toBeVisible();
+    // QA-4: once approved and applied, the receipt never claims an automatic recovery or a pending approval.
+    await expect(receipt).not.toContainText("Recovered automatically");
+    await expect(receipt).not.toContainText("Nothing changes until you approve it");
   });
 
   test("decline keeps the schedule version unchanged and says so", async ({ page, request }) => {

@@ -10,6 +10,7 @@ import { batteryMilliWhFromGridWh, SLOTS_PER_HOUR } from "@/domain/units";
 import type { AppDeps } from "../deps";
 import type { ReservationRow } from "../repo";
 import type { CandidateRecord, RecoveryOutcome, RunStatus, RunTraceEntry } from "./recoveryRuns";
+import { approvedRunReason } from "./recoveryNarrative";
 import { runProvenance, type RunProvenance } from "./recoveryProvenance";
 import { nightContext, reservationDisturbances } from "./scheduleService";
 
@@ -163,7 +164,7 @@ export async function buildRecoveryReceipt(deps: AppDeps, r: ReservationRow): Pr
       status: run.status,
       aiUsed: run.ai_used,
       provenance: runProvenance({ aiUsed: run.ai_used, trace: run.trace }),
-      reason: run.outcome?.reason ?? "",
+      reason: consent?.method === "DRIVER_APPROVED" && run.status === "COMMITTED" ? approvedRunReason(run.outcome?.reason ?? "") : (run.outcome?.reason ?? ""),
       candidates: run.outcome?.candidates ?? [],
       consent,
     };

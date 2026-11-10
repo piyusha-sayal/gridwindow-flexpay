@@ -43,6 +43,11 @@ export const RUN_STATUS_LABEL: Record<RunStatus, string> = {
   EXPIRED: "Proposal expired",
 };
 
+/** Status label that tells a driver-approved change apart from one applied automatically within pre-approved bounds. */
+export function runStatusLabel(status: RunStatus, consent: Readonly<{ method: string }> | null | undefined): string {
+  return status === "COMMITTED" && consent?.method === "DRIVER_APPROVED" ? "Approved by you and applied" : RUN_STATUS_LABEL[status];
+}
+
 /** Run states that still need a decision from the driver. */
 export const PENDING_RUN_STATUSES = new Set<RunStatus>(["NEEDS_APPROVAL"]);
 

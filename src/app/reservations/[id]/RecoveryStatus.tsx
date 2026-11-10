@@ -1,4 +1,4 @@
-import { RUN_STATUS_LABEL } from "@/components/recoveryCopy";
+import { runStatusLabel } from "@/components/recoveryCopy";
 import type { RecoveryReceipt } from "@/server/services/recoveryReceipt";
 
 /**
@@ -17,7 +17,7 @@ export function RecoveryStatus({ recovery }: { recovery: RecoveryReceipt }) {
       <ul className="space-y-2 text-[14px]">
         {settled.map((run) => (
           <li key={run.runId}>
-            <strong>{RUN_STATUS_LABEL[run.status]}</strong>
+            <strong>{runStatusLabel(run.status, run.consent)}</strong>
             {run.reason && <span> · {run.reason}</span>}
             {run.consent === null && <span> Your original schedule is unchanged.</span>}
           </li>
