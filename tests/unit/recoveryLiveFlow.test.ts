@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { argsDigest, boundedToolVerdict, pickLiveEnv, skippedModelReasons, summarizeTrace, type TraceEntryLike } from "../../scripts/recoveryLiveFlow";
+import { argsDigest, boundedToolVerdict, pickLiveEnv, resolveLiveModel, resolveRequestCap, skippedModelReasons, summarizeTrace, type TraceEntryLike } from "../../scripts/recoveryLiveFlow";
 
 const step = (over: Partial<TraceEntryLike>): TraceEntryLike => ({ seq: 1, tool: "requestRecoveryCandidates", actor: "GEMINI", input: {}, outcome: "OK", detail: "ok", ...over });
 
@@ -59,5 +59,30 @@ describe("boundedToolVerdict", () => {
 
   it("is BLOCKED when the model produced no step", () => {
     expect(boundedToolVerdict([step({ actor: "DETERMINISTIC" })], 0).verdict).toBe("BLOCKED");
+  });
+});
+
+describe("--max-requests", () => {
+  it("defaults to 6 and can only lower the cap", () => {
+    expect(resolveRequestCap([])).toBe(6);
+    expect(resolveRequestCap(["--max-requests=1"])).toBe(1);
+    expect(resolveRequestCap(["--max-requests=4"])).toBe(4);
+    expect(resolveRequestCap(["--max-requests=99"])).toBe(6);
+  });
+  it("ignores values that are not positive integers", () => {
+    for (const bad of ["--max-requests=0", "--max-requests=-2", "--max-requests=1.5", "--max-requests=abc", "--max-requests=", "--max-requests= "]) expect(resolveRequestCap([bad])).toBe(6);
+  });
+});
+
+describe("--model", () => {
+  const D = "gemini-3.6-flash";
+  it("an explicit flag wins over the env file and the process env", () => {
+    expect(resolveLiveModel(["--model=gemini-3.6-flash"], "gemini-3.8-flash", "other", D)).toBe("gemini-3.6-flash");
+  });
+  it("falls back to the file, then the process env, then the default", () => {
+    expect(resolveLiveModel([], "from-file", "from-env", D)).toBe("from-file");
+    expect(resolveLiveModel([], undefined, "from-env", D)).toBe("from-env");
+    expect(resolveLiveModel([], " ", undefined, D)).toBe(D);
+    expect(resolveLiveModel(["--model="], undefined, undefined, D)).toBe(D);
   });
 });

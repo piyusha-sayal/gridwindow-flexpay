@@ -23,13 +23,10 @@ import { runRecovery } from "../src/server/services/scheduleService";
 import type { RecoveryRunView } from "../src/server/services/recoveryRuns";
 import { MockGateway } from "../src/payments/mockGateway";
 import { BudgetExceededError, MeteredLlm } from "./aiSmokeFlow";
-import { boundedToolVerdict, pickLiveEnv, skippedModelReasons, summarizeTrace, type BoundedVerdict } from "./recoveryLiveFlow";
+import { boundedToolVerdict, pickLiveEnv, resolveLiveModel, resolveRequestCap, skippedModelReasons, summarizeTrace, type BoundedVerdict } from "./recoveryLiveFlow";
 
 const APPROVAL_FLAG = "--approve-gemini-calls";
-/** Default cap on model requests in one run; `--max-requests=N` can only lower it. */
-const DEFAULT_MAX_REQUESTS = 6;
-const requestFlag = Number(process.argv.find((a) => a.startsWith("--max-requests="))?.slice("--max-requests=".length));
-const MAX_REQUESTS = Number.isInteger(requestFlag) && requestFlag >= 1 ? Math.min(requestFlag, DEFAULT_MAX_REQUESTS) : DEFAULT_MAX_REQUESTS;
+const MAX_REQUESTS = resolveRequestCap(process.argv);
 const BUDGET_USD = 0.25;
 /** Budgeting only: a conservative planning rate. The Gemini free tier is priced at $0 and the paid tariff was not verified. */
 const PLANNING_PRICE = { inPerMTok: 10, outPerMTok: 50 };
@@ -219,9 +216,7 @@ async function main() {
   const fileEnv = pickLiveEnv(envText);
   const apiKey = fileEnv.GEMINI_API_KEY ?? process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY is not set in .env.local");
-  // An explicit --model=<id> wins over the file, so the certified model is used even if .env.local names another one.
-  const modelFlag = process.argv.find((a) => a.startsWith("--model="))?.slice("--model=".length).trim();
-  const model = modelFlag || (fileEnv.GEMINI_MODEL ?? process.env.GEMINI_MODEL)?.trim() || DEFAULT_GEMINI_MODEL;
+  const model = resolveLiveModel(process.argv, fileEnv.GEMINI_MODEL, process.env.GEMINI_MODEL, DEFAULT_GEMINI_MODEL);
 
   const live = await liveRecovery(apiKey, model);
   const run = live.run;

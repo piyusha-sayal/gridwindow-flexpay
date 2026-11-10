@@ -152,3 +152,43 @@ describe("grounding: what the validator does with plausible Gemini phrasings of 
     expect(await interpretRequest(down, DEMO_STATION, "I need 30 kWh by 7")).toMatchObject({ source: "DETERMINISTIC_FALLBACK", reason: "QUOTA_EXHAUSTED" });
   });
 });
+
+describe("timeout and gateway-error classification (offline)", () => {
+  const schema = z.object({ a: z.string() });
+  const gateway = (status: number, word: string) =>
+    new ApiError({ status, message: JSON.stringify({ error: { code: status, message: `${SECRET_PROMPT} ${API_KEY}`, status: word } }) });
+
+  it("a provider-side 504 DEADLINE_EXCEEDED and 503 UNAVAILABLE are UNAVAILABLE with the HTTP and provider status, not TIMEOUT", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    for (const [status, word] of [[504, "DEADLINE_EXCEEDED"], [503, "UNAVAILABLE"]] as const) {
+      const llm = new GeminiLlm(API_KEY, undefined, { generate: async () => { throw gateway(status, word); } });
+      const res = await llm.generate({ system: "s", user: SECRET_PROMPT, schema, maxTokens: 10 });
+      expect(res).toMatchObject({ ok: false, reason: "UNAVAILABLE", diagnostic: { category: "UNAVAILABLE", httpStatus: status, providerStatus: word } });
+    }
+  });
+
+  it("only our own client deadline is TIMEOUT, and it aborts the request", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    let aborted = false;
+    const llm = new GeminiLlm(API_KEY, undefined, {
+      timeoutMs: 20,
+      generate: (params) => new Promise<GenerateContentResponse>(() => { params.config?.abortSignal?.addEventListener("abort", () => { aborted = true; }); }),
+    });
+    const res = await llm.generate({ system: "s", user: "u", schema, maxTokens: 10 });
+    expect(res).toMatchObject({ ok: false, reason: "TIMEOUT" });
+    expect(aborted).toBe(true);
+  });
+
+  it("the request is small, tool-free and uses LOW thinking; the transport receives no retries of its own", async () => {
+    const seen: unknown[] = [];
+    const llm = new GeminiLlm(API_KEY, "gemini-3.6-flash", { generate: async (params) => { seen.push(params); throw gateway(504, "DEADLINE_EXCEEDED"); } });
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    await llm.generate({ system: "s", user: "u", schema, maxTokens: 512 });
+    expect(seen).toHaveLength(1);
+    const cfg = (seen[0] as { model: string; config: { thinkingConfig: { thinkingLevel: string }; maxOutputTokens: number; tools?: unknown } }).config;
+    expect((seen[0] as { model: string }).model).toBe("gemini-3.6-flash");
+    expect(cfg.thinkingConfig.thinkingLevel).toBe("LOW");
+    expect(cfg.maxOutputTokens).toBe(512 + 1024);
+    expect(cfg.tools).toBeUndefined();
+  });
+});

@@ -71,3 +71,18 @@ export function boundedToolVerdict(entries: readonly TraceEntryLike[], paymentCa
   const verdict: BoundedVerdict = toolsNamed.length === 0 ? "BLOCKED" : outsideToolSet.length > 0 || paymentCalls > 0 ? "FAIL" : "PASS";
   return { verdict, toolsNamed, outsideToolSet };
 }
+
+export const DEFAULT_LIVE_MAX_REQUESTS = 6;
+
+/** `--max-requests=N` can only lower the default cap; a missing, non-integer or non-positive value keeps the default. */
+export function resolveRequestCap(argv: readonly string[], defaultCap: number = DEFAULT_LIVE_MAX_REQUESTS): number {
+  const raw = argv.find((a) => a.startsWith("--max-requests="))?.slice("--max-requests=".length);
+  const n = raw === undefined || raw.trim() === "" ? Number.NaN : Number(raw);
+  return Number.isInteger(n) && n >= 1 ? Math.min(n, defaultCap) : defaultCap;
+}
+
+/** Model id for the live call: an explicit `--model=<id>` wins over the env file, the process env, then the default. */
+export function resolveLiveModel(argv: readonly string[], fileModel: string | undefined, processModel: string | undefined, defaultModel: string): string {
+  const flag = argv.find((a) => a.startsWith("--model="))?.slice("--model=".length).trim();
+  return flag || fileModel?.trim() || processModel?.trim() || defaultModel;
+}
