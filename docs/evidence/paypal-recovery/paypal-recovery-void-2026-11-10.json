@@ -1,0 +1,82 @@
+{
+  "title": "GridWindow end-to-end PayPal Sandbox recovery: operator outage -> deterministic void",
+  "ranAtUtc": "2026-11-10",
+  "environment": {
+    "paymentMode": "PAYPAL_SANDBOX (sandbox host only)",
+    "database": "fresh embedded PGlite (isolated, not Neon)",
+    "gemini": "not called (key blanked)",
+    "webhook": "NOT TESTED (localhost, no public endpoint; webhook_inbox rows = 0)"
+  },
+  "reservation": {
+    "idFragment": "res_HDeT…k7Zt",
+    "port": "B",
+    "amountCents": 1303,
+    "currency": "USD",
+    "policy": "OPERATOR_FAILURE_FULL_VOID_V1",
+    "consent": "given by buyer in own browser session (offer accepted with termsHash)",
+    "driverApprovalSession": "browser-driven"
+  },
+  "providerConfirmed": {
+    "orderIdFragment": "…19332T",
+    "authorizationIdFragment": "…90035A",
+    "beforeOutage": "authorization CREATED, captured: no",
+    "afterOutage": "authorization VOIDED, captured: no",
+    "amountCents": 1303,
+    "payeeMatchesExpectedMerchant": true,
+    "readBack": "npm run paypal:order (read-only GET) x3: before, after void, after replay"
+  },
+  "simulatedDelivery": {
+    "label": "SYNTHETIC",
+    "outcome": "FAILED",
+    "deliveredBatteryMilliWh": 0,
+    "targetBatteryMilliWh": 30000000,
+    "outageInjected": true,
+    "triggeredBy": "OPERATOR",
+    "outageSlots": "24-44"
+  },
+  "deterministicDecision": {
+    "result": "FULL_VOID, zero charge",
+    "basis": "operator-attributable failure, policy OPERATOR_FAILURE_FULL_VOID_V1",
+    "recoveryEngineRuns": 0,
+    "note": "Settlement policy applied directly. The disturbance re-planning engine did not create a recovery run for this injection."
+  },
+  "finalState": {
+    "payment": "VOIDED",
+    "service": "FAILED",
+    "slotsCommitted": false
+  },
+  "auditTrail": {
+    "events": [
+      "OFFER_ACCEPTED [DRIVER]",
+      "ORDER_CREATED [PAYPAL_SANDBOX_API]",
+      "BUYER_APPROVED [PAYPAL_SANDBOX_API]",
+      "AUTHORIZED [PAYPAL_SANDBOX_API]",
+      "CAPACITY_COMMITTED [APP]",
+      "SERVICE_FAILED [SYNTHETIC_SIMULATOR]",
+      "VOIDED [PAYPAL_SANDBOX_API]"
+    ],
+    "proofs": [
+      "ORDER_CREATED:PAYER_ACTION_REQUIRED:1303",
+      "BUYER_APPROVED:APPROVED:1303",
+      "AUTHORIZED:CREATED:1303",
+      "VOIDED:VOIDED:1303"
+    ],
+    "paymentOperations": [
+      "CREATE_ORDER:SUCCEEDED",
+      "AUTHORIZE:SUCCEEDED",
+      "VOID:SUCCEEDED"
+    ]
+  },
+  "idempotency": {
+    "replays": "simulate x1, reconcile x1 after provider terminal state verified",
+    "result": "events, proofs, simulation timestamp and payment_operations unchanged; exactly one CREATE_ORDER, AUTHORIZE, VOID; no CAPTURE",
+    "blindPaymentWriteRetries": 0
+  },
+  "orphan": "A first order created through a non-browser session was approved on PayPal but never authorized (app refused the return: session mismatch). It holds no funds and stays ORDER_CREATED in the isolated DB.",
+  "limits": [
+    "Webhook delivery NOT TESTED",
+    "Capture path not exercised in this run (covered by standalone smoke, not recovery-linked)",
+    "Disturbance recovery engine run table empty; void came from the settlement policy",
+    "Evidence read from app views and read-only provider GETs; ids shortened"
+  ]
+}

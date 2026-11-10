@@ -1,0 +1,183 @@
+{
+  "generatedBy": "tests/integration/recoveryCertification.test.ts",
+  "environment": {
+    "database": "embedded PGlite, in-memory, created by this run",
+    "neon": "not contacted",
+    "gemini": "0 calls (no model configured)",
+    "payments": "MOCK gateway only",
+    "databaseUrlSet": false
+  },
+  "provenance": "Charging data, disturbances and savings are SYNTHETIC. No PayPal Sandbox or live call was made by this suite.",
+  "cases": {
+    "A_feasible_and_replay": {
+      "runStatus": "COMMITTED",
+      "toolOrder": [
+        "requestRecoveryCandidates",
+        "validateRecoveryPlan",
+        "validateRecoveryPlan",
+        "proposeRecovery",
+        "commitPermittedRecovery"
+      ],
+      "actors": [
+        "DETERMINISTIC"
+      ],
+      "candidates": [
+        {
+          "preference": "flex_lowest_cost",
+          "status": "PROPOSED",
+          "consent": "AUTO_COMMIT",
+          "chosen": true,
+          "reason": null
+        },
+        {
+          "preference": "flex_gentle",
+          "status": "PROPOSED",
+          "consent": "AUTO_COMMIT",
+          "chosen": false,
+          "reason": null
+        },
+        {
+          "preference": "flex_early_finish",
+          "status": "REJECTED",
+          "consent": null,
+          "chosen": false,
+          "reason": "DUPLICATE_SCHEDULE"
+        }
+      ],
+      "versionsAfter": [
+        {
+          "version": 2,
+          "source": "RECOVERY",
+          "linkedToRun": true
+        }
+      ],
+      "maxPowerAfterEffectiveSlotW": 7200,
+      "validatorViolations": 0,
+      "termsHashUnchanged": true,
+      "amountCents": 1153,
+      "spendCapCents": 2500,
+      "gatewayCallsDuringRecovery": 0,
+      "replayChanged": false,
+      "countsAfterReplay": {
+        "versions": 1,
+        "runs": 1,
+        "disruptions": 1,
+        "events": 7,
+        "operations": 2
+      }
+    },
+    "B1_infeasible_unknown_attribution": {
+      "runStatus": "INFEASIBLE",
+      "rejections": [
+        {
+          "preference": "flex_lowest_cost",
+          "status": "REJECTED",
+          "reason": "INSUFFICIENT_CAPACITY: short by 20609 grid Wh under optimized"
+        },
+        {
+          "preference": "flex_early_finish",
+          "status": "REJECTED",
+          "reason": "INSUFFICIENT_CAPACITY: short by 21609 grid Wh under optimized"
+        },
+        {
+          "preference": "flex_gentle",
+          "status": "REJECTED",
+          "reason": "INSUFFICIENT_CAPACITY: short by 20609 grid Wh under optimized"
+        }
+      ],
+      "scheduleVersionsWritten": 0,
+      "settlement": "OPERATOR_RESOLUTION (policy: UNKNOWN attribution never auto-voids and never captures)",
+      "paymentState": "AUTHORIZED",
+      "paymentWrites": 0,
+      "gatewayCallsDuringRecovery": 0
+    },
+    "B2_infeasible_operator_confirmed": {
+      "runStatus": "INFEASIBLE",
+      "scheduleVersionsWritten": 0,
+      "gatewayCallsDuringRecovery": 0,
+      "gatewayCallsAfterSettlement": 2,
+      "settlement": {
+        "result": "VOIDED via MOCK gateway",
+        "voidOperations": 1,
+        "captureOperations": 0,
+        "replayAddedOperations": 0,
+        "events": [
+          "OFFER_ACCEPTED",
+          "ORDER_CREATED",
+          "BUYER_APPROVED",
+          "AUTHORIZED",
+          "CAPACITY_COMMITTED",
+          "DISRUPTION_RECORDED",
+          "SERVICE_FAILED",
+          "OUTDATED_VOID_DECIDED",
+          "FAILURE_REMEDY_COST_RECORDED",
+          "VOIDED"
+        ]
+      },
+      "note": "The void is a MOCK gateway operation. A PayPal Sandbox void was shown separately in docs/evidence/paypal-recovery/."
+    },
+    "D_consent_boundary": {
+      "statusBeforeApproval": "NEEDS_APPROVAL",
+      "versionsBeforeApproval": 0,
+      "wrongDriverApproval": "refused (NOT_FOUND), nothing written",
+      "statusAfterOwnerApproval": "COMMITTED",
+      "versionsAfterApproval": [
+        {
+          "version": 2,
+          "source": "RECOVERY"
+        }
+      ],
+      "consentRecorded": "DRIVER_APPROVED",
+      "secondApprovalRefused": true,
+      "gatewayCallsDuringRecovery": 0
+    },
+    "E_adversarial_plans": {
+      "results": {
+        "ABOVE_PORT_LIMIT": "PLAN_INVALID",
+        "MISSES_TARGET_ENERGY": "PLAN_INVALID",
+        "CHARGES_AFTER_DEPARTURE": "PLAN_INVALID"
+      },
+      "scheduleVersionsWritten": 0,
+      "scheduleUnchanged": true
+    },
+    "E_hostile_model": {
+      "rejectedModelCalls": [
+        "capturePayment",
+        "commitPermittedRecovery",
+        "proposeRecovery",
+        "noop",
+        "noop",
+        "noop",
+        "noop",
+        "noop"
+      ],
+      "modelDecisionsAccepted": 0,
+      "finalDecisionActor": "DETERMINISTIC",
+      "runStatus": "COMMITTED",
+      "aiUsed": false,
+      "gatewayCallsDuringRecovery": 0
+    },
+    "E_economics_gate": {
+      "minOperatorImprovementCents": 1000000,
+      "runStatus": "INFEASIBLE",
+      "candidates": [
+        {
+          "preference": "flex_lowest_cost",
+          "status": "REJECTED",
+          "reason": "OPERATOR_INELIGIBLE: operator contribution not improved (486 vs -60)"
+        },
+        {
+          "preference": "flex_early_finish",
+          "status": "REJECTED",
+          "reason": "OPERATOR_INELIGIBLE: operator contribution not improved (486 vs -60)"
+        },
+        {
+          "preference": "flex_gentle",
+          "status": "REJECTED",
+          "reason": "OPERATOR_INELIGIBLE: operator contribution not improved (486 vs -60)"
+        }
+      ],
+      "scheduleVersionsWritten": 0
+    }
+  }
+}
