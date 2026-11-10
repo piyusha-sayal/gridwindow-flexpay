@@ -216,7 +216,9 @@ async function main() {
   const fileEnv = pickLiveEnv(envText);
   const apiKey = fileEnv.GEMINI_API_KEY ?? process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY is not set in .env.local");
-  const model = (fileEnv.GEMINI_MODEL ?? process.env.GEMINI_MODEL)?.trim() || DEFAULT_GEMINI_MODEL;
+  // An explicit --model=<id> wins over the file, so the certified model is used even if .env.local names another one.
+  const modelFlag = process.argv.find((a) => a.startsWith("--model="))?.slice("--model=".length).trim();
+  const model = modelFlag || (fileEnv.GEMINI_MODEL ?? process.env.GEMINI_MODEL)?.trim() || DEFAULT_GEMINI_MODEL;
 
   const live = await liveRecovery(apiKey, model);
   const run = live.run;
