@@ -4,6 +4,43 @@ Status: **prepared, nothing executed.** No order, quote row, tunnel or webhook h
 
 Words: PASS / FAIL / BLOCKED / NOT TESTED / NEEDS APPROVAL. Everything below that touches PayPal is NEEDS APPROVAL.
 
+## 0. Historical smoke evidence: read-only audit (2026-11-09)
+
+Source: `E:\GridWindow\artifacts` (the original checkout, git-ignored; not part of this worktree). Nothing was sent to PayPal for this audit.
+
+| File | Mode | Run start (`startedAt`) | Run end (`ranAt`) |
+|---|---|---|---|
+| `paypal-smoke-capture-only-smoke_1793370835421.progress.json` and `.json` | capture-only | 2026-10-30T14:33:55.418Z | 2026-10-30T14:34:27.549Z |
+| `paypal-smoke-void-only-smoke_1793372411617.progress.json` and `.json` | void-only | 2026-10-30T15:00:11.617Z | 2026-10-30T15:00:31.817Z |
+| `paypal-smoke.json`, `paypal-smoke-progress.json` | capture-only | same as the capture pair | same as the capture pair |
+
+- `paypal-smoke.json` and `paypal-smoke-progress.json` are byte-identical to the capture-only pair (`cmp`). Their names do not follow the script's `paypal-smoke-<mode>-<runId>` scheme, so how they were produced is not shown by the files.
+- Host and environment (all files): `environment` = `sandbox`, `apiBase` = `https://api-m.sandbox.paypal.com`.
+- Amounts (all files): order, authorization and, for the capture run, capture all show 123 cents, USD. This is USD 1.23.
+- Two separate orders, one per run. Neither run's reference (`smoke_<ms>_<flow>`) names an application reservation.
+
+Provider status progression, from the `.progress.json` steps (`at` is the time the response was recorded):
+
+| Step | Capture run | Void run |
+|---|---|---|
+| Order created | status `PAYER_ACTION_REQUIRED` at 14:33:56.650Z | status `PAYER_ACTION_REQUIRED` at 15:00:12.789Z |
+| Buyer approval | not a recorded step. The evidence file shows order status `APPROVED` before authorize. The approval time is not recorded. | same as capture |
+| Authorization | `CREATED` at 14:34:25.028Z; `expiresAt` 2026-11-28T14:34:24Z | `CREATED` at 15:00:30.607Z; `expiresAt` 2026-11-28T15:00:30Z |
+| Capture or void | capture `COMPLETED` at 14:34:27.196Z (evidence: `authorizationMatches` true) | authorization `VOIDED` at 15:00:31.816Z (read back with GET after the void) |
+
+- The operations lists in the evidence files match the script's order: create order, poll order, authorize, then capture and read the capture (capture run) or void and read the authorization (void run).
+- Order status `CREATED` is not what the artifacts record. The B.7 table in `docs/EXTERNAL_PREFLIGHT.md` has been corrected to match.
+
+Request IDs: no artifact records a `PayPal-Request-Id`. The script derives IDs as `<ref>:CREATE_ORDER`, `:AUTHORIZE`, `:CAPTURE`, `:VOID` (`scripts/paypalSmokeFlow.ts`), and the header is set only when an ID is passed (`src/payments/paypalSandbox.ts:155`). The header values actually sent are NOT VERIFIED by these files.
+
+Redaction: provider order, authorization and capture IDs, and the payee merchant ID, appear as `…` plus the last 6 characters. The key names in all files are: `ranAt`, `startedAt`, `environment`, `apiBase`, `clientFingerprint`, `mode`, `evidence`, `steps`, and per-step fields `flow`, `kind`, `id`, `status`, `at`, `order`, `authorization`, `capture`, `void`, `operations`, `reservationRef`. No token, client secret, client ID, approval URL or access token field appears. `clientFingerprint` is a 12-character fingerprint; it is not the client ID.
+
+What the artifacts prove: sandbox host; USD 1.23 orders; a fully approved order before authorize (status `APPROVED` recorded); authorization `CREATED`, capture `COMPLETED` (capture run); authorization `VOIDED` after a void (void run). Each capture or void was read back from PayPal.
+
+What they do NOT prove: who approved the order or that a human did (the script says approval is manual, but no approval identity is recorded); PayPal webhook delivery for either run; any reconciliation; any link to a GridWindow reservation or the recovery engine; any PENDING or DECLINED capture; the `PayPal-Request-Id` values sent.
+
+Recovery linkage: none. These are the 2026-10-30 standalone smoke runs. No new sandbox evidence linked to the recovery work exists. The sandbox order in section 1 below (USD 12.43) has not been executed.
+
 ## 1. Proposed transactions (computed from the real backend quote)
 
 Produced by `npm run payment:preflight -- --night-a 2026-11-12 --night-b 2026-11-15` (read-only; Neon opened in a READ ONLY transaction; no quote row, no PayPal call). Both nights have no reservation in Neon, so the price is not shifted by other sessions.
@@ -98,3 +135,16 @@ PASS today: sandbox-only guard, `PAYMENT_MODE=paypal_sandbox`, `PAYPAL_ENV=sandb
 2. Open a temporary HTTPS tunnel and register one Sandbox webhook with the seven events above, then tear both down.
 3. Set `APP_BASE_URL`, `TRUST_PROXY` and `PAYPAL_WEBHOOK_ID` in `.env.local` yourself (the agent does not read or write that file).
 4. Either run steps 7-8 yourself or authorize the agent to drive the app (approval clicks on PayPal remain yours).
+
+## 8. Planned smoke re-run (NOT EXECUTED; needs separate approval)
+
+This is a different, non-recovery run from sections 1-2. It uses the standalone smoke script, not the app.
+
+- Two orders, USD 1.23 each (`SMOKE_AMOUNT_CENTS` = 123): one authorize then capture, one authorize then void. Command: `npm run paypal:smoke -- --approve-sandbox-orders`. Single-path runs: `--capture-only` or `--void-only`, one order each.
+- Sandbox host only (`https://api-m.sandbox.paypal.com`). The run stops on any other host.
+- Manual buyer approval at PayPal's sandbox checkout for each order. The script prints the link and never approves or logs in.
+- `PayPal-Request-Id` fixed per write (`<ref>:CREATE_ORDER`, `:AUTHORIZE`, `:CAPTURE`, `:VOID`). No retries. A failed run is not re-run blindly.
+- Resume: `--resume-order <ORDER_ID>` finishes one existing smoke order without creating another. It refuses orders the script did not create and orders that already have an authorization.
+- Redacted artifacts only: `artifacts/paypal-smoke-<mode>-<runId>.progress.json` after each response, and `.json` on pass. Both are created with `wx` and never overwritten.
+- Reconciliation: each capture or void is re-read from PayPal (`GET` capture or authorization). Webhook delivery is not part of this run and is not checked by it.
+- Not to be executed without a separate, explicit approval from the owner.

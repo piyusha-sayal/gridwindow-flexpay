@@ -43,17 +43,31 @@ describe("hour labels across the 2027 DST transitions", () => {
     const grid = buildNightGrid("2027-11-06", LA);
     expect(grid.slotCount).toBe(68);
     const labels = hourlyLabels(grid.startMs, 17, LA);
-    expect(labels.filter((l) => l === "1 AM")).toHaveLength(2);
+    expect(labels.filter((l) => l === "1 AM PDT")).toHaveLength(1);
+    expect(labels.filter((l) => l === "1 AM PST")).toHaveLength(1);
+    expect(labels.filter((l) => l === "1 AM")).toHaveLength(0);
     expect(labels.filter((l) => l === "2 AM")).toHaveLength(1);
     expect(labels[labels.length - 1]).toBe("9 AM");
   });
 
-  it("the tick two real hours after 1 AM PDT (first occurrence) is 1 AM PST, not 2 AM", () => {
+  it("the repeated hour is named by zone: 1 AM PDT first, then 1 AM PST, then 2 AM", () => {
     const grid = buildNightGrid("2027-11-06", LA);
     const firstOne = grid.startMs + 7 * HOUR_MS;
-    expect(stationHourLabel(firstOne, LA)).toBe("1 AM");
-    expect(stationHourLabel(firstOne + HOUR_MS, LA)).toBe("1 AM");
+    expect(stationHourLabel(firstOne, LA)).toBe("1 AM PDT");
+    expect(stationHourLabel(firstOne + HOUR_MS, LA)).toBe("1 AM PST");
     expect(stationHourLabel(firstOne + 2 * HOUR_MS, LA)).toBe("2 AM");
+  });
+
+  it("a half-hour tick inside the repeated hour is also zone-named", () => {
+    const firstOneThirty = Date.UTC(2027, 10, 7, 8, 30); // 01:30 PDT
+    expect(stationHourLabel(firstOneThirty, LA)).toBe("1:30 AM PDT");
+    expect(stationHourLabel(firstOneThirty + HOUR_MS, LA)).toBe("1:30 AM PST");
+  });
+
+  it("does not zone-name unambiguous hours around the spring gap or in UTC", () => {
+    expect(stationHourLabel(Date.UTC(2027, 2, 14, 9, 0), LA)).toBe("1 AM");
+    expect(stationHourLabel(Date.UTC(2027, 2, 14, 10, 0), LA)).toBe("3 AM");
+    expect(stationHourLabel(Date.UTC(2027, 2, 14, 8, 0), "UTC")).toBe("8 AM");
   });
 });
 

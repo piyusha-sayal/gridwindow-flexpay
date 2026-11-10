@@ -163,7 +163,7 @@ A run is a live model pass only when every row below holds. A fallback result is
 
 ### B.1 Status
 
-- Capture-only and void-only smoke PASSED on 2026-10-30 (`docs/EXTERNAL_INTEGRATION.md` section 1a, "DONE ... do not repeat"). Evidence: `artifacts/paypal-smoke-capture-only-smoke_1793370835421.json` (capture COMPLETED, amount 123 cents, authorization matches) and `artifacts/paypal-smoke-void-only-smoke_1793372411617.json` (authorization VOIDED). `artifacts/paypal-smoke.json` has the same content as the capture-only run (same `ranAt`). IDs in those files are already redacted (`…` plus the last 6 characters).
+- Capture-only and void-only smoke PASSED on 2026-10-30 (`docs/EXTERNAL_INTEGRATION.md` section 1a, "DONE ... do not repeat"). Historical; NOT linked to the recovery work; no recovery-linked sandbox evidence exists. Audit of the artifacts (2026-11-09): `docs/PAYPAL_CERTIFICATION.md` section 0. Evidence: `artifacts/paypal-smoke-capture-only-smoke_1793370835421.json` (capture COMPLETED, amount 123 cents, authorization matches) and `artifacts/paypal-smoke-void-only-smoke_1793372411617.json` (authorization VOIDED). `artifacts/paypal-smoke.json` has the same content as the capture-only run (same `ranAt`). IDs in those files are already redacted (`…` plus the last 6 characters).
 - No PayPal call was made in this preflight.
 
 ### B.2 Dry run executed in this preflight
@@ -235,7 +235,7 @@ From `scripts/paypalSandboxCli.ts` and `src/server/env.ts`:
 
 | Step | PayPal call | Checked |
 |---|---|---|
-| Create order | `POST /v2/checkout/orders` | status CREATED, amount 1.23 USD, payee = expected merchant |
+| Create order | `POST /v2/checkout/orders` | amount 1.23 USD, custom_id matches the run reference, payee = expected merchant. No status is asserted here; the 2026-10-30 artifacts record `PAYER_ACTION_REQUIRED` at this step |
 | Buyer approval | `GET /v2/checkout/orders/{id}` (poll) | status APPROVED (or COMPLETED) |
 | Authorize | `POST /v2/checkout/orders/{id}/authorize` | authorization returned, amount and currency match |
 | Capture path | `POST /v2/payments/authorizations/{id}/capture`, then `GET /v2/payments/captures/{id}` | capture COMPLETED, amount match |

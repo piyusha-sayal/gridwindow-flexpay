@@ -145,7 +145,8 @@ test.describe("operator recovery scheduler on a tablet", () => {
 const STATION_REGULAR_NIGHT = "2027-01-16";
 const STATION_SPRING_NIGHT = "2027-03-13";
 const STATION_FALL_NIGHT = "2027-11-06";
-const HOUR_LABEL = /^\d{1,2}(:\d{2})? (AM|PM)$/;
+/** A whole or half-hour tick; the repeated fall-back hour also carries its zone abbreviation (PDT or PST). */
+const HOUR_LABEL = /^\d{1,2}(:\d{2})? (AM|PM)( [A-Z]{2,4})?$/;
 
 /** Hour-tick labels and the timeline's event bars, read from the rendered Bryntum DOM. */
 async function readTimeline(page: Page) {
@@ -154,7 +155,7 @@ async function readTimeline(page: Page) {
   return page.evaluate(() => {
     const labels = Array.from(document.querySelectorAll(".b-sch-header-text"))
       .map((e) => (e.textContent ?? "").trim())
-      .filter((t) => /^\d{1,2}(:\d{2})? (AM|PM)$/.test(t));
+      .filter((t) => /^\d{1,2}(:\d{2})? (AM|PM)( [A-Z]{2,4})?$/.test(t));
     const bars = Array.from(document.querySelectorAll(".b-sch-event")).map((e) => ({
       text: (e.textContent ?? "").trim(),
       left: e.getBoundingClientRect().left,
@@ -239,7 +240,7 @@ test.describe("operator timeline time zone in a real browser", () => {
     }
   });
 
-  test("fall-back night: the repeated 1 AM hour is labelled in station time in a Pacific browser", async ({ browser, request }) => {
+  test("fall-back night: the repeated 1 AM hour is labelled PDT then PST in a Pacific browser", async ({ browser, request }) => {
     await seedNightOn(request, STATION_FALL_NIGHT);
     const context = await browser.newContext({ storageState: OPERATOR_STATE, timezoneId: "America/Los_Angeles" });
     const page = await context.newPage();
@@ -248,10 +249,73 @@ test.describe("operator timeline time zone in a real browser", () => {
       await expect(page.getByRole("heading", { name: "Timeline" })).toBeVisible();
       const { labels } = await readTimeline(page);
       const hours = labels.filter((l) => HOUR_LABEL.test(l));
-      expect(hours, `hour labels: ${hours.join(", ")}`).toContain("1 AM");
-      // The repeated hour appears twice; 2 AM follows it once, after the second 1 AM.
-      expect(hours.filter((l) => l === "1 AM"), `hour labels: ${hours.join(", ")}`).toHaveLength(2);
+      // The repeated hour appears twice, and each occurrence names its zone so the two are distinguishable.
+      expect(hours, `hour labels: ${hours.join(", ")}`).not.toContain("1 AM");
+      expect(hours.indexOf("1 AM PDT"), `hour labels: ${hours.join(", ")}`).toBeGreaterThanOrEqual(0);
+      expect(hours.indexOf("1 AM PST"), `hour labels: ${hours.join(", ")}`).toBe(hours.indexOf("1 AM PDT") + 1);
+      expect(hours.indexOf("2 AM"), `hour labels: ${hours.join(", ")}`).toBe(hours.indexOf("1 AM PST") + 1);
+      expect(hours.filter((l) => l.startsWith("1 AM"))).toHaveLength(2);
       expect(hours.filter((l) => l === "2 AM")).toHaveLength(1);
+    } finally {
+      await context.close();
+    }
+  });
+
+  test("fall-back night: UTC browser shows the same station labels as Pacific, and bars sit at the same absolute offsets", async ({ browser, request }) => {
+    await seedNightOn(request, STATION_FALL_NIGHT);
+    const byZone: Record<string, Awaited<ReturnType<typeof readTimeline>>> = {};
+    for (const zone of ["America/Los_Angeles", "UTC"]) {
+      const context = await browser.newContext({ storageState: OPERATOR_STATE, timezoneId: zone });
+      const page = await context.newPage();
+      try {
+        await page.goto(`/operator/schedule?night=${STATION_FALL_NIGHT}`);
+        await expect(page.getByRole("heading", { name: "Timeline" })).toBeVisible();
+        byZone[zone] = await readTimeline(page);
+      } finally {
+        await context.close();
+      }
+    }
+    expect(byZone["UTC"]!.browserZone).toBe("UTC");
+    expect(byZone["UTC"]!.labels).toEqual(byZone["America/Los_Angeles"]!.labels);
+    expect(byZone["UTC"]!.bars.map((b) => b.text).sort()).toEqual(byZone["America/Los_Angeles"]!.bars.map((b) => b.text).sort());
+    const offsets = (zone: string) => {
+      const bars = byZone[zone]!.bars;
+      const min = Math.min(...bars.map((b) => b.left));
+      return Object.fromEntries(bars.map((b) => [b.text, Math.round(b.left - min)]));
+    };
+    const reference = offsets("America/Los_Angeles");
+    for (const [text, px] of Object.entries(offsets("UTC"))) expect(Math.abs(px - reference[text]!), text).toBeLessThanOrEqual(2);
+  });
+
+  test("fall-back night in a Kolkata browser: half-hour station ticks still show PDT then PST, with no duplicate unlabelled hour", async ({ browser, request }) => {
+    await seedNightOn(request, STATION_FALL_NIGHT);
+    const context = await browser.newContext({ storageState: OPERATOR_STATE, timezoneId: "Asia/Kolkata" });
+    const page = await context.newPage();
+    try {
+      await page.goto(`/operator/schedule?night=${STATION_FALL_NIGHT}`);
+      await expect(page.getByRole("heading", { name: "Timeline" })).toBeVisible();
+      const { labels } = await readTimeline(page);
+      const hours = labels.filter((l) => HOUR_LABEL.test(l));
+      expect(hours.filter((l) => /^1(:\d{2})? AM PDT$/.test(l)).length, `labels: ${hours.join(", ")}`).toBeGreaterThan(0);
+      expect(hours.filter((l) => /^1(:\d{2})? AM PST$/.test(l)).length, `labels: ${hours.join(", ")}`).toBeGreaterThan(0);
+      expect(hours.filter((l) => /^1(:\d{2})? AM$/.test(l)), `labels: ${hours.join(", ")}`).toHaveLength(0);
+    } finally {
+      await context.close();
+    }
+  });
+
+  test("spring-forward night in a Kolkata browser: no 2 AM or 2:30 AM tick", async ({ browser, request }) => {
+    await seedNightOn(request, STATION_SPRING_NIGHT);
+    const context = await browser.newContext({ storageState: OPERATOR_STATE, timezoneId: "Asia/Kolkata" });
+    const page = await context.newPage();
+    try {
+      await page.goto(`/operator/schedule?night=${STATION_SPRING_NIGHT}`);
+      await expect(page.getByRole("heading", { name: "Timeline" })).toBeVisible();
+      const { labels } = await readTimeline(page);
+      const hours = labels.filter((l) => HOUR_LABEL.test(l));
+      expect(hours.filter((l) => /^2(:\d{2})? AM/.test(l)), `labels: ${hours.join(", ")}`).toHaveLength(0);
+      expect(hours, `labels: ${hours.join(", ")}`).toContain("1:30 AM");
+      expect(hours, `labels: ${hours.join(", ")}`).toContain("3:30 AM");
     } finally {
       await context.close();
     }
