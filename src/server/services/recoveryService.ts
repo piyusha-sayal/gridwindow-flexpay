@@ -6,7 +6,7 @@
  */
 import { ProviderError } from "@/payments/gateway";
 import type { AppDeps } from "../deps";
-import { appendEvent, claimOperation, finishOperation, getReservation, leaseOperation, recordProof, SettlementConflictError, type EventSource, type ReservationRow } from "../repo";
+import { appendEvent, appendEventOnce, claimOperation, finishOperation, getReservation, leaseOperation, recordProof, SettlementConflictError, type EventSource, type ReservationRow } from "../repo";
 import { commitCapacityOrVoid } from "./checkoutService";
 import { awaitingOrder, resumeOrderCreation } from "./orderCreationService";
 import { reconcileDetailed } from "./reconcileService";
@@ -34,7 +34,7 @@ async function voidOrphanAuthorization(deps: AppDeps, rid: string, authorization
   } catch (err) {
     const ambiguous = err instanceof ProviderError && err.ambiguous;
     await finishOperation(deps.db, key, ambiguous ? "AMBIGUOUS" : "FAILED", null, err instanceof ProviderError ? (err.issue ?? err.kind) : "UNKNOWN");
-    await appendEvent(deps.db, rid, "ORPHAN_AUTHORIZATION_VOID_FAILED", source, { ambiguous });
+    await appendEventOnce(deps.db, rid, "ORPHAN_AUTHORIZATION_VOID_FAILED", source, { ambiguous });
   }
 }
 

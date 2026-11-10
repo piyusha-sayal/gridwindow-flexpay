@@ -5,7 +5,7 @@ import type { OfferTerms } from "@/domain/terms";
 import type { ProviderMode } from "@/payments/gateway";
 import { createHash } from "node:crypto";
 import type { DisturbanceRecord, DisturbanceType } from "@/domain/disturbance";
-import type { Queryable } from "./db/client";
+import type { Db, Queryable } from "./db/client";
 
 export interface ReservationRow {
   id: string;
@@ -98,6 +98,15 @@ export async function committedPlans(q: Queryable, stationId: string, nightOf: s
 
 export async function appendEvent(q: Queryable, reservationId: string | null, type: string, source: EventSource, payload: Record<string, unknown> = {}): Promise<void> {
   await q.query("insert into events (reservation_id, type, source, payload) values ($1, $2, $3, $4)", [reservationId, type, source, JSON.stringify(payload)]);
+}
+
+/** Appends unless an event with the same type and payload already exists for the reservation (serialized on its row lock). */
+export async function appendEventOnce(db: Db, reservationId: string, type: string, source: EventSource, payload: Record<string, unknown>): Promise<void> {
+  await db.tx(async (q) => {
+    await getReservationForUpdate(q, reservationId);
+    const seen = await q.query("select 1 from events where reservation_id = $1 and type = $2 and payload = $3::jsonb limit 1", [reservationId, type, JSON.stringify(payload)]);
+    if (seen.length === 0) await appendEvent(q, reservationId, type, source, payload);
+  });
 }
 
 export async function recordProof(

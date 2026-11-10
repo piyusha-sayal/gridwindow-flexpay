@@ -224,6 +224,8 @@ export async function handleCheckoutReturn(deps: AppDeps, driverSession: string,
 async function authorizeAndCommit(deps: AppDeps, rid: string): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;
   const claimed = await claimOperation(deps.db, rid, "AUTHORIZE", { termsHash: r.terms_hash, amountCents: r.amount_cents });
+  // An earlier attempt already authorized: never send a second financial request, read the provider truth instead.
+  if (claimed.op.status === "SUCCEEDED") return (await recoverReservation(deps, rid, "RECONCILER")).reservation;
   const op = await leaseOperation(deps.db, claimed.op.idempotency_key, deps.now());
   if (!op) return r; // a concurrent return is already authorizing with the same key
   try {

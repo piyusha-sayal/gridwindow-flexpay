@@ -55,14 +55,15 @@ export async function handlePayPalWebhook(deps: AppDeps, headers: WebhookHeaders
     : [];
   const rid = match[0]?.id ?? null;
 
-  await deps.db.query(
-    "insert into webhook_inbox (event_id, event_type, resource_id, reservation_id, raw_sha256) values ($1,$2,$3,$4,$5) on conflict (event_id) do nothing",
+  const inserted = await deps.db.query<{ event_id: string }>(
+    "insert into webhook_inbox (event_id, event_type, resource_id, reservation_id, raw_sha256) values ($1,$2,$3,$4,$5) on conflict (event_id) do nothing returning event_id",
     [parsed.id, parsed.event_type, resourceId, rid, createHash("sha256").update(rawBody).digest("hex")],
   );
   const inbox = await deps.db.query<{ processed_at: Date | null }>("select processed_at from webhook_inbox where event_id = $1", [parsed.id]);
   // Only events we finished handling are duplicates; a retry of an unprocessed event is reprocessed.
   if (inbox[0]?.processed_at) return { status: 200, result: "DUPLICATE" };
-  await appendEvent(deps.db, rid, "WEBHOOK_VERIFIED", "PAYPAL_WEBHOOK", { eventId: parsed.id, eventType: parsed.event_type });
+  // Only the delivery that created the inbox row records verification, so concurrent duplicates do not multiply it.
+  if (inserted.length > 0) await appendEvent(deps.db, rid, "WEBHOOK_VERIFIED", "PAYPAL_WEBHOOK", { eventId: parsed.id, eventType: parsed.event_type });
   if (rid) {
     const { providerReachable } = await recoverReservation(deps, rid, "PAYPAL_WEBHOOK");
     // 503 makes PayPal redeliver later; the inbox row stays unprocessed.

@@ -6,7 +6,17 @@
 import { canTransition, isTerminal, paymentStateForCapture, type PaymentState, type ProofType } from "@/domain/paymentState";
 import { ProviderError, type ProviderAuthorization, type ProviderCapture } from "@/payments/gateway";
 import type { AppDeps } from "../deps";
-import { appendEvent, getReservation, recordProof, transitionPayment, type EventSource, type ReservationRow } from "../repo";
+import {
+  appendEvent,
+  appendEventOnce,
+  getReservation,
+  getReservationForUpdate,
+  patchReservation,
+  recordProof,
+  transitionPayment,
+  type EventSource,
+  type ReservationRow,
+} from "../repo";
 
 export interface Truth {
   state: PaymentState;
@@ -81,6 +91,19 @@ export interface ReconcileOutcome {
   orphanAuthorizationId: string | null;
 }
 
+/**
+ * Keeps a provider authorization id on a row that lacks one. Under the row lock, so a terminal or unresolved row can never
+ * lose the only reference to an authorization the provider holds.
+ */
+async function keepAuthorization(deps: AppDeps, rid: string, authorizationId: string, source: EventSource): Promise<void> {
+  await deps.db.tx(async (q) => {
+    const locked = await getReservationForUpdate(q, rid);
+    if (!locked || locked.paypal_authorization_id) return;
+    await patchReservation(q, rid, { paypal_authorization_id: authorizationId });
+    await appendEvent(q, rid, "AUTHORIZATION_ID_RECORDED", source, { authorizationId, localState: locked.payment_state });
+  });
+}
+
 export async function reconcileDetailed(deps: AppDeps, rid: string, source: EventSource): Promise<ReconcileOutcome> {
   const r = await getReservation(deps.db, rid);
   if (!r) throw new Error(`reservation ${rid} not found`);
@@ -93,11 +116,12 @@ export async function reconcileDetailed(deps: AppDeps, rid: string, source: Even
   try {
     truth = await providerTruth(deps, r);
   } catch (err) {
-    await appendEvent(deps.db, rid, "RECONCILE_PROVIDER_UNAVAILABLE", source, { kind: err instanceof ProviderError ? err.kind : "UNKNOWN" });
+    // Recorded once per kind of outage, so a sweep that keeps retrying does not grow the append-only log.
+    await appendEventOnce(deps.db, rid, "RECONCILE_PROVIDER_UNAVAILABLE", source, { kind: err instanceof ProviderError ? err.kind : "UNKNOWN" });
     return done(r, false);
   }
   if (!truth) {
-    await appendEvent(deps.db, rid, "MANUAL_REVIEW_REQUIRED", source, { reason: "no provider reference stored" });
+    await appendEventOnce(deps.db, rid, "MANUAL_REVIEW_REQUIRED", source, { reason: "no provider reference stored" });
     return done(r);
   }
   const proof = truth.proof;
@@ -106,16 +130,19 @@ export async function reconcileDetailed(deps: AppDeps, rid: string, source: Even
   };
   if (truth.state === r.payment_state) {
     await record();
+    if (truth.patch?.paypal_authorization_id) await keepAuthorization(deps, rid, truth.patch.paypal_authorization_id, source);
     return done(r);
   }
   if (isTerminal(r.payment_state)) {
-    await appendEvent(deps.db, rid, "RECONCILIATION_CONFLICT", source, { local: r.payment_state, provider: truth.state });
+    await appendEventOnce(deps.db, rid, "RECONCILIATION_CONFLICT", source, { local: r.payment_state, provider: truth.state });
     // Terminal states are never rewritten automatically, but provider capture evidence is always kept.
     if (proof?.type === "CAPTURED" && r.payment_state !== "CAPTURED") {
       await record();
-      await appendEvent(deps.db, rid, "PROVIDER_CAPTURE_CONFLICT", source, { local: r.payment_state, amountCents: proof.amountCents });
+      await appendEventOnce(deps.db, rid, "PROVIDER_CAPTURE_CONFLICT", source, { local: r.payment_state, amountCents: proof.amountCents });
     }
+    // A live authorization held by a terminal row is persisted before anything voids it, so the sweep can always find it.
     const orphan = (r.payment_state === "FAILED" || r.payment_state === "CANCELLED") && truth.state === "AUTHORIZED" ? (truth.patch?.paypal_authorization_id ?? null) : null;
+    if (orphan) await keepAuthorization(deps, rid, orphan, source);
     return done(r, true, orphan);
   }
   let from = r.payment_state;
