@@ -29,7 +29,11 @@ const globalKey = Symbol.for("gridwindow.runtime");
 type GlobalWithRuntime = typeof globalThis & { [globalKey]?: Promise<Runtime> };
 
 async function openDb(env: AppEnv): Promise<Db> {
-  if (env.DATABASE_URL) return openPostgres(env.DATABASE_URL, { migrationUrl: env.MIGRATION_DATABASE_URL });
+  if (env.DATABASE_URL) {
+    const autoMigrate = env.GW_AUTO_MIGRATE === "true";
+    if (autoMigrate) console.warn("[gridwindow] GW_AUTO_MIGRATE=true: pending migrations will be applied to the configured PostgreSQL database.");
+    return openPostgres(env.DATABASE_URL, { migrationUrl: env.MIGRATION_DATABASE_URL, autoMigrate });
+  }
   return openPglite(env.GW_DATA_DIR ?? path.join(process.cwd(), ".data", "pglite"));
 }
 

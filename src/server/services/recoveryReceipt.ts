@@ -9,7 +9,8 @@ import { slotStartMs } from "@/domain/time";
 import { batteryMilliWhFromGridWh, SLOTS_PER_HOUR } from "@/domain/units";
 import type { AppDeps } from "../deps";
 import type { ReservationRow } from "../repo";
-import type { CandidateRecord, RecoveryOutcome, RunStatus } from "./recoveryRuns";
+import type { CandidateRecord, RecoveryOutcome, RunStatus, RunTraceEntry } from "./recoveryRuns";
+import { runProvenance, type RunProvenance } from "./recoveryProvenance";
 import { nightContext, reservationDisturbances } from "./scheduleService";
 
 export const RECOVERY_EVIDENCE_STATEMENT =
@@ -41,6 +42,8 @@ export interface RecoveryReceiptRun {
   eventId: string;
   status: RunStatus;
   aiUsed: boolean;
+  /** Who chose the outcome, derived from the stored run record and trace. */
+  provenance: RunProvenance;
   reason: string;
   candidates: CandidateRecord[];
   /** AUTO_WITHIN_PRE_APPROVED_BOUNDS, or the driver-approved version; null when no version was written. */
@@ -82,6 +85,7 @@ interface RunRowLite {
   disruption_event_id: string;
   status: RunStatus;
   ai_used: boolean;
+  trace: RunTraceEntry[];
   outcome: RecoveryOutcome | null;
   proposal: unknown;
 }
@@ -104,8 +108,8 @@ export function energyView(targetBatteryWh: number, forecastBatteryWh: number, d
 
 /** Null when the reservation has no recorded disturbance. */
 export async function buildRecoveryReceipt(deps: AppDeps, r: ReservationRow): Promise<RecoveryReceipt | null> {
-  const disturbances = await deps.db.query<{ event_id: string; type: DisturbanceType; effective_slot: number; status: RunStatus | null }>(
-    `select d.event_id, d.type, d.effective_slot, rr.status from disruption_events d
+  const disturbances = await deps.db.query<{ event_id: string; type: DisturbanceType; effective_slot: number; status: RunStatus | null; provenance: "SYNTHETIC" }>(
+    `select d.event_id, d.type, d.effective_slot, d.provenance, rr.status from disruption_events d
      left join recovery_runs rr on rr.disruption_event_id = d.event_id where d.reservation_id = $1 order by d.created_at, d.event_id`,
     [r.id],
   );
@@ -114,7 +118,7 @@ export async function buildRecoveryReceipt(deps: AppDeps, r: ReservationRow): Pr
   const grid = scenario.grid;
 
   const runs = await deps.db.query<RunRowLite>(
-    `select rr.id, rr.disruption_event_id, rr.status, rr.ai_used, rr.outcome, rr.proposal from recovery_runs rr
+    `select rr.id, rr.disruption_event_id, rr.status, rr.ai_used, rr.trace, rr.outcome, rr.proposal from recovery_runs rr
      join disruption_events d on d.event_id = rr.disruption_event_id where d.reservation_id = $1 order by rr.created_at, rr.id`,
     [r.id],
   );
@@ -158,6 +162,7 @@ export async function buildRecoveryReceipt(deps: AppDeps, r: ReservationRow): Pr
       eventId,
       status: run.status,
       aiUsed: run.ai_used,
+      provenance: runProvenance({ aiUsed: run.ai_used, trace: run.trace }),
       reason: run.outcome?.reason ?? "",
       candidates: run.outcome?.candidates ?? [],
       consent,
@@ -179,7 +184,7 @@ export async function buildRecoveryReceipt(deps: AppDeps, r: ReservationRow): Pr
       type: d.type,
       effectiveAtMs: slotStartMs(grid, d.effective_slot),
       attribution: attributions.get(d.event_id) ?? "UNKNOWN",
-      provenance: "SYNTHETIC",
+      provenance: d.provenance,
       runStatus: d.status,
     })),
     runs: runViews,

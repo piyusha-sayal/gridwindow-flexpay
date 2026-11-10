@@ -3,6 +3,7 @@ import type { LlmResult, StructuredLlm } from "@/server/ai/llm";
 
 /** Test double: returns a scripted result and records what the assistant sent. */
 export class ScriptedLlm implements StructuredLlm {
+  readonly provider = "test-fixture" as const;
   readonly model = "test-double";
   calls: { system: string; user: string }[] = [];
   constructor(private readonly reply: (user: string) => LlmResult<unknown>) {}

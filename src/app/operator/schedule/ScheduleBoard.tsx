@@ -108,11 +108,15 @@ export function ScheduleBoard({ nightOf }: { nightOf: string | null }) {
         <div className="max-w-full overflow-hidden" data-testid="schedule-chart">
           <ScheduleChart model={model} lane={lane} />
         </div>
+        {model.pendingProposals > 0 && (
+          <p className="meta">Proposed bars await the driver&apos;s approval. They are not committed and are not part of the current plan.</p>
+        )}
         <ul className="flex flex-wrap gap-x-5 gap-y-1 text-[13px] text-muted">
           {model.disruptions.map((d) => (
             <li key={d.eventId}>
               {DISTURBANCE_LABEL[d.type]} from {timeLabel(d.atMs, model.timeZone)} · SYNTHETIC
               {d.runStatus ? ` · run ${d.runStatus}` : ""}
+              {d.runReason ? ` · ${d.runReason}` : ""}
             </li>
           ))}
         </ul>

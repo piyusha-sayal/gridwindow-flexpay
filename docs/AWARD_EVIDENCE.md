@@ -1,64 +1,104 @@
 # Award evidence: Bryntum, Agentic Commerce, PayPal + AI
 
-Status labels: **PASS** (verified by a test run in this repository), **FAIL**, **BLOCKED** (needs a credential, a license or a service), **NOT TESTED** (not run in the session that wrote this file), **NEEDS USER APPROVAL** (requires the owner's explicit go-ahead, for example a live paid or money-moving call).
+Scope: the combined release on branch `feature/combined-release` (recovery engine, operator schedule, consent, fault attribution, provenance, migrations and sweep).
 
-Mock tests are not live validation. A PASS in MOCK mode shows the code path works with a scripted model and an in-process provider. It does not show a real Gemini decision or a real PayPal Sandbox settlement.
+Status labels:
+- **PASS**: verified by an executed check on the final combined tree.
+- **FAIL**: an executed check found a violation (stated where it applies).
+- **BLOCKED**: needs a credential, a license, a service or a fix that is not in place.
+- **NOT TESTED**: not run, or run only in a different setup.
+- **NEEDS USER APPROVAL**: needs the owner's explicit go-ahead (live model call, money-moving Sandbox call, public webhook, or migration of a persistent database).
 
-Scope of this document: the recovery engine on branch `feature/recovery-engine`, written 2026-11-09. The status column reflects the session in which this file was written. Playwright was excluded from that session because another engineer was using the same port and CPU, so no browser evidence is claimed here.
+Evidence kinds: **MOCK** means the built-in MOCK payment provider, a scripted model, or a seeded synthetic run. **Provider** means a real PayPal Sandbox or Gemini call. MOCK results are not live validation.
+
+Final combined-tree results used below: TypeScript 0 errors; ESLint 0; Vitest 740 passed, 12 skipped (the 12 are the gated real-PostgreSQL tests in `tests/integration/postgres.test.ts`; with `TEST_DATABASE_URL` set on a disposable local PostgreSQL 18.1 they ran and 11 passed, 1 skipped for the restart test); Playwright 16 spec files run one at a time with one worker and isolated data: 0 failed, 6 skipped (keyboard-journey tests on mobile and tablet by design); both production builds pass; `release:scan` PASS; `npm audit --omit=dev` 0 vulnerabilities; the recovery benchmark is deterministic across two runs.
 
 ---
 
 ## 1. Best Use of Bryntum
 
-| Item | Detail |
-|---|---|
-| Claim | The operator schedule at `/operator/schedule` renders persisted schedule versions and pending recovery proposals on a Bryntum Scheduler Community 8.0.0 timeline. The chart is read-only: nothing dragged on it is saved. Proposals are a separate hatched lane. |
-| Where in code | `src/app/operator/schedule/ScheduleBoard.tsx`, `scheduleModel.ts`, `chartEvents.ts`, `useScheduleView.ts`, `ScheduleTable.tsx` (accessible table equivalent); server read model `src/server/services/scheduleView.ts`; route `src/app/api/schedule/route.ts`. |
-| Packages | `@bryntum/scheduler-community` 8.0.0 and `@bryntum/scheduler-react-community` 8.0.0 (see `docs/LICENSE_AND_SECRETS_CHECKLIST.md`). |
-| How to verify | Run the app in MOCK mode, open `/operator/schedule`, record a disturbance on a session, let recovery commit, then reload. The new schedule version should appear on the timeline. |
-| Test evidence | No Bryntum-specific unit test exists. Read model and schedule logic are covered by `tests/unit/scheduleModel.test.ts`, `tests/unit/heroSchedule.test.ts` and `tests/integration/scheduleRecovery.test.ts`. E2E: `tests/e2e/recoveryScheduler.spec.ts` (persistence, live update, Pixel 7 and iPad) passed on 2026-11-09 with one worker. Time mapping: `tests/unit/scheduleTimeZone.test.ts` (both DST nights, station-zone labels, table equals chart). |
-| Status | Build and browser behavior: **NOT TESTED** in this session. Schedule and read-model unit and integration tests: **PASS** in the full vitest run of 2026-11-09. |
-| Known limits | axe reports three serious violations inside Bryntum's own grid DOM (see `docs/BRYNTUM_NOTES.md`). The app's own time mapping is verified in station time (epoch-based, both DST nights). The Bryntum axis time zone is **NOT VERIFIED** (see `docs/BRYNTUM_NOTES.md`). The timeline is a display of persisted state, not an editor. |
+Claim: the operator schedule at `/operator/schedule` draws persisted schedule versions and pending recovery proposals on Bryntum Scheduler Community 8.0.0. The chart is read-only. Proposals are a separate lane, and the accessible table is built from the same model.
+
+| Claim | Status | Evidence kind | Evidence and pointers |
+|---|---|---|---|
+| Chart and table read persisted allocations, versions and proposals only | PASS | MOCK | `src/app/operator/schedule/scheduleModel.ts`, `tests/unit/scheduleModel.test.ts`, `tests/unit/scheduleProposal.test.ts`, `tests/integration/scheduleRecovery.test.ts`; e2e `tests/e2e/recoveryScheduler.spec.ts` (combined run, 0 failed) |
+| Proposals are shown as "proposed, not committed" and excluded from committed lanes and current kWh | PASS | MOCK | `tests/unit/scheduleProposal.test.ts`; `docs/BRYNTUM_NOTES.md` item 4 |
+| Timeline updates after a recovery event without reload (polling about 3 s) | PASS | MOCK | `tests/e2e/recoveryScheduler.spec.ts` test 1 (combined run, 0 failed) |
+| Original plan / Current (recovered) comparison | PASS for data; PARTIAL for layout | MOCK | Chart shows one lane at a time through a toggle. Side-by-side drawing is **not implemented**. `tests/unit/scheduleProposal.test.ts` ("before and after"). |
+| Table equals chart (same model; current kWh equals the sum of burst energy) | PASS | MOCK | `tests/unit/scheduleTimeZone.test.ts` |
+| Axis labels show station time (America/Los_Angeles) in UTC, Kolkata and Pacific browsers on a winter night | PASS | MOCK (browser) | `tests/e2e/recoveryScheduler.spec.ts` "axis labels are station time in every browser zone"; `src/app/operator/schedule/scheduleAxis.ts` |
+| Spring-forward and fall-back nights in a Pacific browser | PASS | MOCK (browser) | `tests/e2e/recoveryScheduler.spec.ts` "spring-forward night" and "fall-back night"; `tests/unit/scheduleAxis.test.ts`, `tests/unit/scheduleTimeZone.test.ts` |
+| Fall-back night in UTC and Kolkata browsers | NOT TESTED | n/a | `docs/BRYNTUM_NOTES.md` |
+| Tick boundaries follow station hours in every zone | NOT VERIFIED (residual) | n/a | Bryntum places ticks on browser-local hours. Labels are station time, so a Kolkata browser shows half-hour ticks (`6:30 PM`). |
+| Manual drag or resize in the chart saves changes | Not offered | n/a | Disabled (`readOnly`); no server endpoint exists. Nothing dragged is saved. |
+| Accessibility of the Bryntum timeline | FAIL (vendor DOM) | MOCK (axe, `.b-scheduler` scope, 2026-11-09 scoped scan) | `aria-required-children` (critical, 2 nodes), `color-contrast` (serious, 2), `scrollable-region-focusable` (serious, 1). App code cannot fix these without overriding Bryntum internals, which was not done. See `docs/BRYNTUM_NOTES.md`. |
+| Accessible equivalent | PASS | MOCK | The HTML table beside the chart (`ScheduleTable`) and the text summary. Keyboard reachability of the lane toggle is covered by e2e test 2. |
+| Bryntum Community license is MIT | PARTIAL | n/a | npm registry metadata and the Bryntum features page say MIT. The in-package LICENSE text is **NOT VERIFIED** (`node_modules` not read). Owner review required before public release. See `THIRD_PARTY_NOTICES.md`. |
+| Bryntum time-zone option on the project or component | Not available | n/a | Rejected by the Community 8.0.0 typings. The app uses a header renderer instead (`scheduleAxis.ts`). |
+
+---
 
 ## 2. Best Use of Agentic Commerce
 
-| Item | Detail |
-|---|---|
-| Claim | A model may choose among candidates that the server has already validated. The server owns the schedule and the money. The agent has no payment tools. Changes outside the buyer's agreed terms need the buyer's approval. |
-| Where in code | Orchestrator `src/server/services/recoveryOrchestrator.ts` (bounded loop, leases, fencing, deterministic completion). Tool allowlist and phase checks `src/server/services/recoveryTools.ts`. Consent boundary `src/domain/recoveryConsent.ts`. Commit with transaction and version check `commitScheduleVersion` in `src/server/services/scheduleService.ts`. Prompt `recoveryPrompt.ts`; narrative grounding `recoveryNarrative.ts`. Gemini adapter `src/server/ai/geminiLlm.ts`. |
-| Safety model | Model input is server-assigned candidate ids only (`c1`, `c2`, ...). Model output is parsed by a schema. Unknown tools, extra arguments, out-of-phase calls and unlisted ids are rejected and written to the trace. A rejected model call falls back to the deterministic path. Every write is checked again by the validators. Price cannot rise. Energy already delivered cannot change. Departure cannot move later. |
-| How to verify | `tests/unit/recoveryTools.test.ts` (tool allowlist and rejection codes), `tests/unit/recoveryConsent.test.ts` (consent decision), `tests/integration/recoveryOrchestrator.test.ts` (fencing, takeover, bounded attempts, scripted model). Benchmark: `docs/RECOVERY_BENCHMARK.md`. |
-| Test evidence | Unit and integration tests run with a scripted model (MOCK). Full vitest run 2026-11-09: 526 passed, 10 skipped, 0 failed (`plans/PROGRESS.md`). |
-| Status | Scripted-model and deterministic tests: **PASS** when the full vitest run passes. Real Gemini recovery decisions: **NEEDS USER APPROVAL** (a live paid model call). Not claimed: that the model chooses well. The deterministic path is the reference; the model only selects among validated options. |
-| Known limits | Recovery benchmark uses the deterministic path only (no model). Auto-commit can raise the operator's energy cost against the agreed plan; see the OPEN decision in `docs/ARCHITECTURE.md`. |
+Claim: a model may choose only among candidates the server has already validated, using server-assigned ids. The server owns the schedule and the money. The agent has no payment tool and no price input. Changes outside the buyer's agreed terms need the buyer's approval.
+
+| Claim | Status | Evidence kind | Evidence and pointers |
+|---|---|---|---|
+| Model input is candidate ids only; unknown tools, extra arguments, out-of-phase calls and unlisted ids are rejected and traced | PASS | MOCK (scripted model) | `tests/unit/recoveryTools.test.ts`, `tests/unit/recoveryAgentContract.test.ts`, `tests/integration/recoveryAgentBoundary.test.ts` |
+| The agent has no payment tool and no price input | PASS | MOCK | `src/server/services/recoveryTools.ts`; `tests/unit/recoveryTools.test.ts` |
+| Model failure, timeout or invalid output falls back to the deterministic path | PASS | MOCK (scripted model) | `tests/integration/recoveryOrchestrator.test.ts`; `src/server/services/recoveryOrchestrator.ts` (bounded loop, 8 tool steps, 45 s budget) |
+| Consent boundary: auto-commit only inside pre-approved bounds (price not up, departure not later, inside plugged-in window, delivered energy and other sessions unchanged) | PASS | MOCK | `src/domain/recoveryConsent.ts`, `tests/unit/recoveryConsent.test.ts`, `tests/integration/scheduleRecovery.test.ts` |
+| Fencing: stale or duplicate workers cannot commit; attempts are bounded (3) | PASS | MOCK | `tests/integration/recoveryOrchestrator.test.ts` (fencing, takeover, bounded attempts) |
+| Schedule version commit is checked again (version, past energy, fence, station-night envelope) | PASS | MOCK | `commitScheduleVersion` in `src/server/services/scheduleService.ts`; `tests/integration/scheduleRecovery.test.ts` |
+| Operator economics constraint holds for every automatic commit (at least 1 c against the immediate baseline) | PASS | MOCK (benchmark, synthetic) | `evaluateCandidate` in `src/domain/recovery.ts`; `tests/unit/recoveryShortfall.test.ts`; `docs/RECOVERY_BENCHMARK_FINDINGS.md` |
+| **Live Gemini recovery decision (MODEL_DECISION)** | BLOCKED, NEEDS USER APPROVAL | Provider | One live attempt with `gemini-3.8-flash` returned HTTP 504 DEADLINE_EXCEEDED; the deterministic fallback ran. No successful live recovery decision exists. A retry with `gemini-3.6-flash` (the model with earlier successful responses) has **not** been executed and needs separate approval. See `docs/EXTERNAL_PREFLIGHT.md`. |
+| The model chooses well | NOT CLAIMED | n/a | The deterministic path is the reference. The model only selects among validated options. |
+| Live prompt-injection and invalid-output handling in recovery | NOT TESTED live | MOCK only | Covered with a scripted model in `tests/unit/recoveryAgentContract.test.ts` and `tests/integration/recoveryAgentBoundary.test.ts`. |
+| Provenance labels come from the persisted run record (MODEL_DECISION, DETERMINISTIC_FALLBACK, SIMULATED_EVENT, MOCK MODEL test fixture) | PASS | MOCK | `src/server/services/recoveryProvenance.ts`, `tests/unit/recoveryProvenance.test.ts` |
+| Recovery benchmark (200 seeds, 5,789 applicable scenarios) is deterministic and reports unfavorable and infeasible cases | PASS (determinism) | Synthetic | `tests/unit/recoveryBenchmark.test.ts`; two runs identical. Numbers are SYNTHETIC and modeled, not measured. See `docs/RECOVERY_BENCHMARK.md`. |
+| Assistant (driver Q&A and request parsing) has no tools and cannot set prices | PASS | MOCK (scripted model) | `tests/unit/assistant.test.ts`, `tests/integration/dealAgent.test.ts`. One earlier live Gemini run (2026-11-05, `gemini-3.6-flash`, pre-recovery feature) is summarized in `docs/EVIDENCE.md`. |
+
+---
 
 ## 3. Best Use of PayPal + AI
 
-| Item | Detail |
-|---|---|
-| Claim | Money follows delivered energy, also when a disturbance changes the plan. Recovery never moves money. A session that can no longer be honored is voided only if no energy was delivered. Partial delivery goes to operator resolution with no capture and no void. The AI has no access to PayPal. |
-| Where in code | Outdated-session classification and decision (pure) `src/domain/outdatedSession.ts`. Sweep and settlement routing `src/server/services/outdatedSessionService.ts`. Keyed void and capture `src/server/services/settlementService.ts`. Sandbox and mock gateways `src/payments/`. Scheduled sweep wiring `src/server/runtime.ts`. |
-| How to verify | `tests/unit/outdatedSession.test.ts` (classification and action table), `tests/integration/outdatedSettlement.test.ts` (sweep against the database, void and operator flag). Existing payment safety tests in `tests/integration/paymentSafety.test.ts`. |
-| Test evidence | MOCK provider only. Included in the full vitest run of 2026-11-09 (526 passed, 10 skipped, 0 failed). |
-| Status | MOCK settlement tests: **PASS** when the full run passes. PayPal Sandbox recovery (authorize, then void or capture after a disturbance): **NEEDS USER APPROVAL** (live Sandbox money-moving calls, and the Sandbox credentials are not in this repository). Historical Sandbox proofs (standalone smoke, 2026-10-30, $1.23 capture COMPLETED and $1.23 void VOIDED) are recorded in `docs/EVIDENCE.md` and are not evidence for the recovery path. |
-| Settlement policy | New agreements use `OPERATOR_FAILURE_FULL_VOID_V1`: an operator-attributable, unrecoverable failure is a full void with zero charge, including partial physical delivery. Nothing is captured partially. Early departure and non-conclusive outcomes go to operator resolution. Legacy agreements keep the earlier rules. See `docs/ARCHITECTURE.md`. |
+Claim: money follows delivered energy, also when a disturbance changes the plan. Recovery never moves money. The capture or void decision uses the synthetic delivered-energy ledger, not the forecast. A new agreement can be fully voided with zero charge only on a conclusive, operator-attributed failure. The AI has no access to PayPal.
 
-## 4. Supporting evidence: synthetic recovery benchmark
-
-| Item | Detail |
-|---|---|
-| Claim | Under seeded synthetic disturbances, deterministic recovery serves more sessions on time than leaving the agreed plan unchanged. It also has real costs: more sessions need driver approval, some finish later and some cost the operator more energy. |
-| Where | `scripts/recoveryBenchmarkRun.ts`, `scripts/recovery-benchmark.ts`, `npm run benchmark:recovery`, output `docs/RECOVERY_BENCHMARK.md`. |
-| Status | Determinism and accounting tests (`tests/unit/recoveryBenchmark.test.ts`): **PASS**. Numbers are **SYNTHETIC and modeled**, not measured. |
-| Headline (200 seeds, 5,789 applicable scenarios) | Satisfied on time: static 1,112, auto-commit only 1,168, with driver approval 1,814. Auto-commit changed 71 schedules without approval. Approval-required changes: 768, of which 706 met the target. |
-| Known problems | Recovery delivered less energy than the static plan in 1 auto-commit scenario and 3 approval scenarios (replay under realized base load; root cause NOT VERIFIED, suspected forecast-versus-realized load gap). The benchmark reports this instead of hiding it. |
+| Claim | Status | Evidence kind | Evidence and pointers |
+|---|---|---|---|
+| Capture or void decided from the delivered-energy ledger; forecast shown as "planned" only | PASS | MOCK | `tests/unit/recoveryConsent.test.ts`, `tests/unit/recoveryShortfall.test.ts`; `docs/ARCHITECTURE.md` (delivered energy vs forecast) |
+| Shortfall shown in Wh and labelled SYNTHETIC; never captured partially | PASS | MOCK | `tests/unit/recoveryShortfall.test.ts`; `docs/ARCHITECTURE.md` trust boundary 4 |
+| Settlement policy `OPERATOR_FAILURE_FULL_VOID_V1`: full void with zero charge only for a conclusive operator failure; early departure and non-conclusive outcomes go to operator resolution with a deadline | PASS | MOCK | `src/domain/outdatedSession.ts`, `tests/unit/outdatedSession.test.ts`, `tests/integration/outdatedSettlement.test.ts`, `tests/integration/attributionSettlement.test.ts` |
+| Fault attribution (OPERATOR, DRIVER, EXTERNAL, UNKNOWN); only a confirmed OPERATOR auto-voids; default UNKNOWN | PASS | MOCK | `src/domain/faultAttribution.ts`, `tests/unit/faultAttribution.test.ts`, `tests/integration/attributionSettlement.test.ts` |
+| Legacy agreements keep the earlier rules | PASS | MOCK | `tests/integration/outdatedSettlement.test.ts`; `docs/ARCHITECTURE.md` |
+| Remedy cost (200 c default) is recorded as a MODELED operator assumption, not a fee | PASS (recorded) | MOCK | `FAILED_SERVICE_REMEDY_CENTS` in config; not a PayPal fee and not a customer charge |
+| Keyed capture and void; capture after void impossible; idempotent side effects | PASS | MOCK | `tests/integration/paymentSafety.test.ts`, `tests/integration/outdatedSettlement.test.ts`; `src/server/services/settlementService.ts` |
+| Real PostgreSQL: concurrency, migrations, lease takeover, dropped connection, backend killed mid-transaction | PASS on a disposable local PostgreSQL 18.1 | Local real database (separate verification run) | `tests/integration/postgres.test.ts`: 11 passed, 1 skipped (restart test needs `TEST_PG_RESTART_CMD`). Not run against Neon. |
+| Migration guard: unmigrated external database refused; no ledger created; default open succeeds once migrated | PASS on a disposable local PostgreSQL | Local real database | `tests/integration/postgres.test.ts` (two gated guard tests); `tests/unit/migrator.test.ts`; `docs/MIGRATIONS.md` |
+| Neon migrations 003 to 005 applied | NOT TESTED (not applied) | n/a | The app refuses to start against an unmigrated external database. Applying needs owner approval and the procedure in `docs/MIGRATIONS.md`. |
+| Reconciliation sweep (every 5 minutes, at most 50 reservations per pass, least recently checked first) | PASS | MOCK | `src/server/services/outdatedSessionService.ts`; migration `005_sweep_checked_at`; `tests/integration/outdatedSettlement.test.ts`. No UI trigger exists. |
+| PayPal Sandbox recovery settlement (authorize, then void or capture after a disturbance) | NOT TESTED, NEEDS USER APPROVAL | Provider | Would move Sandbox money. Sandbox credentials are not part of this check. Plan in `docs/PAYPAL_CERTIFICATION.md`. |
+| Historical PayPal Sandbox evidence (standalone smoke, 2026-10-30, USD 1.23) | PASS (historical, not repeated) | Provider | `docs/EVIDENCE.md` and `docs/PAYPAL_CERTIFICATION.md` section 1a record both capture and void as PASS. The void half is not re-verified in this check; the owner should confirm it against the stored artifact. These are not evidence for the recovery path. |
+| Historical PayPal Sandbox through the app (2026-11-06 capture; 2026-11-07 void, pre-recovery) | PASS (historical) | Provider | `docs/EVIDENCE.md`. Predates the recovery settlement policy. Not evidence for the recovery path. |
+| The AI cannot call PayPal or set payment state | PASS | MOCK | Recovery tool allowlist (`src/server/services/recoveryTools.ts`); assistant has no tools (`tests/unit/assistant.test.ts`) |
 
 ---
+
+## Known limits (all three tracks)
+
+- Charging, building load, tariffs, forecasts and delivery are synthetic. No vehicle is charged. No real grid benefit or savings is measured.
+- Recovery plans on forecast base load; the replay uses realized base load. Some recovered plans deliver less than the static plan (benchmark: 1 auto-commit scenario and 3 approval scenarios). Root cause is a suspected forecast-versus-realized load gap; NOT VERIFIED beyond the analysis in `docs/RECOVERY_BENCHMARK_FINDINGS.md`.
+- Auto-commit may raise the operator's energy cost against the agreed plan, within the 1 c operator constraint.
+- An ambiguous authorize that races a deadline failure can leave no authorization id for the sweep to find (residual).
+- Real-PostgreSQL concurrency for the migration and sweep was checked only on a disposable local cluster.
+- The 2027 DST fall-back night was not browser-tested in UTC or Kolkata browsers.
+- Bryntum timeline accessibility is not compliant (vendor DOM findings above).
 
 ## What is not claimed
 
 - No claim of real grid benefit, real charger behavior or real vehicles.
-- No claim that a live Gemini model makes good recovery decisions.
+- No claim that a live Gemini model makes good recovery decisions, or that a live model decision has happened in the recovery flow.
 - No claim of PayPal Sandbox recovery settlement.
 - No claim of Bryntum accessibility compliance for the timeline.
-- No screenshot of the recovery UI is claimed; the existing screenshots in `docs/screenshots/` predate this branch.
+- No claim of a recorded demo video or a hosted live demo URL. None exists.
+- No screenshot of the recovery UI is claimed; the screenshots in `docs/screenshots/` predate this release.

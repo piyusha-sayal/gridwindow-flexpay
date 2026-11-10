@@ -116,7 +116,7 @@ function Row({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps)
         <code className="block meta mt-0.5">{s.serviceState}</code>
       </td>
       <td className="pr-3">
-        <PaymentBadge state={s.paymentState} />
+        <PaymentBadge state={s.paymentState} capacityConfirmed={s.slotsCommitted} />
         <code className="block meta mt-0.5">{s.paymentState}</code>
         {hasCaptureConflict(s) && <span className="block meta mt-0.5 text-[var(--amber-ink)]">Provider captured. Reconcile</span>}
         <ResolutionNote s={s} timeZone={d.timeZone} />
@@ -153,7 +153,7 @@ function Card({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps
           <code className="block text-xs text-muted mt-0.5">{s.serviceState}</code>
         </CardField>
         <CardField label="Payment" wide>
-          <PaymentBadge state={s.paymentState} />
+          <PaymentBadge state={s.paymentState} capacityConfirmed={s.slotsCommitted} />
           <code className="block text-xs text-muted mt-0.5">{s.paymentState}</code>
           <ResolutionNote s={s} timeZone={d.timeZone} />
         </CardField>

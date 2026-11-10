@@ -101,7 +101,7 @@ describe("buildInjection", () => {
   it("maps each disturbance type to the params the server validates", () => {
     expect(buildInjection({ ...draft, type: "CHARGER_POWER_REDUCTION", value: 1800 }, DEPART, "evt-00000001")).toEqual({
       ok: true,
-      request: { eventId: "evt-00000001", reservationId: "r1", type: "CHARGER_POWER_REDUCTION", effectiveSlot: 3, params: { maxPowerW: 1800 } },
+      request: { eventId: "evt-00000001", reservationId: "r1", type: "CHARGER_POWER_REDUCTION", effectiveSlot: 3, params: { maxPowerW: 1800 }, attribution: "UNKNOWN" },
     });
     expect(buildInjection({ ...draft, type: "SITE_CAP_REDUCTION", value: 9000 }, DEPART, "evt-00000002")).toMatchObject({ ok: true, request: { params: { stationCapW: 9000 } } });
     expect(buildInjection({ ...draft, type: "CHARGER_FAILURE", value: 0 }, DEPART, "evt-00000003")).toMatchObject({ ok: true, request: { params: {} } });

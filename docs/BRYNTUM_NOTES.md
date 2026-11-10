@@ -1,72 +1,101 @@
 # Bryntum Scheduler notes (operator schedule)
 
-Scope: the operator schedule route `/operator/schedule` only. Bryntum is loaded with `next/dynamic` (`ssr: false`) from `src/app/operator/schedule/ScheduleBoard.tsx`.
+Scope: the operator schedule route `/operator/schedule` only. Bryntum is loaded with `next/dynamic` (`ssr: false`) from `src/app/operator/schedule/ScheduleBoard.tsx`. Verified on branch `feature/combined-release`, 2026-11-09.
 
-## Final validation (2026-11-09, branch feature/recovery-engine)
-
-Summary: Community 8.0 only, no commercial dependency. Items 2, 3, 5 and 6 PASS on e2e runs. Item 4 is PASS for the app's own time handling and NOT VERIFIED for the Bryntum axis. Item 1 is PARTIAL (license text not read locally).
+## Verification summary
 
 | # | Item | Result | Evidence |
 |---|---|---|---|
-| 1 | Installed versions and license evidence | PASS for versions, PARTIAL for license | See "Packages" below |
-| 2 | Schedule persists after reload | PASS | `tests/e2e/recoveryScheduler.spec.ts`, test 1: the disturbance text is still shown after `page.reload()` and the server reports it |
-| 3 | Agent-driven change appears without reload | PASS | Same test: the page polls every 3 s and shows the "Schedule updated by recovery" notice without navigation |
-| 4 | UTC vs station time zone | PASS for the app mapping; NOT VERIFIED for the Bryntum axis; browser e2e NOT ADDED | `tests/unit/scheduleTimeZone.test.ts` (see below) |
-| 5 | Responsive | PASS | `recoveryScheduler.spec.ts`: no page-level horizontal overflow at Pixel 7 and at iPad (gen 7) |
-| 6 | Table fallback equals chart data | PASS | Unit test: the table's current kWh equals the sum of the chart burst energy per session (`scheduleTimeZone.test.ts`). Both read the same `ScheduleModel`. |
+| 1 | Shows real backend allocations, occupied ports, deadlines, station power, committed schedule | PASS | Chart and table read only `GET /api/schedule` (persisted versions). `tests/unit/scheduleModel.test.ts`, `tests/unit/scheduleProposal.test.ts`. E2E `recoveryScheduler.spec.ts` test 1. |
+| 2 | Reacts to recovery events without reload | PASS | E2E test 1: injected disturbance shows "Schedule updated by recovery" after polling (3 s), persists after reload. |
+| 3 | BEFORE/AFTER: original agreed plan vs current recovered plan | PASS for the data, PARTIAL for the layout | Chart has an "Original plan" / "Current (recovered)" toggle, so only one lane is drawn at a time; there is no side-by-side drawing. Table shows agreed and current kWh, plan version, and departure. Unit: `scheduleProposal.test.ts` "before and after". E2E: `recoveryScheduler.spec.ts` "before and after" checks the chart, table and summary against the persisted run status (see the branch note below). |
+| 4 | Proposals awaiting driver approval are "proposed, not committed" | PASS (unit), PASS (e2e for whichever run status occurred) | Proposal bursts are labelled "Proposal …", never "Recovered …"; they are excluded from the table's current kWh and from the committed lanes; the summary says "N proposal(s) awaiting driver approval, not committed."; a note sits under the chart. Source: `buildScheduleModel(view, proposals)`, proposals from `session.pendingApproval` only. |
+| 5 | Meaningful validation feedback (why a recovery was rejected or infeasible) | PASS (unit), PARTIAL (e2e) | The disruption list shows the persisted run's `outcome.reason` (`runReason`). Unit: `scheduleProposal.test.ts` "why a recovery run ended". The e2e test asserts the reason text only if the run it injects is not committed and not awaiting approval. |
+| 6 | Accessible table alternative equivalent to the chart | PASS | `ScheduleTable` renders from the same `ScheduleModel` as the chart. Unit: `scheduleTimeZone.test.ts` ("the table's current kWh equals the sum of the chart's burst energy"). |
+| 7 | Time zone and DST in a real browser | DEFECT FOUND AND FIXED (axis labels); PASS after fix | See "Time zones" below. |
+| 8 | Accessibility of the timeline (axe, `.b-scheduler` scope) | FAIL for the timeline (vendor DOM); table path PASS | See "Accessibility" below. |
+| 9 | Licensing | PARTIAL (resolved to MIT per two Bryntum-published sources; in-package license text NOT VERIFIED) | See `THIRD_PARTY_NOTICES.md`. |
 
-Commands run (targeted only, not the full suites):
-- `npx vitest run` on `tests/unit/scheduleTimeZone.test.ts`, `tests/unit/recoveryDemoSteps.test.ts`, `tests/unit/scheduleModel.test.ts`: 27 of 27 pass. Repeated with `TZ=UTC`, `TZ=Asia/Kolkata` and `TZ=America/Los_Angeles`: 27 of 27 pass each time.
-- `npx playwright test <spec> --workers=1` after `npx next build`: `recoveryScheduler.spec.ts` 5 of 5 pass (includes the new tablet test); `scenarioC.spec.ts` passes; `scenarios.spec.ts` 11 of 11 pass (the guided-demo scenarios).
-- Not run: the full vitest and playwright suites (the lead runs them).
+Commands run for this review (targeted only):
+- `npx vitest run` on `scheduleAxis`, `scheduleProposal`, `scheduleTimeZone`, `scheduleModel`, `heroSchedule`: 40 of 40 pass.
+- `npx tsc --noEmit`: no errors in files owned by this review. Errors remain in other agents' files (see "Not verified").
+- `npx eslint` on owned files: 0 problems.
+- `next build` through the lock: passes (`BUILD_RC=0`).
+- `npx playwright test tests/e2e/recoveryScheduler.spec.ts --workers=1` through the lock: 9 of 9 pass (last run). Earlier run: 7 pass, 2 failed on wrong assertions in the new tests, now corrected.
 
-### Packages
+Not run: the full vitest suite and the full Playwright suite (by instruction).
 
-| Package | Installed (`npm ls`) | Lock file (`package-lock.json`) | License |
+### Before and after: what the chart draws
+
+- The chart shows one lane at a time. "Original plan" draws the agreed bursts and parked occupancy. "Current (recovered)" draws the latest committed version plus pending proposal bursts, labelled as such.
+- The table shows both kWh columns and the plan version for each session, so the change is visible without the chart.
+- A side-by-side chart is not implemented. It was not required to pass item 3, and Bryntum Community events on the same row would overlap without a layout change that was not tested.
+
+### E2E branch note (item 3 and item 5)
+
+The "before and after" e2e test injects one disturbance and then checks the page against the persisted run status. Which branch ran (COMMITTED, NEEDS_APPROVAL, or other) depends on the seeded session and the recovery engine. The run output does not record which branch ran. The test passes for whichever branch the persisted status selects. The other branches are not exercised in this run and are not verified.
+
+## Time zones (item 7)
+
+Station zone: `America/Los_Angeles`. Browser zones tested in a real Chromium page: `UTC`, `Asia/Kolkata` (reported as `Asia/Calcutta`), and `America/Los_Angeles`.
+
+### Defect found
+
+Before the fix, Bryntum's default header labels used the browser's zone, not the station's. Measured DOM (probe, before the fix): UTC and Kolkata rows on the night of 2026-12-05 (grid start 18:00 PST); Pacific row on the night of 2027-03-13:
+
+| Browser zone | Axis labels from the DOM (first ticks) | Expected station labels |
+|---|---|---|
+| UTC | `2 AM 3 AM 4 AM …` | `6 PM 7 PM 8 PM …` |
+| Asia/Kolkata | `7 AM 8 AM 9 AM …` (in the 2026 probe, the tick at 7 AM IST = 17:30 PST) | half-hour station ticks, e.g. `6:30 PM` |
+| America/Los_Angeles | `6 PM 7 PM …` (2027-03-13 probe) | `6 PM 7 PM …` (matched) |
+
+Event bar text (`Charging … 00:00-06:30`) was already station time in every zone, so axis and bar text disagreed in the UTC and Kolkata browsers.
+
+### Fix
+
+`src/app/operator/schedule/scheduleAxis.ts` builds the chart's `viewPreset` with a `day` and an `hour` header whose `renderer` formats the tick start in the station zone with `Intl.DateTimeFormat`. The mechanism is the `viewPreset` `headers[].renderer` option. The installed package's typings (checked with `tsc`) accept it with the signature `(startDate: Date, endDate: Date, headerConfig, index, timeline) => string`. The chart passes the memoized preset, so polling does not reset zoom or scroll.
+
+### What remains after the fix
+
+- Tick boundaries are still placed by Bryntum on browser-local hours. Labels are station time, and each label is the correct absolute time for its tick. For a zone that is a whole number of hours from the station, the ticks fall on station hours. For Kolkata (13.5 hours ahead in winter), the ticks fall on station half hours, so labels read `6:30 PM` and not `6 PM`. This is tested, not hidden.
+- Bryntum's own time-zone option is not available in the installed Community package. `project={{ timeZone }}` and a `timeZone` prop on the React wrapper are rejected by `tsc` (TS2769, "does not exist in type ProjectModelCommunityConfig"). A third-party mirror of Bryntum's 5.6 docs describes a project-level `timeZone` option; it is not the 8.0.0 Community API and was not used.
+
+### What is covered where
+
+| Coverage | Test | Result |
+|---|---|---|
+| Spring-forward night 2027-03-13 (60 slots, 15 elapsed hours) and fall-back night 2027-11-06 (68 slots, 17 elapsed hours; the 2027-11-07 transition is inside it), including station hour labels and the repeated hour | `tests/unit/scheduleAxis.test.ts`, `tests/unit/scheduleTimeZone.test.ts` (2026 and 2027 nights) | PASS |
+| Header renderer produces station labels, day and hour | `tests/unit/scheduleAxis.test.ts` | PASS |
+| Axis labels in UTC, Kolkata and Pacific browsers on a winter night: UTC equals Pacific exactly, Kolkata shows half-hour ticks; bar text identical in all three; bar offsets from the leftmost bar match within 2 px across zones | `tests/e2e/recoveryScheduler.spec.ts` "axis labels are station time in every browser zone" | PASS |
+| Spring-forward night in a Pacific browser and a UTC browser: no `2 AM`, `1 AM` followed by `3 AM` | e2e "spring-forward night" | PASS |
+| Fall-back night in a Pacific browser: `1 AM` twice, `2 AM` once | e2e "fall-back night" | PASS |
+
+Not covered: the fall-back night in the UTC and Kolkata browsers (not run); bar pixel positions across the DST transitions themselves (checked as text and offsets for the winter night only).
+
+## Accessibility (item 8)
+
+Scoped axe scan of `.b-scheduler` on the operator schedule (`@axe-core/playwright` 4.13.0, the night 2027-01-16, desktop viewport, run on 2026-11-09 through the lock). Results of the last run:
+
+| Rule id | Impact | Nodes | Where |
 |---|---|---|---|
-| `@bryntum/scheduler-community` | 8.0.0 | 8.0.0, sha512 integrity recorded | `npm view @bryntum/scheduler-community@8.0.0 license` returns `MIT` (registry metadata, 2026-11-09) |
-| `@bryntum/scheduler-react-community` | 8.0.0 | 8.0.0, sha512 integrity recorded | `npm view @bryntum/scheduler-react-community@8.0.0 license` returns `MIT` (registry metadata) |
+| `aria-required-children` | critical | 2 | `.b-grid-panel-body`, `#b-scheduler-1-normalSubgrid` |
+| `color-contrast` | serious | 2 | `.b-resource-info` cells in the resource column |
+| `scrollable-region-focusable` | serious | 1 | `.b-grid-headers-normal` |
 
-- Conflict to resolve before release: the Bryntum license page (`https://bryntum.com/products/scheduler/license/`, fetched 2026-11-09) describes only the End-User License and the OEM License. It does not name a Community edition or MIT. The npm registry says MIT. Owner must confirm which governs the Community 8.0.0 package before any public release.
-- `npm view` also reports `homepage` `https://bryntum.com/products/scheduler/`. The `repository` field is not set in registry metadata.
-- `npm ls` (2026-11-09): `@bryntum/scheduler-community@8.0.0` and `@bryntum/scheduler-react-community@8.0.0` installed, the React package deduped onto the same core. Registry integrity for the core: `sha512-NcvzQqTy8zeOXrGT/mkHvdJyMeULYMZq/qDnBLSzX301k4uRmrrPQKD6oc7+jSs7xgukPLYbW4+xD9lro4rREw==`.
-- The license text inside the installed package (its `LICENSE` file or `package.json` `license` field) was NOT read. Reading `node_modules/**` is denied by the project's `.claude/settings.json`, and that rule was not circumvented. The registry metadata is therefore the only license evidence. Owner review is still required before any public release.
-- Bryntum is not listed in `docs/THIRD_PARTY.md`. Add it once the owner accepts the license evidence.
+Same three rules with the `best-practice` tag added: no further rules. 17 WCAG checks pass inside `.b-scheduler`.
 
-### Time zones (item 4)
-
-- The app's time mapping uses absolute epoch milliseconds. `buildNightGrid` (`src/domain/time.ts`) anchors the grid by `Intl` wall-clock conversion in `America/Los_Angeles`. `toChartEvents` builds `startDate`/`endDate` with `new Date(ms)`. Labels come from `timeLabel(ms, stationTimeZone)` with `Intl`. There is no naive local-Date arithmetic, so no fix was needed in the mapping.
-- Verified by unit tests:
-  - Spring forward, night of 2026-03-07: 60 slots (15 elapsed hours). The 02:xx wall-clock labels never occur, and the slot at 10:00 UTC is labelled 03:00.
-  - Fall back, night of 2026-10-31: 68 slots (17 elapsed hours). The repeated 01:00 hour gives two events one real hour apart. An occupancy from 00:00 PDT to 03:00 PST is 4 real hours.
-  - The night of 2026-11-01 has no transition inside its grid (64 slots, 16 hours). The transition is on the early morning of 2026-11-01, which belongs to the night of 2026-10-31. The 25-hour calendar day of 2026-11-01 is therefore covered by the 2026-10-31 night tests.
-  - Labels follow the station zone, not the process zone (`timeLabel(ms, "UTC")` differs from `timeLabel(ms, LA)`). The tests pass under three process time zones.
-- Browser e2e for the axis was NOT added (2026-11-09). Reasons: (a) the DST nights 2026-03-07 and 2026-10-31 are in the past, and `seedDemoNight` (`src/server/services/demoService.ts`) skips plug-ins that have already passed, so those nights cannot be seeded through the existing helpers; (b) `seedNight` in `recoveryScheduler.spec.ts` uses a wall-clock night (`nightAt(26)`), so a DST test built on it is not deterministic; (c) the Bryntum time-axis DOM and any time-zone option could not be confirmed from docs (see below). A future-night variant (2027-03-13 spring forward, 2027-11-06 fall back) is a candidate, not yet run.
-- Bryntum docs check (2026-11-09): the official Scheduler API and guide pages could not be retrieved (`/products/scheduler/docs/api` returned 404; the docs URLs returned the suite overview). No `timeZone` option, browser-local-axis statement, or tick-label formatter was found. Result: NOT FOUND, not confirmed as unsupported.
-- NOT VERIFIED: how Bryntum draws its own time axis. Bryntum is assumed to use the browser's local time zone for the axis, while the event labels and the table use the station zone. The `timeZone` prop is rejected by the installed React wrapper's types (a `tsc` probe reported `TS2769` at that attribute). The Bryntum docs pages fetched on 2026-11-09 did not document a scheduler time-zone option, so none is used. A mismatch between the axis and the labels is possible when the operator's browser is not in the station zone. Revisit with a browser run in a non-station zone, or with the Bryntum API reference.
-
-### Persistence and live updates (items 2 and 3)
-
-- Every event on the chart comes from the persisted read model (`GET /api/schedule`). Pending proposals come from persisted recovery runs with status `NEEDS_APPROVAL`, drawn as a separate, hatched lane. They are not committed versions.
-- The chart is read-only (`readOnly`). No endpoint persists a manual timeline edit, so nothing dragged on the chart is saved.
-- The page polls every 3 seconds while the tab is visible. The chart is re-rendered only when the revision key changes, and its date props are memoized so scroll and zoom are not reset on a poll.
-
-### Accessibility (item 6 and the vendor audit)
-
-The table view (`ScheduleTable`) is the accessible equivalent. It is always rendered and reads the same model as the chart.
-
-Audit run on 2026-11-09 with `@axe-core/playwright`, tags wcag2a, wcag2aa, wcag21aa, scoped with `include(".b-scheduler")`, desktop viewport, MOCK seed night:
-
-| Rule id | Impact (axe) | Nodes | Where |
-|---|---|---|---|
-| `aria-required-children` | critical | 2 | Bryntum timeline grid body (`.b-grid-panel-body` / normal subgrid) |
-| `color-contrast` | serious | 2 | Bryntum resource info cells (`.b-resource-info`) |
-| `scrollable-region-focusable` | serious | 1 | Bryntum grid headers (`.b-grid-headers-normal`) |
-
-- The earlier note said these were all "serious". The audit shows `aria-required-children` is `critical`.
-- These findings are inside Bryntum's own DOM. App code cannot fix them without overriding Bryntum internals, which was not done.
-- The e2e axe test (`recoveryScheduler.spec.ts`, test 2) excludes `.b-scheduler` and fails on any serious or critical violation elsewhere on the page. It does not prove the Bryntum timeline is accessible.
+- These findings are in Bryntum's own grid DOM. App code cannot fix them without overriding Bryntum internals, which was not done.
+- The e2e axe test (`recoveryScheduler.spec.ts`, test 2) excludes `.b-scheduler` and fails on serious or critical violations elsewhere on the page. It does not prove the Bryntum timeline is accessible.
+- Keyboard path: the lane toggle is reachable and operable by keyboard (e2e test 2); the table is the accessible alternative, in a labelled scroll region with tab focus.
 - Complete accessibility is NOT claimed for the timeline. The table and the text summary are the accessible path.
+
+## Licensing (item 9)
+
+Summary (details in `THIRD_PARTY_NOTICES.md`):
+- Registry (`npm view @bryntum/scheduler-community@8.0.0 license`): `MIT`. Also `@bryntum/scheduler-react-community@8.0.0`: `MIT`.
+- Bryntum features page (https://bryntum.com/products/scheduler/features/, summarised fetch 2026-11-09): the Community tier is labelled "Free · MIT license".
+- Bryntum license page (https://bryntum.com/products/scheduler/license/, summarised fetch 2026-11-09): lists only the End-User and OEM licenses; it does not mention a Community edition. It does not contradict the MIT statement, but it does not state it.
+- In-package LICENSE file and copyright text: NOT VERIFIED (`node_modules/**` is not read).
 
 ## Packages and how each API was verified
 
@@ -75,25 +104,28 @@ Audit run on 2026-11-09 with `@axe-core/playwright`, tags wcag2a, wcag2aa, wcag2
 | `@bryntum/scheduler-react-community` | 8.0.0 | `npm ls` (installed), `npm view` registry metadata |
 | `@bryntum/scheduler-community` | 8.0.0 | `npm ls` (installed), `npm view` registry metadata |
 
-- Component props (`startDate`, `endDate`, `viewPreset`, `resources`, `events`, `columns`, `readOnly`, `rowHeight`, `height`): accepted by `tsc` against the package types. A throwaway probe with a nonexistent prop was rejected, so the prop check is real. The probe file was deleted.
-- CSS: `@bryntum/scheduler-community/scheduler.css` and `@bryntum/scheduler-community/svalbard-light.css` resolved in a `next build` (Turbopack module resolution).
-- Docs used: https://bryntum.com/agents/common-mistakes (CSS order; "Pass config as JSX props; use a `useRef` to reach the underlying instance"). https://bryntum.com/agents/products/overview. https://bryntum.com/products/scheduler/features/ (Community tier table).
-- Not confirmed by docs: the React guide and API reference pages were not retrievable through the docs tools. `.b-scheduler` class names used in tests are confirmed only by the rendered DOM.
+- Props used: `startDate`, `endDate`, `viewPreset`, `resources`, `events`, `columns`, `readOnly`, `rowHeight`, `height`. Accepted by `tsc` against the package types.
+- `viewPreset.headers[].renderer`: accepted by `tsc`; signature read from the TS2769 diagnostic (`(startDate: Date, endDate: Date, headerConfig, index, timeline) => string`).
+- `timeZone` on the component or on `project`: rejected by `tsc` (not in the Community 8.0.0 types).
+- CSS: `@bryntum/scheduler-community/scheduler.css` and `svalbard-light.css` resolve in `next build`.
+- Docs used: https://bryntum.com/agents/common-mistakes (CSS order; config as JSX props; `useRef` for the instance). https://bryntum.com/products/scheduler/features/ (Community tier). The official Scheduler API and guide pages were not retrievable through the fetch tool (the suite overview page does not document the time axis).
 
 ## FontAwesome (not imported)
 
-The docs say icons are not auto-bundled and need the FontAwesome stylesheets. The paths `@bryntum/scheduler-community/fontawesome/css/fontawesome.css` and `.../solid.css` did not resolve in the installed package (`next build` "Module not found"). They are not imported. The chart draws no icon glyphs (read-only, no toolbar), so this has no visible effect today.
+The `@bryntum/scheduler-community/fontawesome/css/*` paths did not resolve in `next build`. They are not imported. The chart draws no icon glyphs (read-only, no toolbar), so this has no visible effect today.
 
-## Community tier limitations hit or relied on
+## Community tier limitations relied on
 
 Source: https://bryntum.com/products/scheduler/features/
 
-Not included in Community (and therefore not used):
-- Time ranges and current-time line (`timeRanges`): disruption windows are a plain React list.
-- Resource time ranges.
-- Summary row and group/tree summaries: the capacity strip is plain React (`CapacityStrip.tsx`).
-- Dependency editor, dependency context menu, dependency types.
-- Drag to select multiple events, drag to pan, resize rows, drag to reorder resources.
-- PDF export and print.
+Not used (not in Community): time ranges and current-time line (disruption windows are a plain React list), resource time ranges, summary row (the capacity strip is plain React), dependency editor, drag to select, drag to pan, row resize, drag to reorder resources, PDF export and print.
 
-Included in Community and relied on: custom event rendering, event tooltips, resize events, drag and drop events, show dependencies. Manual drag is disabled (`readOnly`), so only the display features are used.
+Used: custom event rendering, event tooltips, resize and drag events (disabled by `readOnly`), show dependencies (not used for the schedule).
+
+## Not verified
+
+- Bryntum axis behaviour on a full DST-transition night in a non-Pacific browser (only the winter night was run in all three zones).
+- Side-by-side BEFORE/AFTER drawing (not implemented).
+- The in-package LICENSE text.
+- Complete accessibility of the Bryntum timeline.
+- Historical (this review's session only): `tests/unit/recoveryScheduler.test.ts` failed on `InjectionDraft.attribution`, and `tsc` reported errors in `tests/integration/recoveryAgentBoundary.test.ts` and `tests/unit/paymentCopy.test.ts`. Those were not edited here. On the final combined tree, `tsc` reports 0 errors and the full Vitest run passes (740 passed, 12 skipped).

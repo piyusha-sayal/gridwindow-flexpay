@@ -70,6 +70,10 @@ export class MeteredLlm implements StructuredLlm {
     private readonly limits: MeterLimits,
   ) {}
 
+  get provider() {
+    return this.inner.provider;
+  }
+
   get model(): string {
     return this.inner.model;
   }

@@ -50,6 +50,7 @@ function steps(...calls: [string, Record<string, unknown>?][]): ScriptedLlm {
 
 function failingLlm(reason: "TIMEOUT" | "UNAVAILABLE"): StructuredLlm {
   return {
+    provider: "test-fixture",
     model: "test-failing",
     generate: async (): Promise<LlmResult<never>> => ({ ok: false, reason }),
   } as StructuredLlm;
@@ -323,7 +324,7 @@ describe("model failure falls back to the deterministic path", () => {
   it("a model that never answers is cut off by the loop budget", async () => {
     const rid = await scheduled(DRIVER);
     await insertDisturbance(rid, "evt_fb_0002", "EARLY_DEPARTURE", { departMs: EARLY_DEPART_MS }, PLUG_SLOT);
-    app.deps.llm = { model: "test-hanging", generate: () => new Promise<never>(() => undefined) } as StructuredLlm;
+    app.deps.llm = { provider: "test-fixture", model: "test-hanging", generate: () => new Promise<never>(() => undefined) } as StructuredLlm;
     const started = Date.now();
     const run = await orchestrateRecovery(app.deps, "evt_fb_0002", { timeoutMs: 30 });
     expect(Date.now() - started).toBeLessThan(5_000);

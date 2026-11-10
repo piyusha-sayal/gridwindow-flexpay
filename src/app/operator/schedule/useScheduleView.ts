@@ -2,14 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/components/api";
-import type { ScheduleDisruptionView, ScheduleView } from "@/server/services/scheduleView";
-import type { RecoveryRunView } from "@/server/services/recoveryRuns";
+import type { ScheduleView } from "@/server/services/scheduleView";
 import { buildScheduleModel, type ProposalInput, type ScheduleModel } from "./scheduleModel";
 
 export const POLL_MS = 3_000;
-
-/** The server may attach the latest run id to each disruption. Read it defensively: absent means no proposal can be fetched. */
-type DisruptionWithRun = ScheduleDisruptionView & { runId?: string };
 
 export interface ScheduleVersionNotice {
   /** Highest committed schedule version on the night when the change was seen. */
@@ -31,22 +27,13 @@ async function fetchView(nightOf: string | null): Promise<ScheduleView> {
   return (await api<{ schedule: ScheduleView }>(`/api/schedule${query}`)).schedule;
 }
 
-/** Pending proposals come only from persisted runs awaiting approval. Nothing is inferred from the disruption alone. */
-async function fetchProposals(view: ScheduleView): Promise<ProposalInput[]> {
-  const pending = (view.disruptions as DisruptionWithRun[]).filter((d) => d.runStatus === "NEEDS_APPROVAL" && d.runId);
-  const runs = await Promise.all(
-    pending.map(async (d) => {
-      const { run } = await api<{ run: RecoveryRunView }>(`/api/recovery/runs/${encodeURIComponent(d.runId!)}`);
-      return { d, run };
-    }),
-  );
-  const proposals: ProposalInput[] = [];
-  for (const { d, run } of runs) {
-    const session = view.sessions.find((s) => s.reservationId === d.reservationId);
-    if (!session || !run.proposal) continue;
-    proposals.push({ runId: run.runId, reservationId: session.reservationId, portId: session.portId, powerW: run.proposal.powerW, effectiveDepartMs: session.effectiveDepartMs });
-  }
-  return proposals;
+/** Pending proposals come only from the persisted run the server attaches to a session awaiting approval. */
+function proposalsFor(view: ScheduleView): ProposalInput[] {
+  return view.sessions.flatMap((session) => {
+    const pending = session.pendingApproval;
+    if (!pending) return [];
+    return [{ runId: pending.runId, reservationId: session.reservationId, portId: session.portId, powerW: pending.proposed.powerW, effectiveDepartMs: session.effectiveDepartMs }];
+  });
 }
 
 function maxVersion(view: ScheduleView): number {
@@ -82,7 +69,7 @@ export function useScheduleView(nightOf: string | null): ScheduleState {
     async function load() {
       try {
         const next = await fetchView(nightRef.current);
-        const proposals = await fetchProposals(next);
+        const proposals = proposalsFor(next);
         if (!alive) return;
         const nextModel = buildScheduleModel(next, proposals);
         const changed = revisionRef.current !== null && revisionRef.current !== nextModel.revision;

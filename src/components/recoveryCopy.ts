@@ -17,6 +17,13 @@ export const ATTRIBUTION_LABEL: Record<FaultAttribution, string> = {
   UNKNOWN: "Cause not yet confirmed",
 };
 
+/** Operator-visible text for a recorded attribution. Only OPERATOR is a confirmed operator cause; the code is always shown, never colour alone. */
+export function attributionStatusText(attribution: FaultAttribution): string {
+  if (attribution === "OPERATOR") return "Fault attribution: OPERATOR (confirmed)";
+  if (attribution === "UNKNOWN") return "Fault attribution: UNKNOWN (not confirmed)";
+  return `Fault attribution: ${attribution} (not an operator cause)`;
+}
+
 /** Shortfalls are small (a few Wh), so they are shown in Wh to one decimal, never rounded to 0.00 kWh. */
 export function formatShortfallWh(shortfallMilliWh: number): string {
   return `${(shortfallMilliWh / 1000).toFixed(1)} Wh`;

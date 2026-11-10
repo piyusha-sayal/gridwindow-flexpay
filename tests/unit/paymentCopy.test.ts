@@ -1,6 +1,6 @@
 /** Customer payment copy is truthful in every state, including ones MOCK journeys cannot reach. */
 import { describe, expect, it } from "vitest";
-import { amountLine, PAYMENT_COPY, paymentCopyFor, paymentCopyForView } from "@/app/reservations/[id]/paymentCopy";
+import { amountLine, CAPACITY_UNCONFIRMED_COPY, capacityUnconfirmed, PAYMENT_COPY, paymentCopyFor, paymentCopyForView } from "@/app/reservations/[id]/paymentCopy";
 import { PAYMENT_STATES } from "@/domain/paymentState";
 import type { ReservationView } from "@/server/services/viewService";
 
@@ -27,6 +27,24 @@ describe("reservation payment copy", () => {
     expect(text("NEEDS_RECONCILIATION")).toMatch(/no new charge will be attempted/i);
     expect(text("AUTHORIZED")).toMatch(/not captured/i);
     for (const s of PAYMENT_STATES) if (s !== "VOIDED") expect(text(s), s).not.toMatch(/refund/i);
+  });
+});
+
+describe("provider authorization without confirmed capacity", () => {
+  const view = (slotsCommitted: boolean) => ({ paymentState: "AUTHORIZED" as const, serviceState: "AWAITING_PAYMENT" as const, proofs: [], slotsCommitted });
+
+  it("is derived only for an AUTHORIZED hold with no committed capacity", () => {
+    expect(capacityUnconfirmed(view(false))).toBe(true);
+    expect(capacityUnconfirmed(view(true))).toBe(false);
+    expect(capacityUnconfirmed({ paymentState: "VOIDED", slotsCommitted: false })).toBe(false);
+  });
+
+  it("is never described as a committed charging window", () => {
+    const copy = paymentCopyForView(view(false));
+    expect(copy).toBe(CAPACITY_UNCONFIRMED_COPY);
+    expect(`${copy.title} ${copy.body}`).toMatch(/charging capacity not yet confirmed/i);
+    expect(`${copy.title} ${copy.body}`).not.toMatch(/window is reserved|reserved/i);
+    expect(paymentCopyForView(view(true))).toBe(PAYMENT_COPY.AUTHORIZED);
   });
 });
 

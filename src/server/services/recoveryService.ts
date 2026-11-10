@@ -6,7 +6,7 @@
  */
 import { ProviderError } from "@/payments/gateway";
 import type { AppDeps } from "../deps";
-import { appendEvent, claimOperation, finishOperation, getReservation, recordProof, SettlementConflictError, type EventSource, type ReservationRow } from "../repo";
+import { appendEvent, claimOperation, finishOperation, getReservation, leaseOperation, recordProof, SettlementConflictError, type EventSource, type ReservationRow } from "../repo";
 import { commitCapacityOrVoid } from "./checkoutService";
 import { awaitingOrder, resumeOrderCreation } from "./orderCreationService";
 import { reconcileDetailed } from "./reconcileService";
@@ -15,7 +15,12 @@ import { settleFromExistingRun, voidAuthorization } from "./settlementService";
 async function voidOrphanAuthorization(deps: AppDeps, rid: string, authorizationId: string, source: EventSource): Promise<void> {
   let key: string;
   try {
-    key = (await claimOperation(deps.db, rid, "VOID")).op.idempotency_key;
+    const claim = await claimOperation(deps.db, rid, "VOID");
+    // A succeeded void already released the orphan; a live lease belongs to another worker. Neither may void again.
+    if (claim.op.status === "SUCCEEDED") return;
+    const leased = await leaseOperation(deps.db, claim.op.idempotency_key, deps.now());
+    if (!leased) return;
+    key = leased.idempotency_key;
   } catch (err) {
     if (err instanceof SettlementConflictError) return; // a capture exists; never void after capture
     throw err;

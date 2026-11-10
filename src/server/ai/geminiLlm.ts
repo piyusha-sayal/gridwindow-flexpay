@@ -5,7 +5,7 @@
  */
 import { ApiError, GoogleGenAI, ThinkingLevel, type GenerateContentParameters, type GenerateContentResponse } from "@google/genai";
 import { z } from "zod";
-import { classifyHttpStatus, providerStatusWord, type LlmDiagnostic, type LlmFailure, type LlmResult, type StructuredLlm } from "./llm";
+import { classifyHttpStatus, providerStatusWord, type LlmDiagnostic, type LlmFailure, type LlmResult, type ModelProvider, type StructuredLlm } from "./llm";
 
 /**
  * Stable Flash model that Google's pricing page lists as free of charge on the Gemini Developer API
@@ -27,6 +27,7 @@ export interface GeminiTransport {
 }
 
 export class GeminiLlm implements StructuredLlm {
+  readonly provider: ModelProvider = "gemini";
   private readonly generateContent: GeminiGenerate;
   private readonly timeoutMs: number;
 

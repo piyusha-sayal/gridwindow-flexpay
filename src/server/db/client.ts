@@ -5,15 +5,23 @@
 import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import type { Pool } from "pg";
-import { MIGRATIONS } from "./migrations";
+import { applyPending, assertSchemaReady } from "./migrator";
 
 /** Upper bound for opening one database connection, so an unreachable or suspended server fails the request instead of hanging it. */
 export const PG_CONNECT_TIMEOUT_MS = 15_000;
 
 export interface PostgresOptions {
-  /** Direct (non-pooled) URL used only to apply migrations; DDL should not run through a transaction pooler. */
+  /**
+   * Direct (non-pooled) URL used for migrations when autoMigrate is set; DDL should not run through a transaction pooler.
+   * Ignored otherwise: the default path only reads the ledger, through connectionString.
+   */
   migrationUrl?: string;
   connectionTimeoutMs?: number;
+  /**
+   * Apply pending migrations on open. Off by default: an external PostgreSQL must be migrated with `npm run db:migrate`,
+   * and the app refuses to open a database whose schema does not match this build. Only for disposable databases.
+   */
+  autoMigrate?: boolean;
 }
 
 export interface Queryable {
@@ -27,27 +35,16 @@ export interface Db extends Queryable {
   readonly kind: "pglite" | "postgres";
 }
 
-/**
- * Applies pending migrations in one transaction under an advisory lock, so several processes starting
- * against the same PostgreSQL server serialize instead of racing (concurrent CREATE TABLE fails there).
- */
-async function migrate(db: Db): Promise<void> {
-  await db.tx(async (q) => {
-    await q.query("create table if not exists schema_migrations (id text primary key, applied_at timestamptz not null default now())");
-    const applied = new Set((await q.query<{ id: string }>("select id from schema_migrations")).map((r) => r.id));
-    for (const m of MIGRATIONS) {
-      if (applied.has(m.id)) continue;
-      await q.query(m.sql);
-      await q.query("insert into schema_migrations (id) values ($1)", [m.id]);
-    }
-  }, "gridwindow:migrations");
-}
-
 async function lock(q: Queryable, lockKey?: string): Promise<void> {
   if (lockKey) await q.query("select pg_advisory_xact_lock(hashtext($1))", [lockKey]);
 }
 
-export async function openPglite(dataDir?: string): Promise<Db> {
+export interface PgliteOptions {
+  /** Default true: PGlite is embedded and owned by this process. Tests that need a bare database pass false. */
+  autoMigrate?: boolean;
+}
+
+export async function openPglite(dataDir?: string, options: PgliteOptions = {}): Promise<Db> {
   const { PGlite } = await import("@electric-sql/pglite");
   if (dataDir) await mkdir(dirname(dataDir), { recursive: true });
   const pg = dataDir ? await PGlite.create(dataDir) : await PGlite.create();
@@ -77,7 +74,7 @@ export async function openPglite(dataDir?: string): Promise<Db> {
     },
     close: () => pg.close(),
   };
-  await migrate(db);
+  if (options.autoMigrate ?? true) await applyPending(db);
   return db;
 }
 
@@ -127,23 +124,31 @@ function postgresDb(pool: Pool): Db {
   };
 }
 
+/** Connects without checking or changing the schema. Used by the migration command, which inspects first. */
+export async function connectPostgres(connectionString: string, connectionTimeoutMs = PG_CONNECT_TIMEOUT_MS): Promise<Db> {
+  return postgresDb(await newPool(connectionString, 10, connectionTimeoutMs));
+}
+
+/**
+ * Opens an external PostgreSQL database. Default: the schema must already match this build, otherwise this throws
+ * SchemaNotReadyError and the app serves nothing. Migrations run only with autoMigrate (disposable databases).
+ */
 export async function openPostgres(connectionString: string, options: PostgresOptions = {}): Promise<Db> {
   const timeout = options.connectionTimeoutMs ?? PG_CONNECT_TIMEOUT_MS;
-  if (options.migrationUrl) {
-    const admin = await newPool(options.migrationUrl, 1, timeout);
+  if (options.autoMigrate && options.migrationUrl) {
+    const admin = postgresDb(await newPool(options.migrationUrl, 1, timeout));
     try {
-      await migrate(postgresDb(admin));
+      await applyPending(admin);
     } finally {
-      await admin.end();
+      await admin.close();
     }
   }
-  const pool = await newPool(connectionString, 10, timeout);
-  const db = postgresDb(pool);
+  const db = await connectPostgres(connectionString, timeout);
   try {
-    // With a migration URL this only confirms that nothing is pending.
-    await migrate(db);
+    if (options.autoMigrate) await applyPending(db);
+    else await assertSchemaReady(db);
   } catch (err) {
-    await pool.end().catch(() => undefined);
+    await db.close().catch(() => undefined);
     throw err;
   }
   return db;

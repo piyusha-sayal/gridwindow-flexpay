@@ -4,6 +4,7 @@
  */
 import type { PaymentState } from "@/domain/paymentState";
 import type { RecoveryRunView } from "@/server/services/recoveryRuns";
+import { runProvenance, SIMULATED_EVENT_LABEL } from "@/server/services/recoveryProvenance";
 
 export interface ScenarioStep {
   id: "event" | "agent" | "validation" | "schedule" | "consent" | "financial" | "receipt";
@@ -15,6 +16,8 @@ export interface ScenarioStep {
 
 export interface ScenarioStepInput {
   eventId: string;
+  /** Provenance column of the stored disturbance (SYNTHETIC for every recorded disturbance); null when unknown. */
+  eventProvenance: string | null;
   run: RecoveryRunView | null;
   paymentState: PaymentState;
   providerMode: string;
@@ -27,10 +30,16 @@ export function providerLabel(providerMode: string): string {
   return providerMode === "MOCK" ? "MOCK provider (simulated, not PayPal)" : "PayPal Sandbox (test money)";
 }
 
+/** SIMULATED_EVENT only when the stored disturbance says so; any other provenance is shown as unknown. */
+function eventDetail(input: ScenarioStepInput): string {
+  const label = input.eventProvenance === "SYNTHETIC" ? SIMULATED_EVENT_LABEL : "event source not recorded";
+  return `${label} · event ${input.eventId}`;
+}
+
 function agentStep(run: RecoveryRunView | null): ScenarioStep {
   if (!run) return { id: "agent", title: "Agent run", status: "pending", detail: "No run recorded yet." };
-  const source = run.aiUsed ? "MODEL" : "FALLBACK";
-  return { id: "agent", title: "Agent run", status: "done", detail: `Source ${source} · ${run.trace.length} trace entries` };
+  const provenance = runProvenance(run);
+  return { id: "agent", title: "Agent run", status: "done", detail: `${provenance.decisionLabel} · ${provenance.reason} (${run.trace.length} trace entries)` };
 }
 
 function validationStep(run: RecoveryRunView | null): ScenarioStep {
@@ -84,7 +93,7 @@ function receiptStep(input: ScenarioStepInput): ScenarioStep {
 export function buildScenarioSteps(input: ScenarioStepInput): ScenarioStep[] {
   const { run } = input;
   return [
-    { id: "event", title: "Disturbance detected", status: "done", detail: `SYNTHETIC event ${input.eventId}` },
+    { id: "event", title: "Disturbance detected", status: "done", detail: eventDetail(input) },
     agentStep(run),
     validationStep(run),
     scheduleStep(run),

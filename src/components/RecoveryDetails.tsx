@@ -1,5 +1,6 @@
 import { formatLocalTime } from "@/domain/time";
 import { formatKWh } from "@/domain/units";
+import { SIMULATED_EVENT_LABEL } from "@/server/services/recoveryProvenance";
 import type { RecoveryReceipt } from "@/server/services/recoveryReceipt";
 import { ATTRIBUTION_LABEL, DISTURBANCE_LABEL, FORECAST_NOTE, formatShortfallWh, RUN_STATUS_LABEL } from "./recoveryCopy";
 import { Badge } from "./ui";
@@ -33,9 +34,6 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
   return (
     <div className="space-y-5 text-[14px]">
       <p className="text-muted">{recovery.evidenceStatement}</p>
-      <p>
-        AI used: <strong>{recovery.aiUsed ? "yes (text only, checked against backend numbers)" : "no"}</strong>
-      </p>
 
       <div className="space-y-2">
         <h3 className="font-semibold">Original commitment</h3>
@@ -63,7 +61,10 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
               <span>
                 {DISTURBANCE_LABEL[d.type]} from {formatLocalTime(d.effectiveAtMs, timeZone)}
               </span>
-              <Badge tone="neutral">SYNTHETIC</Badge>
+              <>
+                <Badge tone="neutral">{d.provenance === "SYNTHETIC" ? "SYNTHETIC" : "source not recorded"}</Badge>
+                {d.provenance === "SYNTHETIC" && <Badge tone="neutral">{SIMULATED_EVENT_LABEL}</Badge>}
+              </>
               <span className="meta">{ATTRIBUTION_LABEL[d.attribution]}</span>
               {d.runStatus && <span className="meta">{RUN_STATUS_LABEL[d.runStatus]}</span>}
             </li>
@@ -74,6 +75,9 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
       {recovery.runs.map((run) => (
         <div key={run.runId} className="space-y-2">
           <h3 className="font-semibold">Recovery run · {RUN_STATUS_LABEL[run.status]}</h3>
+          <p className="meta">
+            Decided by: {run.provenance.decisionLabel}. {run.provenance.reason}
+          </p>
           {run.reason && <p>{run.reason}</p>}
           <p className="meta">
             Consent: {run.consent ? (run.consent.method === "DRIVER_APPROVED" ? `${CONSENT_LABEL.DRIVER_APPROVED} (version ${run.consent.version})` : CONSENT_LABEL.AUTO_WITHIN_PRE_APPROVED_BOUNDS) : "no schedule version was written"}

@@ -1,5 +1,10 @@
-/** Ordered, append-only SQL migrations (PostgreSQL dialect; runs on PGlite or a real server). */
-export const MIGRATIONS: readonly { id: string; sql: string }[] = [
+/** Ordered, append-only SQL migrations (PostgreSQL dialect; runs on PGlite or a real server). Never edit an applied entry: its checksum is recorded. */
+export interface Migration {
+  readonly id: string;
+  readonly sql: string;
+}
+
+export const MIGRATIONS: readonly Migration[] = [
   {
     id: "001_core",
     sql: `

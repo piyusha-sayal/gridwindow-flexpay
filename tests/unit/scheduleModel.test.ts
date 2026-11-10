@@ -91,7 +91,7 @@ describe("buildScheduleModel", () => {
   const model = buildScheduleModel(
     view([recovered, other], {
       disruptions: [
-        { eventId: "evt-1", reservationId: "r1", type: "SITE_CAP_REDUCTION", params: { stationCapW: 2_000 }, effectiveSlot: 2, createdAt: "", runStatus: "COMPLETED" },
+        { eventId: "evt-1", reservationId: "r1", type: "SITE_CAP_REDUCTION", params: { stationCapW: 2_000 }, effectiveSlot: 2, createdAt: "", runStatus: "COMPLETED", runReason: null, attribution: "OPERATOR" },
       ],
     }),
   );

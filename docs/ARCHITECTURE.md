@@ -33,9 +33,9 @@ GridWindow FlexPay sells overnight EV charging flexibility. The engine decides w
 | Domain (pure, deterministic) | `src/domain/` | Integer units (cents, W, Wh). `allocator` (24 kW aggregate cap, per-port power, 92 % efficiency), `validator` (independent recompute), `economics`, `quotes`/`terms` (hash, expiry, approval deadline), `simulator`, `paymentState` (CAS transitions), `dealAgent`, `benchmark`. |
 | Payments | `src/payments/` | `PaymentGateway` contract; `PayPalSandboxGateway` (sandbox host hard-coded); `MockGateway` (labeled MOCK). |
 | Services | `src/server/services/` | quote, checkout, order creation (crash-safe, leased), settlement, reconcile, recovery sweep, webhook, views. |
-| AI | `src/server/ai/` | `llm` (Anthropic SDK), `assistant`, `dealAgent` (server-orchestrated, read-only), `grounding`. |
-| Persistence | `src/server/db/` | PostgreSQL via `DATABASE_URL`, else embedded PGlite in `.data/`. Append-only events and energy tables; triggers freeze accepted terms. |
-| UI | `src/app/`, `src/components/` | Next.js App Router: `/drive`, `/reservations/[id]`, `/operator`, `/benchmark`. |
+| AI | `src/server/ai/` | `geminiLlm` (Google Gen AI SDK), `llm` (Anthropic adapter), `assistant` (driver Q&A, no tools), `dealAgent` (server-orchestrated, read-only), `grounding`. |
+| Persistence | `src/server/db/` | PostgreSQL via `DATABASE_URL`, else embedded PGlite in `.data/`. Append-only events and energy tables; triggers freeze accepted terms. External databases are never migrated at startup (see Migrations below). |
+| UI | `src/app/`, `src/components/` | Next.js App Router: `/drive`, `/reservations/[id]`, `/operator`, `/operator/schedule`, `/impact-lab`, `/how-it-works`. |
 
 ## Trust boundaries
 
@@ -107,7 +107,20 @@ A synthetic disturbance (charger power reduction, site cap reduction, early depa
 | `recovery_runs` | One run per disturbance: status, trace, proposal, expiry, lease, attempts, outcome, explanation | `disruption_event_id` unique; status checked; status changes by compare-and-set |
 | `schedule_versions` | Committed revisions of one session's per-slot plan (version 1 is the agreed `terms.powerW`) | Primary key `(reservation_id, version)`; `version >= 2`; append-only trigger |
 
-Migrations `003_recovery_engine` and `004_recovery_orchestrator` in `src/server/db/migrations.ts`.
+Migrations `003_recovery_engine`, `004_recovery_orchestrator` and `005_sweep_checked_at` (adds `reservations.sweep_checked_at`) in `src/server/db/migrations.ts`.
+
+**Provenance labels.** Every recovery run and disturbance shows where its decision came from. The label is derived from the persisted run record (`src/server/services/recoveryProvenance.ts`), not from the UI:
+
+| Label | Meaning |
+|---|---|
+| `MODEL_DECISION` | A model selected the tool calls, and the server validated them. Shown with the model name. |
+| `DETERMINISTIC_FALLBACK` | No model decision: no key, a model failure, or a rejected output. The deterministic path decided. |
+| `SIMULATED_EVENT` | The disturbance was injected by the operator as a synthetic event. It is not a real charger fault. |
+| `MOCK MODEL (test fixture)` | A scripted model used in tests. Never shown as a live decision. |
+
+In MOCK payment mode the payment step says "MOCK PAYMENT PROVIDER". It is not PayPal.
+
+**Migrations and schema refusal.** Migrations run on PGlite on open, in the disposable test helpers, and only when `GW_AUTO_MIGRATE=true`. An external database is never migrated at startup. `openPostgres` throws `SchemaNotReadyError` when the ledger has pending, unknown or drifted migrations, and the runtime serves errors until the schema matches. The apply path is `npm run db:migrate` with `--status`, `--plan` and `--apply --confirm-database <fingerprint>`. See [MIGRATIONS.md](MIGRATIONS.md). Migrations 003 to 005 are not yet applied to the hosted Neon database.
 
 **Services map (`src/server/services/`).**
 

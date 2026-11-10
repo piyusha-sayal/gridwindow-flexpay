@@ -1,11 +1,13 @@
 /** Read model for committed schedules and recorded disturbances. Provider references and buyer identity are never included. */
 import { SLOT_MS } from "@/domain/units";
 import { effectiveDepartMs, type DisturbanceType } from "@/domain/disturbance";
+import type { FaultAttribution } from "@/domain/faultAttribution";
 import type { PaymentState, ServiceState } from "@/domain/paymentState";
 import type { AppDeps } from "../deps";
 import type { Queryable } from "../db/client";
 import { nightContext } from "./scheduleService";
 import { latestRunsByReservation, pendingApprovalView, type LatestRunView, type PendingApprovalView } from "./approvalView";
+import type { RecoveryOutcome } from "./recoveryRuns";
 
 export interface ScheduleVersionView {
   version: number;
@@ -42,9 +44,13 @@ export interface ScheduleDisruptionView {
   type: DisturbanceType;
   params: Record<string, number>;
   effectiveSlot: number;
+  /** Recorded fault attribution; UNKNOWN when none was recorded. */
+  attribution: FaultAttribution;
   createdAt: string;
   /** Status of the recovery run for this disturbance, or null if none has run yet. */
   runStatus: string | null;
+  /** Plain-English result of that run (why it was committed, needs approval, or is infeasible), or null. */
+  runReason: string | null;
 }
 
 export interface ScheduleView {
@@ -92,10 +98,12 @@ async function buildView(deps: AppDeps, nightOf: string, driverSession: string |
     [ids],
   );
   const latestRuns = await latestRunsByReservation(q, ids);
-  const disruptions = await q.query<{ event_id: string; reservation_id: string; type: DisturbanceType; params: Record<string, number>; effective_slot: number; created_at: Date; status: string | null }>(
-    `select d.event_id, d.reservation_id, d.type, d.params, d.effective_slot, d.created_at, rr.status
+  const disruptions = await q.query<{ event_id: string; reservation_id: string; type: DisturbanceType; params: Record<string, number>; effective_slot: number; created_at: Date; status: string | null; outcome: RecoveryOutcome | null; attribution: FaultAttribution }>(
+    `select d.event_id, d.reservation_id, d.type, d.params, d.effective_slot, d.created_at, rr.status, rr.outcome,
+       coalesce(e.payload->>'attribution', 'UNKNOWN') as attribution
      from disruption_events d join reservations r on r.id = d.reservation_id
      left join recovery_runs rr on rr.disruption_event_id = d.event_id
+     left join events e on e.reservation_id = d.reservation_id and e.type = 'DISRUPTION_RECORDED' and e.payload->>'eventId' = d.event_id
      where r.station_id = $1 and r.night_of = $2 and ($3::text is null or r.driver_session = $3) order by d.created_at, d.event_id`,
     [deps.station.id, nightOf, driverSession],
   );
@@ -139,8 +147,10 @@ async function buildView(deps: AppDeps, nightOf: string, driverSession: string |
       type: d.type,
       params: d.params,
       effectiveSlot: d.effective_slot,
+      attribution: d.attribution,
       createdAt: d.created_at.toISOString(),
       runStatus: d.status,
+      runReason: d.outcome?.reason ?? null,
     })),
   };
 }

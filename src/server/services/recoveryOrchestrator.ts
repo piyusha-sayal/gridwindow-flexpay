@@ -14,6 +14,7 @@ import { committedPlans, effectivePowerOf, getReservation, type ReservationRow }
 import { agreedSession, commitScheduleVersion, currentVersion, findEvent, isActiveSession, nightContext, PROPOSAL_TTL_MS, type DisruptionRow } from "./scheduleService";
 import { appendTraceFenced, appendTraceUnfenced, findRunRow, findRunRowById, patchRun, saveOutcomeFenced, toRunView, transitionRun, type CandidateRecord, type RecoveryOutcome, type RecoveryRunView, type RunTraceEntry } from "./recoveryRuns";
 import { deterministicExplanation, type NarrativeKind } from "./recoveryNarrative";
+import { MODEL_SKIP_PREFIX, NO_MODEL_DETAIL } from "./recoveryProvenance";
 import { RECOVERY_SYSTEM, STEP_SCHEMA, buildRecoveryPrompt, type TranscriptItem } from "./recoveryPrompt";
 import { allowedToolNames, dispatchTool, narrativeFacts, newRunState, parseModelCall, pickDeterministic, sanitizeForTrace, summarizeCandidate, type RunState, type ToolOutcome } from "./recoveryTools";
 
@@ -206,12 +207,12 @@ class RunWorker {
 
   async execute(): Promise<RecoveryRunView> {
     try {
-      await this.log("orchestrator", "DETERMINISTIC", { attempt: this.attempt }, "INFO", this.resumed ? `resumed on attempt ${this.attempt}` : "started");
+      await this.log("orchestrator", "DETERMINISTIC", { attempt: this.attempt, modelProvider: this.llm?.provider ?? null }, "INFO", this.resumed ? `resumed on attempt ${this.attempt}` : "started");
       const state = await loadRunState(this.deps, this.event);
       if (!state) return await this.finish("FAILED", "The session is not an active scheduled session.");
       this.state = state;
       if (this.llm) await this.modelLoop(state);
-      else await this.log("orchestrator", "DETERMINISTIC", {}, "INFO", "no model configured; deterministic path");
+      else await this.log("orchestrator", "DETERMINISTIC", {}, "INFO", NO_MODEL_DETAIL);
       await this.completeDeterministically(state);
       if (state.decision) return await this.finish(state.decision, null);
       return await this.finish("INFEASIBLE", state.infeasibleReason ?? "No schedule passed the independent checks.");
@@ -290,7 +291,7 @@ class RunWorker {
   }
 
   private async skipModel(reason: string): Promise<void> {
-    await this.log("orchestrator", "DETERMINISTIC", {}, "INFO", `model not used for this step: ${reason}`);
+    await this.log("orchestrator", "DETERMINISTIC", {}, "INFO", `${MODEL_SKIP_PREFIX}${reason}`);
   }
 
   /** Runs the remaining decisions through the same validated tools, in order, with actor DETERMINISTIC. */

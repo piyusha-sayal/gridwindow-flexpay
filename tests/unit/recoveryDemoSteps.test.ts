@@ -19,7 +19,7 @@ function run(overrides: Partial<RecoveryRunView>): RecoveryRunView {
 }
 
 function input(overrides: Partial<ScenarioStepInput>): ScenarioStepInput {
-  return { eventId: "evt_1", run: run({}), paymentState: "AUTHORIZED", providerMode: "MOCK", ...overrides };
+  return { eventId: "evt_1", eventProvenance: "SYNTHETIC", run: run({}), paymentState: "AUTHORIZED", providerMode: "MOCK", ...overrides };
 }
 
 function step(steps: ReturnType<typeof buildScenarioSteps>, id: string) {
@@ -33,9 +33,19 @@ describe("buildScenarioSteps", () => {
     expect(buildScenarioSteps(input({})).map((s) => s.id)).toEqual(["event", "agent", "validation", "schedule", "consent", "financial", "receipt"]);
   });
 
-  it("labels the agent source from the run record, never a fixed value", () => {
-    expect(step(buildScenarioSteps(input({ run: run({ aiUsed: true }) })), "agent").detail).toContain("Source MODEL");
-    expect(step(buildScenarioSteps(input({ run: run({ aiUsed: false }) })), "agent").detail).toContain("Source FALLBACK");
+  it("labels the agent step from the run record, never a fixed value", () => {
+    const modelChose = run({
+      aiUsed: true,
+      trace: [{ seq: 1, at: "", tool: "proposeRecovery", actor: "GEMINI", input: {}, outcome: "OK", detail: "proposed c1 (AUTO_COMMIT)" }],
+    } as Partial<RecoveryRunView>);
+    expect(step(buildScenarioSteps(input({ run: modelChose })), "agent").detail).toContain("MODEL_DECISION");
+    expect(step(buildScenarioSteps(input({ run: run({ aiUsed: false }) })), "agent").detail).toContain("DETERMINISTIC_FALLBACK");
+    expect(step(buildScenarioSteps(input({ run: run({ aiUsed: true }) })), "agent").detail).toContain("DETERMINISTIC_FALLBACK");
+  });
+
+  it("labels the disturbance as SIMULATED_EVENT only when the stored provenance says SYNTHETIC", () => {
+    expect(step(buildScenarioSteps(input({ eventProvenance: "SYNTHETIC" })), "event").detail).toContain("SIMULATED_EVENT");
+    expect(step(buildScenarioSteps(input({ eventProvenance: null })), "event").detail).toBe("event source not recorded · event evt_1");
   });
 
   it("shows an automatic commit as AUTO_COMMIT with the written version", () => {

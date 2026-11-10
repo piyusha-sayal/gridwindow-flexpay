@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { api, ApiError } from "@/components/api";
-import { DISTURBANCE_LABEL, RUN_STATUS_LABEL } from "@/components/recoveryCopy";
+import { ATTRIBUTION_LABEL, attributionStatusText, DISTURBANCE_LABEL, RUN_STATUS_LABEL } from "@/components/recoveryCopy";
 import { Alert, Badge } from "@/components/ui";
 import { DISTURBANCE_TYPES, type DisturbanceType } from "@/domain/disturbance";
+import type { FaultAttribution } from "@/domain/faultAttribution";
 import type { ScheduleDisruptionView, ScheduleSessionView, ScheduleView } from "@/server/services/scheduleView";
 import { RecoveryRunDetail } from "./RecoveryRunDetail";
-import { buildInjection, newEventId } from "./recoveryForm";
+import { attributionChoices, buildInjection, DEFAULT_ATTRIBUTION, newEventId, nextAttribution } from "./recoveryForm";
 
 function runLabel(status: string): string {
   return (RUN_STATUS_LABEL as Record<string, string>)[status] ?? status;
@@ -32,6 +33,7 @@ export function RecoveryPanel({ nightOf }: { nightOf: string }) {
   const [type, setType] = useState<DisturbanceType>("CHARGER_POWER_REDUCTION");
   const [slot, setSlot] = useState(0);
   const [value, setValue] = useState(VALUE_LABEL.CHARGER_POWER_REDUCTION!.initial);
+  const [attribution, setAttribution] = useState<FaultAttribution>(DEFAULT_ATTRIBUTION);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -52,6 +54,7 @@ export function RecoveryPanel({ nightOf }: { nightOf: string }) {
   function chooseType(next: DisturbanceType) {
     setType(next);
     setValue(VALUE_LABEL[next]?.initial ?? 0);
+    setAttribution((current) => nextAttribution(current, next));
   }
 
   async function inject(e: React.FormEvent) {
@@ -63,7 +66,7 @@ export function RecoveryPanel({ nightOf }: { nightOf: string }) {
       setError("Choose a session to disturb.");
       return;
     }
-    const built = buildInjection({ type, reservationId, effectiveSlot: slot, value }, session.departMs, newEventId(Date.now()));
+    const built = buildInjection({ type, reservationId, effectiveSlot: slot, value, attribution }, session.departMs, newEventId(Date.now()));
     if (!built.ok) {
       setError(built.message);
       return;
@@ -82,7 +85,9 @@ export function RecoveryPanel({ nightOf }: { nightOf: string }) {
   }
 
   const valueField = VALUE_LABEL[type];
-  const selectedReservation = schedule?.disruptions.find((d) => d.eventId === selectedEvent)?.reservationId ?? null;
+  const selectedDisruption = schedule?.disruptions.find((d) => d.eventId === selectedEvent);
+  const selectedReservation = selectedDisruption?.reservationId ?? null;
+  const selectedAttribution: FaultAttribution = selectedDisruption?.attribution ?? "UNKNOWN";
   return (
     <section className="card p-5 sm:p-6 space-y-5" aria-labelledby="recovery-title">
       <div className="space-y-1">
@@ -146,6 +151,7 @@ export function RecoveryPanel({ nightOf }: { nightOf: string }) {
               <p className="meta">No parameter needed</p>
             )}
           </div>
+          <AttributionGroup type={type} value={attribution} onChange={setAttribution} />
           <button type="submit" className="btn btn-primary" disabled={submitting}>
             {submitting ? "Recording…" : "Inject SYNTHETIC disturbance"}
           </button>
@@ -155,8 +161,49 @@ export function RecoveryPanel({ nightOf }: { nightOf: string }) {
       {schedule && schedule.disruptions.length > 0 && (
         <DisturbanceList disruptions={schedule.disruptions} selected={selectedEvent} onSelect={setSelectedEvent} timeZone={schedule.timeZone} />
       )}
-      {selectedEvent && selectedReservation && <RecoveryRunDetail key={selectedEvent} eventId={selectedEvent} reservationId={selectedReservation} />}
+      {selectedEvent && selectedReservation && (
+        <RecoveryRunDetail key={selectedEvent} eventId={selectedEvent} reservationId={selectedReservation} attribution={selectedAttribution} />
+      )}
     </section>
+  );
+}
+
+/** Operator choice of fault attribution. Nothing is preselected from the disturbance type; disallowed values are shown disabled with the reason. */
+function AttributionGroup({ type, value, onChange }: { type: DisturbanceType; value: FaultAttribution; onChange: (next: FaultAttribution) => void }) {
+  const choices = attributionChoices(type);
+  const unavailable = choices.filter((c) => !c.allowed).map((c) => c.value);
+  const allowed = choices.filter((c) => c.allowed).map((c) => c.value);
+  return (
+    <fieldset className="sm:col-span-2 lg:col-span-5 space-y-2" aria-describedby={unavailable.length > 0 ? "rec-attribution-help rec-attribution-note" : "rec-attribution-help"}>
+      <legend className="label">Fault attribution</legend>
+      <div className="flex flex-wrap gap-x-5 gap-y-2">
+        {choices.map(({ value: option, allowed: isAllowed }) => (
+          <label key={option} className={`flex items-start gap-2 text-[14px] ${isAllowed ? "" : "text-muted"}`}>
+            <input
+              type="radio"
+              name="rec-attribution"
+              value={option}
+              checked={value === option}
+              disabled={!isAllowed}
+              onChange={() => onChange(option)}
+              className="mt-1 h-4 w-4 shrink-0 accent-[var(--ink)]"
+            />
+            <span>
+              <span className="font-mono font-semibold">{option}</span> · {ATTRIBUTION_LABEL[option]}
+              {!isAllowed && " (not available for this type)"}
+            </span>
+          </label>
+        ))}
+      </div>
+      {unavailable.length > 0 && (
+        <p id="rec-attribution-note" className="meta">
+          {unavailable.join(" and ")} cannot be recorded for {DISTURBANCE_LABEL[type]}. Only {allowed.join(" or ")} can.
+        </p>
+      )}
+      <p id="rec-attribution-help" className="meta">
+        Only OPERATOR makes a failure eligible for the automatic full void under the accepted policy. Keep UNKNOWN unless the operator has confirmed the cause.
+      </p>
+    </fieldset>
   );
 }
 
@@ -185,7 +232,7 @@ function DisturbanceList({
             >
               <span>
                 {DISTURBANCE_LABEL[d.type]} · effective slot {d.effectiveSlot}
-                <span className="block meta">{d.eventId} · {timeZone}</span>
+                <span className="block meta">{d.eventId} · {attributionStatusText(d.attribution)} · {timeZone}</span>
               </span>
               <span className="flex flex-wrap gap-2">
                 <Badge tone="neutral">SYNTHETIC</Badge>

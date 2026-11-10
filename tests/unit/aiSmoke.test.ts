@@ -10,6 +10,7 @@ import { formatUsd } from "@/domain/units";
 import { BudgetExceededError, MeteredLlm, MODEL_PRICES, runAiSmokeCases, smokeFixtures, summarizeSmoke } from "../../scripts/aiSmokeFlow";
 
 class FakeModel implements StructuredLlm {
+  readonly provider = "test-fixture" as const;
   readonly model = "claude-opus-5-5";
   sent = 0;
   constructor(
@@ -87,7 +88,7 @@ describe("AI smoke harness (offline)", () => {
   });
 
   it("counts calls the provider never answered separately from answers the app rejected", async () => {
-    const down: StructuredLlm = { model: "claude-opus-5-5", generate: async () => ({ ok: false, reason: "QUOTA_EXHAUSTED", diagnostic: { category: "QUOTA_EXHAUSTED", httpStatus: 429, providerStatus: "RESOURCE_EXHAUSTED" } }) };
+    const down: StructuredLlm = { provider: "test-fixture", model: "claude-opus-5-5", generate: async () => ({ ok: false, reason: "QUOTA_EXHAUSTED", diagnostic: { category: "QUOTA_EXHAUSTED", httpStatus: 429, providerStatus: "RESOURCE_EXHAUSTED" } }) };
     const meter = new MeteredLlm(down, { maxRequests: 8, budgetUsd: 1, price });
     const results = await runAiSmokeCases(meter);
     const summary = summarizeSmoke(meter.calls, results, meter.spent);

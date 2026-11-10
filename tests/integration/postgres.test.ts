@@ -9,7 +9,8 @@ import { execSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { validatePlans } from "@/domain/validator";
-import { openPostgres } from "@/server/db/client";
+import { connectPostgres, openPostgres } from "@/server/db/client";
+import { applyPending, SchemaNotReadyError } from "@/server/db/migrator";
 import { MIGRATIONS } from "@/server/db/migrations";
 import { committedPlans, getReservation, leaseOperation, claimOperation } from "@/server/repo";
 import { acceptOffer, handleCheckoutReturn } from "@/server/services/checkoutService";
@@ -53,8 +54,8 @@ describe.skipIf(!PG_URL)("real PostgreSQL", () => {
   it("fresh migration, repeated migration and concurrent migrators leave one consistent schema", async () => {
     const url = await freshSchemaUrl();
     // Several processes starting at once must not race on the same migration.
-    const dbs = await Promise.all(Array.from({ length: 4 }, () => openPostgres(url)));
-    const again = await openPostgres(url);
+    const dbs = await Promise.all(Array.from({ length: 4 }, () => openPostgres(url, { autoMigrate: true })));
+    const again = await openPostgres(url, { autoMigrate: true });
     const rows = await again.query<{ id: string }>("select id from schema_migrations order by id");
     expect(rows.map((r) => r.id)).toEqual(MIGRATIONS.map((m) => m.id));
     await Promise.all([...dbs, again].map((d) => d.close()));
@@ -62,13 +63,34 @@ describe.skipIf(!PG_URL)("real PostgreSQL", () => {
 
   it("a dedicated migration URL applies pending migrations and the runtime pool then finds nothing to do", async () => {
     const url = await freshSchemaUrl();
-    const db = await openPostgres(url, { migrationUrl: url });
+    const db = await openPostgres(url, { migrationUrl: url, autoMigrate: true });
     const rows = await db.query<{ id: string }>("select id from schema_migrations order by id");
     expect(rows.map((r) => r.id)).toEqual(MIGRATIONS.map((m) => m.id));
     await db.close();
-    const reopened = await openPostgres(url, { migrationUrl: url });
+    const reopened = await openPostgres(url, { migrationUrl: url, autoMigrate: true });
     expect((await reopened.query<{ n: number }>("select count(*)::int as n from schema_migrations"))[0]!.n).toBe(MIGRATIONS.length);
     await reopened.close();
+  });
+
+  it("an unmigrated external database is refused on open by default and gets no ledger", async () => {
+    const url = await freshSchemaUrl();
+    await expect(openPostgres(url)).rejects.toBeInstanceOf(SchemaNotReadyError);
+    const { Client } = await import("pg");
+    const probe = new Client({ connectionString: url });
+    await probe.connect();
+    const ledger = await probe.query<{ t: string | null }>("select to_regclass('schema_migrations')::text as t");
+    await probe.end();
+    expect(ledger.rows[0]!.t).toBeNull();
+  });
+
+  it("once the migrator has applied the list, the default open succeeds without auto-migrating", async () => {
+    const url = await freshSchemaUrl();
+    const migrator = await connectPostgres(url);
+    await applyPending(migrator);
+    await migrator.close();
+    const db = await openPostgres(url);
+    expect((await db.query<{ n: number }>("select count(*)::int as n from schema_migrations"))[0]!.n).toBe(MIGRATIONS.length);
+    await db.close();
   });
 
   it("double-click acceptance across connections creates one reservation, one order operation and one provider order", async () => {

@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { api, ApiError } from "@/components/api";
-import { RUN_STATUS_LABEL } from "@/components/recoveryCopy";
+import { attributionStatusText, RUN_STATUS_LABEL } from "@/components/recoveryCopy";
 import { Alert, Badge, PaymentBadge } from "@/components/ui";
+import type { FaultAttribution } from "@/domain/faultAttribution";
 import { formatUsd } from "@/domain/units";
+import { runProvenance } from "@/server/services/recoveryProvenance";
 import type { RecoveryRunView } from "@/server/services/recoveryRuns";
 import type { ReservationView } from "@/server/services/viewService";
 import { buildScenarioSteps, type ScenarioStep } from "./recoveryDemoSteps";
@@ -34,11 +36,12 @@ function ScenarioChecklist({ steps }: { steps: ScenarioStep[] }) {
 interface Loaded {
   payment: ReservationView["paymentState"];
   providerMode: string;
+  eventProvenance: string | null;
   run: RecoveryRunView | null;
 }
 
 /** Operator view of one disturbance: its run status, reasoning summary, tool trace, proposal and payment state. */
-export function RecoveryRunDetail({ eventId, reservationId }: { eventId: string; reservationId: string }) {
+export function RecoveryRunDetail({ eventId, reservationId, attribution }: { eventId: string; reservationId: string; attribution: FaultAttribution }) {
   const [data, setData] = useState<Loaded | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,7 +53,8 @@ export function RecoveryRunDetail({ eventId, reservationId }: { eventId: string;
         const entry = reservation.recovery?.runs.find((r) => r.eventId === eventId);
         const run = entry ? (await api<{ run: RecoveryRunView }>(`/api/recovery/runs/${encodeURIComponent(entry.runId)}`)).run : null;
         if (alive) {
-          setData({ payment: reservation.paymentState, providerMode: reservation.providerMode, run });
+          const eventProvenance = reservation.recovery?.disturbances.find((d) => d.eventId === eventId)?.provenance ?? null;
+          setData({ payment: reservation.paymentState, providerMode: reservation.providerMode, eventProvenance, run });
           setError(null);
         }
       } catch (e) {
@@ -67,15 +71,23 @@ export function RecoveryRunDetail({ eventId, reservationId }: { eventId: string;
 
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!data) return <p aria-live="polite" className="text-muted">Loading recovery run…</p>;
-  const steps = buildScenarioSteps({ eventId, run: data.run, paymentState: data.payment, providerMode: data.providerMode });
+  const steps = buildScenarioSteps({ eventId, eventProvenance: data.eventProvenance, run: data.run, paymentState: data.payment, providerMode: data.providerMode });
   const checklist = <ScenarioChecklist steps={steps} />;
+  const attributionLine = <p className="text-[14px] font-semibold">{attributionStatusText(attribution)}</p>;
   if (!data.run) {
-    return <div className="space-y-5 border-t border-line pt-5">{checklist}</div>;
+    return (
+      <div className="space-y-5 border-t border-line pt-5">
+        {attributionLine}
+        {checklist}
+      </div>
+    );
   }
 
   const run = data.run;
+  const provenance = runProvenance(run);
   return (
     <div className="space-y-5 border-t border-line pt-5" aria-labelledby={`run-${run.runId}`}>
+      {attributionLine}
       {checklist}
       <div className="flex flex-wrap items-center gap-2">
         <h3 id={`run-${run.runId}`} className="text-[17px] font-semibold">
@@ -84,9 +96,10 @@ export function RecoveryRunDetail({ eventId, reservationId }: { eventId: string;
         <Badge tone={run.status === "NEEDS_APPROVAL" ? "warn" : run.status === "COMMITTED" || run.status === "APPROVED" ? "success" : "info"}>
           {RUN_STATUS_LABEL[run.status]}
         </Badge>
-        <Badge tone="neutral">{run.aiUsed ? "AI assisted" : "Deterministic (no AI)"}</Badge>
+        <Badge tone="neutral">{provenance.decisionLabel}</Badge>
         <PaymentBadge state={data.payment} />
       </div>
+      <p className="text-[14px]">{provenance.reason}</p>
 
       {run.explanation && (
         <div className="space-y-1">

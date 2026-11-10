@@ -16,6 +16,7 @@ import {
   committedPlans,
   finishOperation,
   getReservation,
+  getReservationForUpdate,
   digestOfEventIds,
   getReservationByOffer,
   leaseOperation,
@@ -234,12 +235,19 @@ async function authorizeAndCommit(deps: AppDeps, rid: string): Promise<Reservati
       return (await getReservation(deps.db, rid))!;
     }
     await finishOperation(deps.db, op.idempotency_key, "SUCCEEDED", auth.authorizationId);
-    await recordProof(deps.db, rid, "AUTHORIZED", deps.gateway.mode, auth.authorizationId, auth.status, auth.amountCents);
-    await transitionPayment(deps.db, rid, "BUYER_APPROVED", "AUTHORIZED", {
+    const moved = await transitionPayment(deps.db, rid, "BUYER_APPROVED", "AUTHORIZED", {
       paypal_authorization_id: auth.authorizationId,
       authorization_expires_at: auth.expirationTime ? new Date(auth.expirationTime) : null,
       authorized_at: new Date(deps.now()),
     });
+    if (!moved) {
+      // The row left BUYER_APPROVED while the authorize was in flight (for example a late return set it FAILED).
+      // Keep the provider id so the sweep reconciles it and voids the orphan; never record it as authorized here.
+      await patchReservation(deps.db, rid, { paypal_authorization_id: auth.authorizationId });
+      await appendEvent(deps.db, rid, "AUTHORIZATION_AFTER_LOCAL_CHANGE", providerSource(deps.gateway.mode), { authorizationId: auth.authorizationId });
+      return (await getReservation(deps.db, rid))!;
+    }
+    await recordProof(deps.db, rid, "AUTHORIZED", deps.gateway.mode, auth.authorizationId, auth.status, auth.amountCents);
     await appendEvent(deps.db, rid, "AUTHORIZED", providerSource(deps.gateway.mode), { authorizationId: auth.authorizationId, status: auth.status });
   } catch (err) {
     // Even a 4xx (e.g. a concurrent request already authorized) may leave a live authorization
@@ -253,37 +261,46 @@ async function authorizeAndCommit(deps: AppDeps, rid: string): Promise<Reservati
   return commitCapacityOrVoid(deps, rid);
 }
 
-/** Atomic capacity commit serialized per station-night; voids the authorization on conflict. */
+/** Only an authorized reservation still waiting for capacity may commit, or be cancelled and voided, from here. */
+function awaitingCapacity(r: ReservationRow): boolean {
+  return r.payment_state === "AUTHORIZED" && !r.slots_committed && r.service_state === "AWAITING_PAYMENT";
+}
+
+/**
+ * Atomic capacity commit serialized per station-night; voids the authorization on conflict. The state is re-read
+ * under the reservation row lock inside the station-night transaction, so a concurrent commit, simulation or void
+ * that won the race is never overwritten.
+ */
 export async function commitCapacityOrVoid(deps: AppDeps, rid: string): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;
-  if (r.payment_state !== "AUTHORIZED" || r.slots_committed || r.service_state !== "AWAITING_PAYMENT") return r;
-  const voids = await deps.db.query("select 1 from payment_operations where reservation_id = $1 and kind = 'VOID'", [rid]);
-  if (voids.length > 0) return r; // a void was already attempted; never re-commit capacity
-  // An authorization confirmed only after charging should have started (e.g. a lost provider
-  // response recovered later) cannot honor the accepted schedule: release it, never commit.
-  if (deps.now() >= approvalDeadlineMs(r.terms)) {
-    await patchReservation(deps.db, rid, { service_state: "CANCELLED" });
-    await appendEvent(deps.db, rid, "AUTHORIZATION_AFTER_DEADLINE", "APP", { deadline: new Date(approvalDeadlineMs(r.terms)).toISOString() });
-    return voidAuthorization(deps, rid, "AUTHORIZATION_AFTER_DEADLINE");
-  }
-  const { scenario, envelope } = await nightContext(deps.db, deps.station, r.night_of);
-  const committed = await deps.db.tx(async (q) => {
-    const others = await committedPlans(q, r.station_id, r.night_of, r.id);
-    const violations = validateWithEnvelope({ station: deps.station, grid: scenario.grid, forecastBaseLoadW: scenario.forecastBaseLoadW, envelope, plans: [...others, planOf(r)],
-      targets: [{ sessionId: r.id, targetBatteryWh: r.terms.targetBatteryWh, efficiencyBp: r.terms.efficiencyBp }],
+  if (!awaitingCapacity(r)) return r;
+  const release = await deps.db.tx(async (q) => {
+    const locked = await getReservationForUpdate(q, rid);
+    if (!locked || !awaitingCapacity(locked)) return null;
+    const voids = await q.query("select 1 from payment_operations where reservation_id = $1 and kind = 'VOID'", [rid]);
+    if (voids.length > 0) return null; // a void was already attempted; never re-commit capacity
+    // An authorization confirmed only after charging should have started (e.g. a lost provider
+    // response recovered later) cannot honor the accepted schedule: release it, never commit.
+    if (deps.now() >= approvalDeadlineMs(locked.terms)) {
+      await patchReservation(q, rid, { service_state: "CANCELLED" });
+      await appendEvent(q, rid, "AUTHORIZATION_AFTER_DEADLINE", "APP", { deadline: new Date(approvalDeadlineMs(locked.terms)).toISOString() });
+      return "AUTHORIZATION_AFTER_DEADLINE";
+    }
+    const { scenario, envelope } = await nightContext(q, deps.station, locked.night_of);
+    const others = await committedPlans(q, locked.station_id, locked.night_of, locked.id);
+    const violations = validateWithEnvelope({ station: deps.station, grid: scenario.grid, forecastBaseLoadW: scenario.forecastBaseLoadW, envelope, plans: [...others, planOf(locked)],
+      targets: [{ sessionId: locked.id, targetBatteryWh: locked.terms.targetBatteryWh, efficiencyBp: locked.terms.efficiencyBp }],
     });
     if (violations.length > 0) {
       await appendEvent(q, rid, "CAPACITY_CONFLICT", "APP", { violations: violations.slice(0, 5).map((v) => v.code) });
-      return false;
+      await patchReservation(q, rid, { service_state: "CANCELLED" });
+      return "CAPACITY_CONFLICT";
     }
     await patchReservation(q, rid, { slots_committed: true, service_state: "SCHEDULED" });
     await appendEvent(q, rid, "CAPACITY_COMMITTED", "APP", {});
-    return true;
+    return null;
   }, `${r.station_id}:${r.night_of}`);
-  if (!committed) {
-    await patchReservation(deps.db, rid, { service_state: "CANCELLED" });
-    await voidAuthorization(deps, rid, "CAPACITY_CONFLICT");
-  }
+  if (release) return voidAuthorization(deps, rid, release);
   return (await getReservation(deps.db, rid))!;
 }
 

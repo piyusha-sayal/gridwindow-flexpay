@@ -39,7 +39,7 @@ The database is created and migrated automatically on first start (embedded PGli
 6. Back in `/operator`, press **Inject outage** on a seeded reservation. The authorization is voided, not captured.
 7. Use **Deliver · capture pending**, then **Provider completes capture**, to see a non-final payment state. These controls are MOCK-only.
 8. On `/drive`, request 120 kWh on Port C between 05:00 and 07:00 to see an infeasible request explained.
-9. Open `/benchmark` for the 500-scenario synthetic comparison.
+9. Open `/impact-lab` for the 500-scenario synthetic comparison.
 
 Notes:
 - The AI assistant shows **"Deterministic fallback (no AI)"** unless a Gemini or Anthropic key is configured. That is expected.

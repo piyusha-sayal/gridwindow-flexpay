@@ -67,7 +67,9 @@ export interface ScheduleModel {
   occupancy: { id: string; sessionId: string; portId: string; startMs: number; endMs: number }[];
   deadlines: { sessionId: string; portId: string; atMs: number; shortened: boolean }[];
   capacity: CapacityBucket[];
-  disruptions: { eventId: string; type: ScheduleDisruptionView["type"]; atMs: number; runStatus: string | null }[];
+  disruptions: { eventId: string; type: ScheduleDisruptionView["type"]; atMs: number; runStatus: string | null; runReason: string | null }[];
+  /** Proposals awaiting driver approval. They are drawn as PROPOSAL bursts and are never part of a committed version. */
+  pendingProposals: number;
   sessions: SessionSummary[];
   /** Revision key: changes whenever a session's committed version, the disruption set or a pending proposal changes. */
   revision: string;
@@ -192,8 +194,10 @@ export function buildScheduleModel(view: ScheduleView, proposals: readonly Propo
       type: d.type,
       atMs: view.gridStartMs + d.effectiveSlot * SLOT_MS,
       runStatus: d.runStatus,
+      runReason: d.runReason,
     })),
     sessions: view.sessions.map(summarise),
+    pendingProposals: proposals.filter((p) => sessionById.has(p.reservationId)).length,
     revision: revisionKey(view, proposals),
   };
 }
@@ -220,5 +224,6 @@ export function scheduleSummary(model: ScheduleModel): string {
   const over = model.capacity.filter((c) => c.over).length;
   const recovered = model.sessions.filter((s) => s.recovered).length;
   const shortened = model.sessions.filter((s) => s.departureShortened).length;
-  return `${model.sessions.length} sessions on ${model.resources.length} ports. ${recovered} recovered, ${shortened} with shortened departure, ${over} time slot(s) over the site cap.`;
+  const pending = model.pendingProposals > 0 ? ` ${model.pendingProposals} proposal(s) awaiting driver approval, not committed.` : "";
+  return `${model.sessions.length} sessions on ${model.resources.length} ports. ${recovered} recovered, ${shortened} with shortened departure, ${over} time slot(s) over the site cap.${pending}`;
 }

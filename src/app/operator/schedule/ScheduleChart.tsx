@@ -6,6 +6,7 @@ import "@bryntum/scheduler-community/svalbard-light.css";
 import { BryntumScheduler } from "@bryntum/scheduler-react-community";
 import { useMemo } from "react";
 import { toChartEvents } from "./chartEvents";
+import { scheduleViewPreset } from "./scheduleAxis";
 import type { ScheduleLane, ScheduleModel } from "./scheduleModel";
 
 export interface ScheduleChartProps {
@@ -20,11 +21,13 @@ export function ScheduleChart({ model, lane }: ScheduleChartProps) {
   // Stable date objects: a new range on every poll would reset the timeline's scroll and zoom.
   const startDate = useMemo(() => new Date(model.gridStartMs), [model.gridStartMs]);
   const endDate = useMemo(() => new Date(model.gridEndMs), [model.gridEndMs]);
+  // Header labels in the station zone. Memoized so a poll does not reset the timeline.
+  const viewPreset = useMemo(() => scheduleViewPreset(model.timeZone), [model.timeZone]);
   return (
     <BryntumScheduler
       startDate={startDate}
       endDate={endDate}
-      viewPreset="hourAndDay"
+      viewPreset={viewPreset}
       resources={resources}
       events={events}
       columns={[{ type: "resourceInfo", field: "name", text: "Port", width: 150 }]}

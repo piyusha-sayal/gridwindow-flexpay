@@ -56,9 +56,23 @@ export function hasUnreconciledCapture(r: Pick<ReservationView, "paymentState" |
   return r.paymentState !== "CAPTURED" && r.proofs.some((p) => p.type === "CAPTURED");
 }
 
+/** Provider has authorized the hold, but station capacity is not confirmed: never described as a committed charging window. */
+export const CAPACITY_UNCONFIRMED_COPY: Copy = {
+  tone: "warn",
+  title: "Authorized at provider, charging capacity not yet confirmed.",
+  body: "A hold is on your payment method, but your charging window is not confirmed yet. If it cannot be confirmed, the hold is released. No payment has been collected.",
+};
+
+/** Derived status: a provider authorization exists while the local capacity commit is still unresolved. */
+export function capacityUnconfirmed(r: Pick<ReservationView, "paymentState" | "slotsCommitted">): boolean {
+  return r.paymentState === "AUTHORIZED" && !r.slotsCommitted;
+}
+
 /** Driver-page copy for a reservation; a contradiction with the provider record reads as reconciliation. */
-export function paymentCopyForView(r: Pick<ReservationView, "paymentState" | "serviceState" | "proofs">): Copy {
-  return hasUnreconciledCapture(r) ? PAYMENT_COPY.NEEDS_RECONCILIATION : paymentCopyFor(r.paymentState, r.serviceState);
+export function paymentCopyForView(r: Pick<ReservationView, "paymentState" | "serviceState" | "proofs" | "slotsCommitted">): Copy {
+  if (hasUnreconciledCapture(r)) return PAYMENT_COPY.NEEDS_RECONCILIATION;
+  if (capacityUnconfirmed(r)) return CAPACITY_UNCONFIRMED_COPY;
+  return paymentCopyFor(r.paymentState, r.serviceState);
 }
 
 /** Final progress step: names the provider-confirmed outcome; a pending capture is never shown as complete. */

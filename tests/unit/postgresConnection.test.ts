@@ -43,6 +43,6 @@ describe("PostgreSQL connection bounds", () => {
 
   it("applies the same timeout to a dedicated migration URL", async () => {
     const port = await silentServer();
-    await expect(openPostgres("postgres://u:p@127.0.0.1:1/db", { migrationUrl: `postgres://u:p@127.0.0.1:${port}/db`, connectionTimeoutMs: 400 })).rejects.toThrow(/timeout/i);
+    await expect(openPostgres("postgres://u:p@127.0.0.1:1/db", { migrationUrl: `postgres://u:p@127.0.0.1:${port}/db`, autoMigrate: true, connectionTimeoutMs: 400 })).rejects.toThrow(/timeout/i);
   });
 });

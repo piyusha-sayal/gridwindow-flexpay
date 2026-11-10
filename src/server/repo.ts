@@ -53,6 +53,12 @@ export async function getReservation(q: Queryable, id: string): Promise<Reservat
   return rows[0] ?? null;
 }
 
+/** Row-locked read for a read-modify-write inside a transaction (held until that transaction ends). */
+export async function getReservationForUpdate(q: Queryable, id: string): Promise<ReservationRow | null> {
+  const rows = await q.query<ReservationRow>("select * from reservations where id = $1 for update", [id]);
+  return rows[0] ?? null;
+}
+
 export async function getReservationByOffer(q: Queryable, offerId: string): Promise<ReservationRow | null> {
   const rows = await q.query<ReservationRow>("select * from reservations where offer_id = $1", [offerId]);
   return rows[0] ?? null;

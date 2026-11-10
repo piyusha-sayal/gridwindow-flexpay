@@ -218,13 +218,16 @@ export async function resolveOutdatedSession(deps: AppDeps, rid: string): Promis
  * Reconciliation sweep selection. Authorized sessions are settled or escalated. Unresolved reservations with a stored
  * provider reference are reconciled, except expired authorizations, which stay with the expired-authorization path
  * (re-reconciling them would flip them back and forth). Least recently checked rows come first, so a persistent
- * backlog of unresolvable rows rotates instead of starving the rest.
+ * backlog of unresolvable rows rotates instead of starving the rest. A locally FAILED or CANCELLED row that still holds an
+ * authorization id may carry a live provider authorization (orphan) until this app has voided it.
  */
 const SWEEP_SELECT = `select id from reservations
   where payment_state = 'AUTHORIZED'
      or (payment_state = 'NEEDS_RECONCILIATION'
          and (paypal_order_id is not null or paypal_authorization_id is not null or paypal_capture_id is not null)
          and (authorization_expires_at is null or authorization_expires_at > $2::timestamptz))
+     or (payment_state in ('FAILED', 'CANCELLED') and paypal_authorization_id is not null and paypal_capture_id is null
+         and not exists (select 1 from events e where e.reservation_id = reservations.id and e.type = 'ORPHAN_AUTHORIZATION_VOIDED'))
   order by sweep_checked_at asc nulls first, updated_at, id
   limit $1`;
 
@@ -244,6 +247,7 @@ async function reconcileUnresolved(deps: AppDeps, rid: string): Promise<void> {
 async function sweepOne(deps: AppDeps, rid: string): Promise<void> {
   const r = await getReservation(deps.db, rid);
   if (r?.payment_state === "NEEDS_RECONCILIATION") await reconcileUnresolved(deps, rid);
+  else if (r?.payment_state === "FAILED" || r?.payment_state === "CANCELLED") await recoverReservation(deps, rid, "RECONCILER");
   else await resolveOutdatedSession(deps, rid);
 }
 

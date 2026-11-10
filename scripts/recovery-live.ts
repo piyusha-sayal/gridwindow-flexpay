@@ -16,6 +16,7 @@ import type { LlmDiagnostic, LlmResult, StructuredLlm } from "../src/server/ai/l
 import { openPglite, type Db } from "../src/server/db/client";
 import type { AppDeps } from "../src/server/deps";
 import { getReservation, effectivePowerOf, type ReservationRow } from "../src/server/repo";
+import { runProvenance } from "../src/server/services/recoveryProvenance";
 import { acceptOffer, handleCheckoutReturn } from "../src/server/services/checkoutService";
 import { createQuote, scenarioFor } from "../src/server/services/quoteService";
 import { runRecovery } from "../src/server/services/scheduleService";
@@ -128,6 +129,10 @@ class CountingLlm implements StructuredLlm {
   attempts = 0;
   constructor(private readonly inner: StructuredLlm) {}
 
+  get provider() {
+    return this.inner.provider;
+  }
+
   get model(): string {
     return this.inner.model;
   }
@@ -232,7 +237,7 @@ async function main() {
     tokens: live.meter.calls.reduce((t, c) => ({ inputTokens: t.inputTokens + c.inputTokens, outputTokens: t.outputTokens + c.outputTokens }), { inputTokens: 0, outputTokens: 0 }),
     calls: live.meter.calls.map((c) => ({ ok: c.ok, responded: c.responded, reason: c.reason, diagnostic: sanitizeDiagnostic(c.diagnostic), latencyMs: c.latencyMs, inputTokens: c.inputTokens, outputTokens: c.outputTokens })),
     runError: live.runError,
-    run: run ? { status: run.status, aiUsed: run.aiUsed, mode: run.aiUsed ? "MODEL" : "FALLBACK", explanationSource: run.explanation?.source ?? null, outcomeKind: run.outcome?.kind ?? null, versionCommitted: run.outcome?.versionCommitted ?? null } : null,
+    run: run ? { status: run.status, aiUsed: run.aiUsed, mode: runProvenance(run).decision, provenance: runProvenance(run).decisionLabel, explanationSource: run.explanation?.source ?? null, outcomeKind: run.outcome?.kind ?? null, versionCommitted: run.outcome?.versionCommitted ?? null } : null,
     fallbackReasons: [...skippedModelReasons(trace), ...modelFailures],
     trace: summarizeTrace(trace),
     chosenCandidate: (() => {

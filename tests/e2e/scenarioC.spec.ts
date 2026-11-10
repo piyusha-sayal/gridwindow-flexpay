@@ -73,7 +73,7 @@ test.describe("guided demo Scenario C: disturbance and recovery", () => {
     const checklist = await openOperatorChecklist(page, night);
     await expect(checklist.getByRole("heading", { name: "Scenario C: recovery steps" })).toBeVisible();
     await expect(checklist.getByText(/Disturbance detected/)).toBeVisible();
-    await expect(checklist.getByText(/Source (MODEL|FALLBACK) · \d+ trace entries/)).toBeVisible({ timeout: 15_000 });
+    await expect(checklist.getByText(/(MODEL_DECISION|DETERMINISTIC_FALLBACK) · .*\(\d+ trace entries\)/)).toBeVisible({ timeout: 15_000 });
     await expect(checklist.getByText("Deterministic validation")).toBeVisible();
     await expect(checklist.getByText("MOCK provider (simulated, not PayPal)", { exact: false })).toBeVisible();
 

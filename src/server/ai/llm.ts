@@ -54,7 +54,11 @@ export interface LlmUsage {
 /** `usage` is present whenever the provider returned a response (billed tokens), even if it was rejected. */
 export type LlmResult<T> = { ok: true; value: T; model: string; usage?: LlmUsage } | { ok: false; reason: LlmFailure; usage?: LlmUsage; diagnostic?: LlmDiagnostic };
 
+/** Which adapter answered. Recorded on every recovery run so a test fixture can never be shown as a live model. */
+export type ModelProvider = "gemini" | "anthropic" | "test-fixture";
+
 export interface StructuredLlm {
+  readonly provider: ModelProvider;
   readonly model: string;
   generate<S extends z.ZodType>(req: { system: string; user: string; schema: S; maxTokens: number }): Promise<LlmResult<z.infer<S>>>;
 }
@@ -63,6 +67,7 @@ export const DEFAULT_AI_MODEL = "claude-opus-5-5";
 const TIMEOUT_MS = 20_000;
 
 export class AnthropicLlm implements StructuredLlm {
+  readonly provider: ModelProvider = "anthropic";
   private readonly client: Anthropic;
 
   constructor(

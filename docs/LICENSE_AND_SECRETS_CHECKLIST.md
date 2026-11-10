@@ -7,9 +7,10 @@
 | `@bryntum/scheduler-community` | 8.0.0 (`npm ls`; lock file entry present) | `npm view ... license` = `MIT` (registry metadata, 2026-11-09). The in-package LICENSE file was NOT read (`node_modules` read denied). | PARTIAL: owner review required. |
 | `@bryntum/scheduler-react-community` | 8.0.0 (`npm ls`; lock file entry present) | `npm view ... license` = `MIT` (registry metadata). In-package license file NOT read (same reason). | PARTIAL: owner review required. |
 
-- Conflict (2026-11-09): the registry says MIT, but the Bryntum license page (`https://bryntum.com/products/scheduler/license/`) lists only the End-User License and the OEM License and names no Community MIT grant. Owner must resolve this before release; until then the status stays PARTIAL.
+- Checked 2026-11-09: the npm registry says MIT (both packages). The Bryntum features page (https://bryntum.com/products/scheduler/features/, summarised fetch) labels the Community tier "Free · MIT license". The Bryntum license page (https://bryntum.com/products/scheduler/license/, summarised fetch) lists only the End-User and OEM licenses and does not mention Community. The two sources agree; the license page does not state the Community grant.
+- Still NOT VERIFIED: the copyright and license text inside the installed package (`node_modules/**` is not read). Owner must confirm before public release. Details: `THIRD_PARTY_NOTICES.md` (repo root).
 - Only Community features are used (see `docs/BRYNTUM_NOTES.md`). No Bryntum Pro or licensed asset is referenced.
-- Bryntum is not listed in `docs/THIRD_PARTY.md`, which was generated from the lockfile on 2026-11-07. Add it when the license is confirmed.
+- Bryntum is listed in `THIRD_PARTY_NOTICES.md` (repo root). `docs/THIRD_PARTY.md` is generated from the lockfile and was not regenerated here.
 - No Bryntum source, CSS or icon file is copied into the repository. The stylesheets are imported from the installed packages.
 
 ## Other new dependencies

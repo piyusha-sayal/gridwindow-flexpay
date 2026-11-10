@@ -35,7 +35,7 @@ export function PaymentPanel({ r }: { r: ReservationView }) {
         </h2>
         <div className="badge-wrap">
           {/* A capture the local state does not reflect must not read as "not collected". */}
-          <PaymentBadge state={hasUnreconciledCapture(r) ? "NEEDS_RECONCILIATION" : r.paymentState} />
+          <PaymentBadge state={hasUnreconciledCapture(r) ? "NEEDS_RECONCILIATION" : r.paymentState} capacityConfirmed={r.slotsCommitted} />
         </div>
       </div>
 

@@ -141,6 +141,53 @@ describe("POST /api/recovery/events", () => {
   });
 });
 
+describe("fault attribution on POST /api/recovery/events", () => {
+  const attributionOf = (eventId: string) => app.db.query("select payload from events where type = 'DISRUPTION_RECORDED' and payload->>'eventId' = $1", [eventId]);
+
+  it("refuses a value the disturbance type does not allow, with INVALID_ATTRIBUTION, and records nothing", async () => {
+    const rid = await scheduled(DRIVER);
+    asOperator();
+    const body = { ...eventBody(rid, "evt_attr_0001"), type: "EARLY_DEPARTURE", params: { departMs: EARLY_DEPART_MS }, effectiveSlot: PLUG_SLOT };
+    const res = await postEvent(jsonRequest("/api/recovery/events", { ...body, attribution: "OPERATOR" }));
+    expect(res.status).toBe(400);
+    expect((await res.json()).error.code).toBe("INVALID_ATTRIBUTION");
+    expect(await app.db.query("select id from disruption_events")).toHaveLength(0);
+  });
+
+  it("refuses a value that is not an attribution at all as a validation error", async () => {
+    const rid = await scheduled(DRIVER);
+    asOperator();
+    const res = await postEvent(jsonRequest("/api/recovery/events", { ...eventBody(rid, "evt_attr_0002"), attribution: "ADMIN" }));
+    expect(res.status).toBe(400);
+    expect((await res.json()).error.code).toBe("VALIDATION_ERROR");
+    expect(await app.db.query("select id from disruption_events")).toHaveLength(0);
+  });
+
+  it("persists the supplied attribution in the recorded event and returns it on reload", async () => {
+    const rid = await scheduled(DRIVER);
+    asOperator();
+    const res = await postEvent(jsonRequest("/api/recovery/events", { ...eventBody(rid, "evt_attr_0003"), attribution: "OPERATOR" }));
+    expect(res.status).toBe(201);
+    expect((await attributionOf("evt_attr_0003"))[0]!.payload).toMatchObject({ attribution: "OPERATOR" });
+    const reload = await (await getSchedule(getRequest(`/api/schedule?nightOf=${NIGHT}`))).json();
+    expect(reload.schedule.disruptions.find((d: { eventId: string }) => d.eventId === "evt_attr_0003")).toMatchObject({ attribution: "OPERATOR" });
+  });
+
+  it("a missing attribution is stored as the documented default, and a legacy record with none reads as UNKNOWN", async () => {
+    const rid = await scheduled(DRIVER);
+    asOperator();
+    expect((await postEvent(jsonRequest("/api/recovery/events", eventBody(rid, "evt_attr_0004")))).status).toBe(201);
+    expect((await attributionOf("evt_attr_0004"))[0]!.payload).toMatchObject({ attribution: "UNKNOWN" });
+
+    await app.db.query(
+      "insert into disruption_events (id, event_id, reservation_id, type, params, effective_slot, created_by) values ('dis_legacy_1', 'evt_legacy_01', $1, 'CHARGER_FAILURE', '{}', 5, 'TEST')",
+      [rid],
+    );
+    const reload = await (await getSchedule(getRequest(`/api/schedule?nightOf=${NIGHT}`))).json();
+    expect(reload.schedule.disruptions.find((d: { eventId: string }) => d.eventId === "evt_legacy_01")).toMatchObject({ attribution: "UNKNOWN" });
+  });
+});
+
 describe("GET /api/schedule", () => {
   it("the operator sees every session on the night; a driver sees only their own", async () => {
     const mine = await scheduled(DRIVER);

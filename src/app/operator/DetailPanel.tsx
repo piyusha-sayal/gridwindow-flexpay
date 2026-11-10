@@ -81,7 +81,7 @@ export function DetailPanel({ id, version, onClose }: { id: string; version: num
       {r && (
         <>
           <div className="flex flex-wrap gap-2 badge-wrap">
-            <PaymentBadge state={r.paymentState} />
+            <PaymentBadge state={r.paymentState} capacityConfirmed={r.slotsCommitted} />
             <ServiceBadge state={r.serviceState} />
             <span className="badge tone-neutral">{r.slotsCommitted ? "Capacity committed" : "Capacity not held"}</span>
           </div>

@@ -123,3 +123,30 @@ describe("table and chart read the same data", () => {
     expect(toChartEvents(model, "ORIGINAL").filter((e) => e.cls === "gw-burst-original")).toHaveLength(2);
   });
 });
+
+/** The 2027 transitions: spring forward Sunday 2027-03-14 02:00 PST, fall back Sunday 2027-11-07 02:00 PDT. */
+describe("station time zone grid around the 2027 DST transitions", () => {
+  it("spring-forward night 2027-03-13 is 15 elapsed hours (60 slots)", () => {
+    const grid = buildNightGrid("2027-03-13", LA);
+    expect(grid.slotCount).toBe(60);
+    expect(grid.startMs).toBe(Date.UTC(2027, 2, 14, 2, 0)); // 18:00 PST
+    expect(grid.startMs + grid.slotCount * SLOT_MS).toBe(Date.UTC(2027, 2, 14, 17, 0)); // 10:00 PDT
+  });
+
+  it("fall-back night 2027-11-06 is 17 elapsed hours (68 slots) and holds the 2027-11-07 transition", () => {
+    const grid = buildNightGrid("2027-11-06", LA);
+    expect(grid.slotCount).toBe(68);
+    expect(grid.startMs).toBe(Date.UTC(2027, 10, 7, 1, 0)); // 18:00 PDT
+    expect(grid.startMs + grid.slotCount * SLOT_MS).toBe(Date.UTC(2027, 10, 7, 18, 0)); // 10:00 PST
+  });
+
+  it("the repeated 01:00 hour on 2027-11-07 keeps two distinct burst timestamps", () => {
+    const grid = buildNightGrid("2027-11-06", LA);
+    const session = sessionAt(grid.startMs, grid.slotCount, { 30: 2_000, 31: 2_000, 32: 2_000 });
+    const model = buildScheduleModel(viewFor("2027-11-06", [session]));
+    const [burst] = burstsForLane(model, "ORIGINAL");
+    expect(burst!.endMs - burst!.startMs).toBe(3 * SLOT_MS);
+    expect(timeLabel(burst!.startMs, LA)).toBe("01:30");
+    expect(timeLabel(grid.startMs + 32 * SLOT_MS, LA)).toBe("01:00");
+  });
+});

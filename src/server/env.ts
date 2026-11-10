@@ -19,6 +19,8 @@ const schema = z
     OPERATOR_PASSPHRASE: z.string().optional(),
     DATABASE_URL: z.string().optional(),
     MIGRATION_DATABASE_URL: z.string().optional(),
+    /** Opt-in only: apply pending migrations to DATABASE_URL at startup. Default off; use `npm run db:migrate` instead. */
+    GW_AUTO_MIGRATE: z.enum(["true", "false"]).optional(),
     GW_DATA_DIR: z.string().optional(),
     NODE_ENV: z.string().optional(),
     ANTHROPIC_API_KEY: z.string().optional(),

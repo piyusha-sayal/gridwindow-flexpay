@@ -49,7 +49,7 @@ Captured from the running app in MOCK mode with seeded synthetic data. Nothing h
 1. **Scheduling.** Each request is planned in 15-minute slots against the site's power cap, port limits and charging efficiency. An independent validator re-checks every plan.
 2. **Offers that help both sides.** A flexible offer is published only if the driver gets a discount and the operator's modeled contribution improves. Otherwise the driver sees only immediate charging.
 3. **Payment tied to delivery.** PayPal authorizes the exact approved amount first. Capture happens once, after delivery. Failure leads to a void.
-4. **Bounded AI.** The assistant fills in forms, explains offers and answers questions about a reservation. It has no tools and cannot set a price, grant consent or move money.
+4. **Bounded AI.** The driver assistant fills in forms, explains offers and answers questions about a reservation. It has no tools. The recovery agent may only pick among server-validated candidates by id. Neither can set a price, grant consent or move money.
 
 ## Features
 
@@ -65,6 +65,8 @@ Captured from the running app in MOCK mode with seeded synthetic data. Nothing h
 - Passphrase-protected console with reservations and a night timeline.
 - Site load plan against the configured cap (24 kW on the demo station, whose three ports are rated 3.6, 7.2 and 11 kW), with port occupancy shown separately from electrical draw.
 - Run the simulated night, inject a charger outage, and reconcile payment state against the provider.
+- Record a SYNTHETIC disturbance (power limit, site cap, early departure or charger failure) with a fault attribution, and watch the recovery run: its steps, validation, schedule, consent and payment outcome.
+- `/operator/schedule`: persisted schedule versions and pending proposals on a read-only Bryntum timeline, with an accessible table beside it.
 - Per-reservation payment status and an event trail.
 
 ### PayPal integration
@@ -112,7 +114,7 @@ When a charger is limited, a site cap drops, a driver leaves early or a charger 
 - **Operator schedule.** `/operator/schedule` draws the persisted schedule with Bryntum Scheduler Community 8.0.0. The chart is read-only, and pending proposals appear as a separate lane. The accessible table beside it is the reference view. Bryntum's own grid has known axe findings (see [docs/BRYNTUM_NOTES.md](docs/BRYNTUM_NOTES.md)).
 - **Synthetic disturbance injector.** Disturbances are labeled SYNTHETIC. No real charger or grid is connected.
 - **Benchmark.** `npm run benchmark:recovery` compares leaving the plan unchanged with recovery over 200 seeded nights. It reports unfavorable and infeasible cases alongside the wins. See [docs/RECOVERY_BENCHMARK.md](docs/RECOVERY_BENCHMARK.md). These are modeled numbers, not field measurements.
-- **Limitations.** Recovery plans against forecast base load, and the replay uses realized base load, so a recovered schedule can deliver less than the static plan in some cases. Auto-commit can raise the operator's energy cost against the agreed plan; this is an open decision. Real Gemini recovery decisions and PayPal Sandbox recovery settlement have not been run. The guided demo's "Failure and recovery" scenario still uses the older outage injection (see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)).
+- **Limitations.** Recovery plans against forecast base load, and the replay uses realized base load, so a recovered schedule can deliver less than the static plan in some cases. Auto-commit can raise the operator's energy cost against the agreed plan, but only while the operator's 1 c minimum margin holds (see [docs/RECOVERY_BENCHMARK_FINDINGS.md](docs/RECOVERY_BENCHMARK_FINDINGS.md)). One live Gemini recovery attempt returned HTTP 504 and fell back to the deterministic path, so a live model decision is not demonstrated. PayPal Sandbox recovery settlement has not been run. Guided demo Scenario C uses the recovery path; the operator's **Inject outage** button still uses the older simulator outage.
 
 ## Architecture
 
@@ -171,11 +173,36 @@ Then open <http://localhost:3000>. The values above are throwaway local placehol
 | `/drive` | Smart Charge: your needs, plan comparison, consent and PayPal approval |
 | `/reservations/<id>` | Payment status, simulated night and FlexReceipt |
 | `/operator` | Operator console (sign in with the passphrase) |
+| `/operator/schedule` | Operator schedule: Bryntum timeline (read-only) and accessible table |
 | `/rewards` | Rewards & Payments: this session's commitments and verified payment states |
 | `/impact-lab` | Interactive Charge now vs Smart Flex scenarios and the 500-scenario synthetic study |
 | `/how-it-works` | Four-step walkthrough and FAQ |
 
-For a guided evaluation, follow the [judge walkthrough](docs/JUDGES.md). For a persistent local setup, the repository includes an `.env.example` template to copy to `.env.local` (`cp .env.example .env.local`, or `Copy-Item .env.example .env.local` in PowerShell). Data is stored under `.data/`. Delete that folder to start over.
+For a guided evaluation, follow the [judge walkthrough](docs/JUDGES.md) and the [demo script](docs/DEMO_SCRIPT.md). For a persistent local setup, the repository includes an `.env.example` template to copy to `.env.local` (`cp .env.example .env.local`, or `Copy-Item .env.example .env.local` in PowerShell). Data is stored under `.data/`. Delete that folder to start over.
+
+For development, `npm run dev` starts the Next.js dev server. The `npm start` commands above run the production build.
+
+### Running the tests
+
+Run these after `npm ci`. The Playwright suite needs a production build and a Chromium install.
+
+```bash
+npm run typecheck        # tsc --noEmit (strict)
+npm run lint             # eslint
+npm test                 # Vitest: unit and integration, embedded database
+npm run build
+npx playwright install chromium
+npm run test:e2e         # Playwright: desktop, tablet and mobile
+npm run benchmark        # deterministic synthetic 500-night benchmark
+npm run benchmark:recovery  # deterministic synthetic 200-seed recovery benchmark
+npm run release:scan     # secret scan of the client build
+```
+
+Vitest skips 12 tests unless `TEST_DATABASE_URL` points to a disposable PostgreSQL server (`TEST_PG_RESTART_CMD` adds the restart test). Those tests are the real-PostgreSQL checks. Run them only against a throwaway database. The test runners set `GW_ISOLATED_DB=true` and refuse hosted databases and non-mock payments. Playwright skips 6 keyboard-journey tests on the mobile and tablet projects by design.
+
+### Database migrations
+
+Migrations run automatically on the embedded database. An external PostgreSQL (`DATABASE_URL`, including Neon) is never migrated at startup. The app refuses to open a database whose schema does not match this build. Use `npm run db:migrate -- --status`, `--plan` and `--apply --confirm-database <fingerprint>` as described in [docs/MIGRATIONS.md](docs/MIGRATIONS.md). Do not set `GW_AUTO_MIGRATE=true` for a persistent database.
 
 <details>
 <summary>Environment variables</summary>
@@ -183,6 +210,8 @@ For a guided evaluation, follow the [judge walkthrough](docs/JUDGES.md). For a p
 | Variable | Purpose |
 |---|---|
 | `PAYMENT_MODE` | `mock` (default) or `paypal_sandbox` |
+| `GW_AUTO_MIGRATE` | `true` applies pending migrations at startup. For disposable local databases only; never for Neon or any persistent database |
+| `FAILED_SERVICE_REMEDY_CENTS` | MODELED operator remedy cost recorded with an operator-failure void (default 200 cents). Not a PayPal fee |
 | `PAYPAL_ENV` | must be `sandbox`; anything else stops startup |
 | `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | Sandbox REST app credentials (backend only) |
 | `PAYPAL_EXPECTED_MERCHANT_ID` | required in Sandbox mode; the payee every order must name |
@@ -234,18 +263,20 @@ No real customer funds were involved, and the "delivery" was the built-in simula
 
 ## Testing and benchmark
 
-Results from the release candidate:
+Results on the final combined-release tree:
 
 | Check | Result |
 |---|---|
-| Vitest (unit and integration, including adversarial payment cases on embedded PostgreSQL) | 360 passed, 10 skipped |
-| Playwright (desktop, tablet and mobile, with axe accessibility and keyboard tests) | 73 passed, 6 skipped |
-| TypeScript strict check and ESLint | clean |
-| Production build | passes |
-| `npm run release:scan` (secret and configured-value scan of the client bundle) | pass |
+| TypeScript strict check (`tsc --noEmit`) and ESLint | 0 errors, 0 problems |
+| Vitest (unit and integration, including adversarial payment cases on embedded PostgreSQL) | 740 passed, 12 skipped (the skipped tests are the gated real-PostgreSQL checks) |
+| Real-PostgreSQL checks on a disposable local PostgreSQL 18.1 server (separate run) | 11 passed, 1 skipped (restart test needs `TEST_PG_RESTART_CMD`) |
+| Playwright (16 spec files, one worker, isolated data; axe accessibility and keyboard tests) | 0 failed, 6 skipped by design |
+| Production builds | pass |
+| `npm run release:scan` (secret and configured-value scan of the client bundle) | PASS |
 | `npm audit --omit=dev` | 0 vulnerabilities |
+| `npm run benchmark:recovery` | deterministic (two runs identical) |
 
-Run them yourself with `npm run typecheck`, `npm run lint`, `npm test` and `npm run test:e2e` (build first). See [docs/JUDGES.md](docs/JUDGES.md) for details.
+Run them yourself with the commands in [Running the tests](#running-the-tests). See [docs/AWARD_EVIDENCE.md](docs/AWARD_EVIDENCE.md) for what each result does and does not show, and [docs/JUDGES.md](docs/JUDGES.md) for the judge walkthrough.
 
 ### The benchmark
 
@@ -266,7 +297,10 @@ The benchmark measures how scheduling policies behave under one set of synthetic
 
 - Charging, energy delivery, building load and forecasts come from a simulator. No vehicle is charged.
 - Tariffs, fees, costs and savings are modeled from assumptions that are shown with every offer. They are not measured results.
-- Payments use the PayPal Sandbox or a MOCK provider that says so on screen. A PayPal authorization is a hold, not escrow.
+- Payments use the PayPal Sandbox or a MOCK provider that says so on screen. A PayPal authorization is a hold, not escrow. Recovery settlement has not been run in PayPal Sandbox.
+- Disturbances are SYNTHETIC, injected by the operator. Recovery decisions are labeled MODEL_DECISION only when the run record shows a live model decided. Otherwise they are labeled DETERMINISTIC_FALLBACK.
+- Bryntum's timeline is read-only. Its own grid has known accessibility violations (vendor DOM), so the accessible table is the reference view. The Bryntum license text inside the installed package has not been checked by the project; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- The settlement sweep runs every 5 minutes in the background, with no UI trigger.
 - The AI interprets and explains. It cannot set prices, give consent, or authorize, capture or void a payment. Free-tier Gemini traffic may be used by Google to improve its products, so do not enter personal data.
 - Driver and operator identities are pseudonymous demo sessions, not production authentication.
 - This is not a production utility or commercial charging deployment.
@@ -283,10 +317,15 @@ The benchmark measures how scheduling policies behave under one set of synthetic
 | [docs/EXTERNAL_INTEGRATION.md](docs/EXTERNAL_INTEGRATION.md) | Runbook for Sandbox, webhooks and AI smoke tests |
 | [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md) | Third-party package licenses |
 | [docs/RECOVERY_BENCHMARK.md](docs/RECOVERY_BENCHMARK.md) | Synthetic recovery benchmark: static plan vs recovery, with unfavorable and infeasible cases |
-| [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | Under-three-minute walkthrough (MOCK mode) |
-| [docs/AWARD_EVIDENCE.md](docs/AWARD_EVIDENCE.md) | Claims, code locations and verification status for each track |
+| [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | Under-three-minute walkthrough (MOCK mode) with click path and pre-demo checklist |
+| [docs/AWARD_EVIDENCE.md](docs/AWARD_EVIDENCE.md) | PASS, FAIL, BLOCKED and NOT TESTED status per claim (Bryntum, Agentic Commerce, PayPal + AI) |
+| [docs/MIGRATIONS.md](docs/MIGRATIONS.md) | Migration behaviour by database and the confirmed apply procedure |
+| [docs/BRYNTUM_NOTES.md](docs/BRYNTUM_NOTES.md) | Bryntum verification: time zones, accessibility findings, licensing |
+| [docs/RECOVERY_BENCHMARK_FINDINGS.md](docs/RECOVERY_BENCHMARK_FINDINGS.md) | Investigation of recovery shortfalls and operator-margin results |
+| [docs/EXTERNAL_PREFLIGHT.md](docs/EXTERNAL_PREFLIGHT.md) | Required approvals for live Gemini, PayPal Sandbox and Neon runs |
+| [docs/SKIPPED_TESTS.md](docs/SKIPPED_TESTS.md) | Inventory of skipped tests and their gates |
 | [docs/LICENSE_AND_SECRETS_CHECKLIST.md](docs/LICENSE_AND_SECRETS_CHECKLIST.md) | Bryntum license status and secret scan results |
-| [docs/DEVPOST.md](docs/DEVPOST.md) | Hackathon submission text |
+| [docs/DEVPOST.md](docs/DEVPOST.md) | Hackathon submission text (draft) |
 
 ## Credits and license
 

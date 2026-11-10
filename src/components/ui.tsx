@@ -29,8 +29,10 @@ const SERVICE: Record<string, { tone: Tone; label: string }> = {
   CANCELLED: { tone: "neutral", label: "Cancelled" },
 };
 
-export function PaymentBadge({ state }: { state: string }) {
-  const p = PAYMENT[state] ?? { tone: "neutral" as const, label: state };
+/** `capacityConfirmed=false` marks a provider authorization whose station capacity commit is still unresolved. */
+export function PaymentBadge({ state, capacityConfirmed = true }: { state: string; capacityConfirmed?: boolean }) {
+  const unconfirmed = state === "AUTHORIZED" && !capacityConfirmed;
+  const p = unconfirmed ? { tone: "warn" as const, label: "Authorized at provider · charging capacity not yet confirmed" } : (PAYMENT[state] ?? { tone: "neutral" as const, label: state });
   return (
     <Badge tone={p.tone}>
       <span className="sr-only">Payment: </span>

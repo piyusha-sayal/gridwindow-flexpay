@@ -30,7 +30,7 @@ The model has no tools. It never sets a price, consent, authorization, capture o
 
 ## Automated tests (final run of this release candidate)
 
-TypeScript strict check, ESLint, 344 Vitest tests (physics, economics, payment state machine, adversarial lifecycle cases on an embedded PostgreSQL, 10 skipped), the real-PostgreSQL suite on a disposable local server (9 passed, 1 skipped because it needs a restartable server), Playwright end-to-end checks on desktop, tablet and mobile with axe accessibility and keyboard tests, a production build, and a secret scan of the browser bundle. `npm audit --omit=dev` reports 0 vulnerabilities.
+Earlier release-candidate run, before the recovery work (superseded by the combined-release figures in `README.md` and `docs/AWARD_EVIDENCE.md`): TypeScript strict check, ESLint, 344 Vitest tests (physics, economics, payment state machine, adversarial lifecycle cases on an embedded PostgreSQL, 10 skipped), the real-PostgreSQL suite on a disposable local server (9 passed, 1 skipped because it needs a restartable server), Playwright end-to-end checks on desktop, tablet and mobile with axe accessibility and keyboard tests, a production build, and a secret scan of the browser bundle. `npm audit --omit=dev` reports 0 vulnerabilities.
 
 ## Known limits
 

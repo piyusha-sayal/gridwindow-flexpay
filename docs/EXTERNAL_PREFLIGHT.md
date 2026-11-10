@@ -2,6 +2,14 @@
 
 Scope: read-only preflight for the three external test tracks (Gemini live recovery, PayPal Sandbox, Neon migrations 003 and 004). This document was produced without any external call. Nothing was migrated, no model was called, no PayPal order was created, and no `.env*` file was read.
 
+## Required approvals
+
+Nothing below has been executed on the combined release. Each needs the owner's explicit go-ahead.
+
+1. **Gemini retry**: one live recovery run with `gemini-3.6-flash`, the model with earlier successful responses (section A.5). The owner sets the model in `.env.local`. The agent does not read that file.
+2. **PayPal Sandbox**: two orders (section B and the runbook in `docs/PAYPAL_CERTIFICATION.md`), with Sandbox buyer approval on PayPal's page. Covers an authorize and capture and an authorize and void.
+3. **Neon migrations 003 to 005**: take a backup branch first, then follow the ordered procedure in `docs/MIGRATIONS.md`. The agent must not run `--apply` against Neon.
+
 Status key: PASS / FAIL / BLOCKED / NOT TESTED. Claims not confirmed by an executed check are labelled NOT VERIFIED.
 
 | Track | Status | Reason |
@@ -42,10 +50,10 @@ No artifact in `artifacts/` shows a successful `gemini-3.8-flash` call.
 
 | Setting | Value | Location |
 |---|---|---|
-| Client timeout (SDK `httpOptions.timeout` and race timer) | 20,000 ms, hard-coded, no env override | `src/server/ai/geminiLlm.ts:15`, used at lines 38 and 49-54 |
-| SDK retries | `attempts: 1` (no retry) | `geminiLlm.ts:42` |
-| Thinking | `ThinkingLevel.LOW` | `geminiLlm.ts:67` |
-| Output cap sent to Gemini | `req.maxTokens + 1,024` headroom | `geminiLlm.ts:66` |
+| Client timeout (SDK `httpOptions.timeout` and race timer) | 20,000 ms, hard-coded, no env override | `src/server/ai/geminiLlm.ts:15`, used at lines 39, 43 and 55 |
+| SDK retries | `attempts: 1` (no retry) | `geminiLlm.ts:43` |
+| Thinking | `ThinkingLevel.LOW` | `geminiLlm.ts:68` |
+| Output cap sent to Gemini | `req.maxTokens + 1,024` headroom | `geminiLlm.ts:67` |
 | Recovery step output cap | `STEP_MAX_TOKENS = 512`, so 1,536 sent | `src/server/services/recoveryOrchestrator.ts:25` |
 | Recovery loop budget | `LOOP_BUDGET_MS = 45,000` (per-step `withTimeout` uses remaining budget) | `recoveryOrchestrator.ts:24`, `:242-245` |
 | Recovery tool steps | `MAX_TOOL_STEPS = 8`; `MAX_ATTEMPTS = 3` | `recoveryOrchestrator.ts:20-21` |
@@ -55,40 +63,71 @@ No artifact in `artifacts/` shows a successful `gemini-3.8-flash` call.
 
 Is 20 s reasonable? For a 1,536-token cap with LOW thinking, 20 s is normal for Flash models. The successful `gemini-3.6-flash` calls in the 2026-11-05 certification took 0.96 to 2.02 s each (`artifacts/ai-smoke-gemini-2026-11-05T23-08-03-654Z.json`). The 20 s limit therefore has a wide margin for the 3.6 model. For 3.8 there is no successful latency sample, so whether 20 s is enough for it is NOT VERIFIED.
 
-### A.3 Model selection
+### A.3 Model selection and what the artifacts prove
 
-| Source | Model |
-|---|---|
-| `DEFAULT_GEMINI_MODEL` (`geminiLlm.ts:14`) | `gemini-3.6-flash` |
-| Model in the 2026-11-09 recovery artifact | `gemini-3.8-flash` |
-| Model in the successful ai-smoke certification (2026-11-05 23:08) | `gemini-3.6-flash`, served `gemini-3.6-flash`, 5 of 5 calls responded, 4 of 4 mandatory cases MODEL_VALIDATED, `certified: true` |
-| Model in the earlier ai-smoke run (2026-11-05 22:40) | `gemini-3.6-flash`; one UNAVAILABLE and three grounding rejections (before the fixes) |
+Model ids with evidence in `artifacts/` (sanitized files, read only):
 
-Why the recovery run used 3.8: `scripts/recovery-live.ts` uses `fileEnv.GEMINI_MODEL ?? process.env.GEMINI_MODEL ?? DEFAULT_GEMINI_MODEL`. `fileEnv` comes from `.env.local` (keys allowlisted in `scripts/recoveryLiveFlow.ts:9`). The `.env.local` value therefore beats a shell `GEMINI_MODEL`. The file was not read for this preflight, so whether `.env.local` sets `GEMINI_MODEL=gemini-3.8-flash` is NOT VERIFIED. The artifact shows that 3.8 was the value used.
+| Model id | Successful response in an artifact | Evidence |
+|---|---|---|
+| `gemini-3.6-flash` | Yes | `ai-smoke-gemini-2026-11-05T23-08-03-654Z.json` (certified): metadata preflight `available: true, supportsGenerateContent: true`; 5 requests, 5 provider responses; `servedModels: ["gemini-3.6-flash"]`; per-call latency 963, 1,272, 1,366, 1,415, 2,019 ms; tokens 2,063 in / 548 out. `ai-smoke-gemini-run1-2026-11-05.json` (not certified, earlier run): `servedModels: ["gemini-3.6-flash"]`; 4 successful, 1 UNAVAILABLE; the five recorded latencies were 1,375 to 3,747 ms (one of them belongs to the UNAVAILABLE call, which the file does not identify). |
+| `gemini-3.8-flash` | No | `recovery-live-2026-11-09T19-13-09-066Z.json`: 1 request, 0 provider responses, `servedModels: []`, HTTP 504, `DEADLINE_EXCEEDED`, 18,796 ms, 0 tokens. No other artifact in `artifacts/` mentions it. |
 
-Known: the code, the docs (`docs/EXTERNAL_INTEGRATION.md` section 2a) and the 3.6 evidence all point to `gemini-3.6-flash` as the model with a successful live record. `gemini-3.8-flash` has no successful record in the repo.
+**VERIFIED MODEL: `gemini-3.6-flash`** (the only id with a successful response in the artifacts).
 
-### A.4 Likely cause and proposals (no defaults changed)
+**VERIFIED MODEL for `gemini-3.8-flash`: unknown.** The artifacts show one failed call and no success. Nothing else is proven about it.
 
-Most likely cause (NOT VERIFIED as a fact): the 3.8 model is slower or was under load when called. The 504 came inside the 20 s limit, and a model change is a cheaper explanation than a code fault.
+Where the 3.8 value came from: `scripts/recovery-live.ts` reads `GEMINI_MODEL` from `.env.local` first, then from the shell, then uses `DEFAULT_GEMINI_MODEL`. The artifact proves 3.8 was the value used. That `.env.local` set it is NOT VERIFIED (the file was not read, by design).
 
-Proposals, in order of risk:
+Code default: `DEFAULT_GEMINI_MODEL = "gemini-3.6-flash"` (`src/server/ai/geminiLlm.ts:14`). The artifacts prove 3.6 works and do not prove the default is wrong, so **no default was changed**.
 
-1. Operator change only (no code): in `.env.local`, set `GEMINI_MODEL=gemini-3.6-flash` (or remove the line so the default applies), then retry. Note that a shell-level `GEMINI_MODEL` is overridden by the `.env.local` value.
-2. Code proposal (not applied): raise `TIMEOUT_MS` in `src/server/ai/geminiLlm.ts` from 20,000 to 30,000 ms. This stays below `LOOP_BUDGET_MS` (45,000) and needs a unit test update in `tests/unit/geminiLlm.test.ts` (NOT VERIFIED that the test asserts 20 s). Only do this if option 1 also fails.
-3. Do not raise `MAX_REQUESTS` or the budget to chase a retry. The run has no retry path, so a failed call costs one request.
-
-### A.5 Retry command (requires your approval)
-
-There is no npm script for recovery-live. The command is:
+Metadata-only check for 3.8 (`models.get`, no generation, no tokens). Documented here, NOT RUN. It needs `GEMINI_API_KEY` exported in the shell (not read from `.env.local`; never printed):
 
 ```
-npx tsx scripts/recovery-live.ts --approve-gemini-calls
+npx tsx -e "import { GeminiLlm } from './src/server/ai/geminiLlm.ts'; (async () => { for (const m of ['gemini-3.6-flash', 'gemini-3.8-flash']) console.log(m, JSON.stringify(await GeminiLlm.checkModelAccess(process.env.GEMINI_API_KEY ?? '', m))); })();"
 ```
 
-Run it only after you have set `GEMINI_MODEL` in `.env.local` (see A.4 option 1). It repeats the deterministic rehearsal first, then makes at most 6 requests, with no retries, payments MOCK, and an in-memory PGlite database (no Neon).
+Expected: `available: true, supportsGenerateContent: true` for each id. A `false` result with a sanitized `diagnostic` is a stop signal for that id. This check cannot show quota or billing tier.
 
-Dry run (no model call, `.env.local` not opened): `npx tsx scripts/recovery-live.ts`. Not run in this preflight.
+### A.4 Timeout, thinking budget and likely cause (analysis, no defaults changed)
+
+| Question | Finding | Status |
+|---|---|---|
+| Did our 20 s timer fire? | No. The 504 arrived at 18,796 ms, before the 20,000 ms client timer (`geminiLlm.ts:15`). The provider's own `DEADLINE_EXCEEDED` answered the call. | PROVEN (from the artifact's latency and status) |
+| Is the 3.8 failure caused by the thinking budget? | Unlikely to be the difference. The thinking setting is the same `ThinkingLevel.LOW` (`geminiLlm.ts:68`) used by the successful 3.6 calls, and the recovery step asks for less output (512 + 1,024 headroom = 1,536 sent) than the 3.6 certification calls (up to 2,048 + 1,024 = 3,072 for explain). | PROVEN that the config is the same code path; the cause is NOT VERIFIED |
+| Is 20 s reasonable for 3.6? | Yes. The slowest recorded 3.6 call was 3,747 ms; 20 s is more than 5x that. | PROVEN for 3.6 only |
+| Is 20 s reasonable for 3.8? | NOT VERIFIED. There is one failed sample and no successful one. | UNKNOWN |
+| Most likely cause of the 504 | 3.8 was slow or under load on that request. A single sample cannot separate that from a provider-side problem with the id. | HYPOTHESIS, NOT VERIFIED |
+
+Proposed parameters for one retry (NOT EXECUTED). All values already exist in code; nothing new is introduced:
+
+| Parameter | Value | Where it is set |
+|---|---|---|
+| Model id | `gemini-3.6-flash` (set `GEMINI_MODEL=gemini-3.6-flash` in `.env.local`, or remove the key to use the default) | `.env.local` (`scripts/recovery-live.ts`), default in `geminiLlm.ts:14` |
+| Requests | One recovery run. The model loop stops at the first provider failure (`recoveryOrchestrator.ts`, `skipModel`, line 248), so a failed retry costs one request. Hard cap 6 requests. | `scripts/recovery-live.ts:28` |
+| SDK retries | None (`attempts: 1`) | `geminiLlm.ts` (`retryOptions`) |
+| Max output tokens | 512 requested + 1,024 thinking headroom = 1,536 sent | `recoveryOrchestrator.ts` (`STEP_MAX_TOKENS`), `geminiLlm.ts` |
+| Client timeout | 20,000 ms | `geminiLlm.ts:15` |
+| Budget cap | $0.25 at the planning rate of $10 in / $50 out per million tokens (the free tier is priced at $0 in the meter; the paid tariff was not verified) | `scripts/recovery-live.ts:29-32` |
+
+If the 3.6 retry also ends in TIMEOUT or UNAVAILABLE, the next step is a separate decision, not an automatic change: raising the client timeout to 30,000 ms (stays below `LOOP_BUDGET_MS` of 45,000 ms) and updating `tests/unit/geminiLlm.test.ts`.
+
+### A.5 Retry: exact steps (NOT EXECUTED, needs your separate authorization)
+
+This retry has not been run. Running `--approve-gemini-calls` is the authorization step, and it needs your separate go-ahead.
+
+1. In `.env.local` (values never pasted or printed) set `GEMINI_MODEL=gemini-3.6-flash`, or remove the `GEMINI_MODEL` line. Only `GEMINI_API_KEY` and `GEMINI_MODEL` are read by the script. A value in `.env.local` overrides a shell `GEMINI_MODEL`.
+2. Optional metadata check (A.3 command). No generation call.
+3. Dry run, no model call and `.env.local` not opened:
+   ```
+   npx tsx scripts/recovery-live.ts
+   ```
+   It must report at least 2 usable candidates before the live step is allowed.
+4. Live call, one recovery run, at most 6 requests, no SDK retries, payments MOCK, in-memory PGlite (Neon not used):
+   ```
+   npx tsx scripts/recovery-live.ts --approve-gemini-calls
+   ```
+
+Evidence file: `artifacts/recovery-live-<ISO timestamp>.json`. It is git-ignored by the rule `artifacts/recovery-live*.json` in `.gitignore`, which was confirmed with `git check-ignore`. It contains sanitized values only: no key, no prompt, no model text, no `DATABASE_URL`. The `run.mode` field is now the derived decision (`MODEL_DECISION` or `DETERMINISTIC_FALLBACK`), and `run.provenance` gives the label.
 
 ### A.6 Tool boundary
 
@@ -99,17 +138,18 @@ Dry run (no model call, `.env.local` not opened): `npx tsx scripts/recovery-live
 
 ### A.7 Pass criteria for the retry
 
+A run is a live model pass only when every row below holds. A fallback result is never a live model pass, even when its verdicts show PASS.
+
 | Criterion | Pass |
 |---|---|
-| Model answered | `calls[0].responded` true, `ok` true, `servedModels` contains the requested model |
-| Model used | `run.aiUsed` true, `mode: MODEL` |
+| Model answered | at least one `calls[]` entry has `responded` true and `ok` true, and `servedModels` contains `gemini-3.6-flash` |
+| Model decided | `run.mode` is `MODEL_DECISION`: `run.aiUsed` is true AND the trace holds a GEMINI `OK` step for `proposeRecovery`, `commitPermittedRecovery` or `requestDriverApproval`. The label is `MODEL_DECISION · Gemini (live model)` |
+| Fallback reported honestly | if the model did not decide, `run.mode` is `DETERMINISTIC_FALLBACK` and `fallbackReasons` says why |
 | `modelOnlyAllowedTools` | PASS (model named at least one tool, all inside the tool set) |
-| `noPaymentToolCalls` | PASS (0 gateway calls) |
-| `requestCapEnforced` | PASS (<= 6 requests) |
+| `noPaymentToolCalls` | PASS (0 gateway calls during the run) |
+| `requestCapEnforced` | PASS (6 or fewer requests) |
 | `consentRespected` | PASS |
-| `invalidOrInjectedOutputFallsBack` | Still NOT TESTED after this run; it needs a separate adversarial probe |
-
-A run where `aiUsed` is false is a fallback result and not a live model pass, even if the verdicts show PASS.
+| `invalidOrInjectedOutputFallsBack` | NOT TESTED by this script. It needs a separate adversarial probe. The unit and integration tests in `tests/integration/recoveryAgentBoundary.test.ts` cover the fallback path with scripted fixtures, not the live model. |
 
 ### A.8 Evidence files and redaction
 
@@ -228,34 +268,29 @@ The 2026-10-30 artifacts list these operations as performed in that order.
 | `002_operation_recovery` | committed | `alter table payment_operations add column` for `lease_until`, `attempts` (not null default 0), `request` (jsonb), `terms_hash`, `amount_cents`. Function `gw_forbid_terms_change()`. Trigger `reservations_terms_immutable` (BEFORE UPDATE on `reservations`). |
 | `003_recovery_engine` | committed | Tables `disruption_events` (check constraints on type and effective_slot; `provenance` check = SYNTHETIC), `recovery_runs` (status check, unique `disruption_event_id` FK to `disruption_events(event_id)`), `schedule_versions` (composite PK `(reservation_id, version)`, version >= 2, FK `reservation_id` and `recovery_run_id`). Index `disruption_events_reservation`. Triggers `disruption_events_append_only` and `schedule_versions_append_only` (both use `gw_forbid_mutation`). |
 | `004_recovery_orchestrator` | committed | `alter table recovery_runs add column`: `attempts` integer not null default 0 with check >= 0; `ai_used` boolean not null default false; `outcome` jsonb; `explanation` jsonb. No index, no trigger. |
-| `005_sweep_checked_at` | UNCOMMITTED (working tree only; `git diff` shows it) | `alter table reservations add column sweep_checked_at timestamptz` (nullable). Not in your list. |
+| `005_sweep_checked_at` | committed in `feature/combined-release` (HEAD f1ac53c); not in the original preflight list | `alter table reservations add column sweep_checked_at timestamptz` (nullable). Additive. Decide whether it is in scope before applying. |
 
-Note on 005: running the app from this working tree applies 005 along with 003 and 004. Decide before migrating whether 005 is in scope. This preflight did not change the file.
+Note on 005: `npm run db:migrate -- --plan` lists it with 003 and 004 when it is pending. It cannot be applied without an explicit `--apply`.
 
 ### C.2 Idempotency (precise)
 
 - The SQL uses plain `create table`, `create index`, `create function`, `create trigger` and `alter table ... add column`, all without `IF NOT EXISTS`.
-- A migration therefore runs only once, because `migrate()` skips any id already present in `schema_migrations` (`src/server/db/client.ts`, around lines 34-44). Re-running the SQL by hand, or on a database that has the objects but not the `schema_migrations` row, fails with "already exists" and the whole batch rolls back.
-- Partial failure: all pending migrations run in one transaction under the advisory lock `gridwindow:migrations`. A failure in 004 rolls back 003 as well, because PostgreSQL DDL is transactional. Nothing is recorded in `schema_migrations` for a failed batch. The next boot retries the whole batch.
-- Concurrency: the advisory transaction lock serializes processes that start at the same time (`client.ts`, comment above `migrate`).
+- An applied migration is skipped because its id is in `schema_migrations`. Re-running the SQL by hand, or on a database that has the objects but not the ledger row, fails with "already exists" and that migration's transaction rolls back.
+- Each migration runs in its own transaction under the advisory lock `gridwindow:migrations`. A failing migration is rolled back and not recorded; earlier ones stay applied and recorded. Concurrent runners serialize on the lock and re-check the ledger inside it.
 
-### C.3 Runner and recording
+### C.3 Runner and recording (updated)
 
-- `migrate(db)` in `src/server/db/client.ts`:
-  1. `create table if not exists schema_migrations (id text primary key, applied_at timestamptz not null default now())`
-  2. read applied ids
-  3. for each pending id in array order: run its `sql`, then `insert into schema_migrations (id)`
-- Everything runs inside one `db.tx(..., "gridwindow:migrations")`.
-- Order is the array order, so 001 and 002 are applied first by the same runner when they are pending. They are not separate steps. Whether 001 and 002 are applied on Neon is UNKNOWN (see C.6).
+- `src/server/db/migrator.ts`, `applyPending(db)`, per migration in array order: inside one transaction under the lock, create the ledger if needed, skip if recorded, otherwise run its SQL and insert `(id, checksum)`.
+- `checksum` is SHA-256 of the migration SQL. The ledger gained this column; rows written before it existed are reported as "applied before checksums were recorded" and get their checksum on `--apply`.
+- Before applying, the runner refuses a database with unknown ids or a checksum that differs from this build.
+- 001 and 002 are ordinary entries in the same list. Whether they are applied on Neon is UNKNOWN (see C.6); `--status` shows it.
 
-### C.4 Is migration implicit on boot?
+### C.4 Is migration implicit on boot? (changed: no)
 
-Yes, with the following code path (from reading the code; runtime trigger timing NOT VERIFIED beyond this):
-
-- `src/server/runtime.ts` `openDb(env)`: if `DATABASE_URL` is set, it calls `openPostgres(env.DATABASE_URL, { migrationUrl: env.MIGRATION_DATABASE_URL })`.
-- `openPostgres` (`client.ts`, around line 130): when `migrationUrl` is set, it opens a one-connection pool on the direct URL and runs `migrate()`. It then opens the pooled pool and runs `migrate()` again, which only confirms that nothing is pending.
-- Without `MIGRATION_DATABASE_URL`, `migrate()` still runs once on the application connection.
-- `runtime.ts` builds the runtime once (global promise), so migration happens on the first runtime use after the process starts, not in a separate command. There is no npm migrate script (`package.json` has `dev`, `build`, `start`, and the smoke and preflight scripts only).
+- Before this change, `openPostgres` migrated Neon on first use. It no longer does.
+- Now `openPostgres` (`src/server/db/client.ts`) reads the ledger and throws `SchemaNotReadyError` unless the schema matches this build exactly. The runtime then serves errors instead of traffic against a mismatched schema. Nothing is written.
+- `GW_AUTO_MIGRATE=true` restores boot-time migration. It is for disposable databases only and must not be set for Neon.
+- PGlite (local `.data/pglite`) still migrates on open.
 
 ### C.5 Risk assessment
 
@@ -266,7 +301,7 @@ Yes, with the following code path (from reading the code; runtime trigger timing
 | ALTER TABLE ADD COLUMN | 004 adds `not null default` columns to `recovery_runs`, and 002 adds one to `payment_operations`. On PostgreSQL 11 and later a constant default is a metadata change, but the statement still takes an ACCESS EXCLUSIVE lock briefly. | Low for small tables. The lock behaviour on the Neon version is NOT VERIFIED. |
 | Check constraint on add column | 004's `attempts` check is validated against existing rows during the ALTER. | Low; defaults are 0. |
 | 003 foreign keys | `schedule_versions` and `recovery_runs` reference `reservations` and `recovery_runs`. `disruption_events` references `reservations`. | Created with the tables; no existing rows are touched. |
-| 005 (uncommitted) | Adds a nullable column to `reservations`. | Low risk, but it is not in the reviewed scope. |
+| 005 | Adds a nullable column to `reservations`. | Low risk. Additive; see C.1. |
 | Pooled connection | Migrations through a transaction pooler are not recommended here. | Use `MIGRATION_DATABASE_URL` (direct) as `docs/EXTERNAL_INTEGRATION.md` section 0b says. |
 
 ### C.6 What is known and unknown about the Neon schema
@@ -311,22 +346,23 @@ Operator query for the first point (read-only; run in your own session, not by t
   - `delete from schema_migrations where id in (...)` for each rolled-back id.
 - Do not run any of this without a verified backup. The 002 terms trigger and its function must stay in place unless 002 is also rolled back.
 
-### C.9 Exact command the operator would run
+### C.9 Exact ordered procedure (the owner runs it; the agent does not)
 
-There is no dedicated migrate command. The operator path is to start the app with the database variables set in `.env.local`, after the backup in C.7. Commands (the values stay in `.env.local`):
+The full procedure, rollback and recovery are in `docs/MIGRATIONS.md`. In short, with `MIGRATION_DATABASE_URL` (direct URL) set in `.env.local`:
 
-```
-npm run build
-npm start
-```
+1. Take a Neon branch or confirm the point-in-time restore window (C.7). Record the branch name, not the URL.
+2. `npm run db:migrate -- --status`. Note the printed `target fingerprint` and the pending list. Stop if the output shows unknown ids or a checksum change.
+3. `npm run db:migrate -- --plan`. Review the objects.
+4. `npm run db:migrate -- --apply --confirm-database <fingerprint from step 2>`.
+5. `npm run db:migrate -- --status`. Expect `schema ready for this build: yes` and exit code 0.
+6. App smoke check: `npm run build`, `npm start`, load the home page and the operator console. The server log must show no `SchemaNotReadyError`.
+7. Record the result in `plans/PROGRESS.md`.
 
-With `DATABASE_URL` (pooled) and `MIGRATION_DATABASE_URL` (direct) set, the first runtime use applies all pending ids from `migrations.ts`. Migration on boot is therefore not a separate step. Whether `npm start` alone triggers the runtime before the first request is NOT VERIFIED (it is lazy; first use triggers it). To confirm, query `schema_migrations` (C.6) after the first request.
-
-NOT RUN in this preflight.
+NOT RUN. The migration of the real Neon database needs separate authorization.
 
 ### C.10 Status
 
-NOT TESTED. Reasons: no database access was used; no backup has been taken; 005 is uncommitted and needs a decision; the Neon state is unknown.
+NOT TESTED against Neon. The migration command was tested only against PGlite and a disposable local PostgreSQL (see `docs/MIGRATIONS.md`). Reasons: no database access was used; no backup has been taken; the Neon state is unknown.
 
 ---
 
@@ -334,4 +370,4 @@ NOT TESTED. Reasons: no database access was used; no backup has been taken; 005 
 
 1. Gemini: edit `GEMINI_MODEL` in `.env.local` to `gemini-3.6-flash` (or remove it), then run the command in A.5 once. Read the evidence before any repeat.
 2. PayPal: nothing needed for the smoke track (PASSed 2026-10-30). Do not re-run it.
-3. Neon: decide on 005; check `schema_migrations` with the read-only query in C.6; take the backup in C.7; then start the app once (C.9). Record the result in `plans/PROGRESS.md`.
+3. Neon: decide on 005; check `schema_migrations` with `npm run db:migrate -- --status` (C.9); take the backup in C.7; then run the ordered procedure in C.9. Record the result in `plans/PROGRESS.md`.

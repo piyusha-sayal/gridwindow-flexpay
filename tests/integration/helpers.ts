@@ -75,7 +75,8 @@ export async function openTestDb(): Promise<Db> {
   await admin.query(`create schema ${schema}`);
   await admin.end();
   const sep = url.includes("?") ? "&" : "?";
-  return openPostgres(`${url}${sep}options=${encodeURIComponent(`-c search_path=${schema}`)}`);
+  // Disposable schema on a URL that assertDisposableTestUrl just accepted: auto-migrating is the intended test behaviour.
+  return openPostgres(`${url}${sep}options=${encodeURIComponent(`-c search_path=${schema}`)}`, { autoMigrate: true });
 }
 
 export const NIGHT = "2026-11-05";

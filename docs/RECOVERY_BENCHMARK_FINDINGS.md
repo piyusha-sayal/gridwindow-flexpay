@@ -58,13 +58,13 @@ In case 1 the realized site draw in slot 10:00 was 18,300 W against an 18,000 W 
 | Lowest margin against the baseline among them | 1 c (at the limit, still viable) |
 | Sum of operator contribution change vs the agreed plan | -5,862 c |
 | Fee and operating cost | included in every contribution figure above |
-| Failure-remedy cost | not modeled in this repo; not applicable to these runs |
+| Failure-remedy cost | not part of these contribution figures; a MODELED remedy (`FAILED_SERVICE_REMEDY_CENTS`, default 200 c) is recorded only for operator-failure voids in settlement, which the benchmark does not simulate |
 
 Each of the 56 stays viable under the accepted constraint, so none is blocked. The driver price is unchanged in all 56. The -5,862 c figure is a change against the agreed plan, not a breach of the operator constraint. Policy says that extra electricity cost is acceptable while the constraint holds.
 
 The benchmark now reports the margin directly: "Lowest operator margin" (1 c in auto, 1 c in approval) and "Applied changes below minimum operator margin" (0 in both). Regression tests cover a viable cost-raising auto-commit, a margin block, and the exact boundary (`tests/unit/recoveryShortfall.test.ts`). An integration test drives the orchestrator with a stricter minimum and checks that nothing is committed (`tests/integration/recoveryOrchestrator.test.ts`, scenario D).
 
-`docs/ARCHITECTURE.md` line 122 and `docs/DEMO_SCRIPT.md` line 62 still list this as an OPEN policy decision. Under the policy above it is resolved: cost increase is accepted while the margin constraint holds. Those files are outside this task and were not edited.
+The earlier OPEN entry for this in `docs/ARCHITECTURE.md` (policy decisions) is now marked resolved, and `docs/DEMO_SCRIPT.md` lists it under known gaps with the margin result. Under the policy above, cost increase is accepted while the margin constraint holds.
 
 ## Changes in this task
 
