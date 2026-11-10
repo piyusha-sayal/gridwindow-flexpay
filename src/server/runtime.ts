@@ -6,7 +6,7 @@ import { DEMO_STATION } from "@/domain/station";
 import type { PaymentGateway } from "@/payments/gateway";
 import { MockGateway } from "@/payments/mockGateway";
 import { PayPalSandboxGateway } from "@/payments/paypalSandbox";
-import { openPglite, openPostgres, type Db } from "./db/client";
+import { openPglite, openPostgres, SchemaNotReadyError, type Db } from "./db/client";
 import { randomId, type AppDeps } from "./deps";
 import { ConfigError, loadEnv, type AppEnv } from "./env";
 import { createLlm } from "./ai/llmFactory";
@@ -29,7 +29,12 @@ const globalKey = Symbol.for("gridwindow.runtime");
 type GlobalWithRuntime = typeof globalThis & { [globalKey]?: Promise<Runtime> };
 
 async function openDb(env: AppEnv): Promise<Db> {
-  if (env.DATABASE_URL) return openPostgres(env.DATABASE_URL, { migrationUrl: env.MIGRATION_DATABASE_URL });
+  if (env.DATABASE_URL) {
+    // An external database is verified, never migrated, at startup (QA-1). A missing schema is a configuration error.
+    return openPostgres(env.DATABASE_URL, { migrationUrl: env.MIGRATION_DATABASE_URL }).catch((err: unknown) => {
+      throw err instanceof SchemaNotReadyError ? new ConfigError(err.message) : err;
+    });
+  }
   return openPglite(env.GW_DATA_DIR ?? path.join(process.cwd(), ".data", "pglite"));
 }
 

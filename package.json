@@ -23,7 +23,8 @@
     "paypal:order": "tsx scripts/paypal-order-status.ts",
     "ai:smoke": "tsx scripts/ai-smoke.ts",
     "payment:preflight": "tsx scripts/payment-preflight.ts",
-    "release:scan": "tsx scripts/release-scan.ts"
+    "release:scan": "tsx scripts/release-scan.ts",
+    "db:migrate": "tsx scripts/db-migrate.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.133.0",

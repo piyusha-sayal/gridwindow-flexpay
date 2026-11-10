@@ -127,8 +127,90 @@ function postgresDb(pool: Pool): Db {
   };
 }
 
+/** Thrown at startup when an external database is missing migrations. Startup never applies them; see `npm run db:migrate`. */
+export class SchemaNotReadyError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SchemaNotReadyError";
+  }
+}
+
+const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
+
+/** Only a loopback server is treated as disposable. Anything else is external and is never migrated implicitly. */
+export function isLoopbackUrl(url: string): boolean {
+  try {
+    return LOOPBACK_HOSTS.has(new URL(url).hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
+/** `host/database` with no credentials or query string, for confirmation and error messages. */
+export function describeMigrationTarget(url: string): string {
+  const u = new URL(url);
+  return `${u.host}${u.pathname}`;
+}
+
+/** Read-only: which known migrations are missing, and which applied ones this build does not know. Never creates anything. */
+async function migrationState(q: Queryable): Promise<{ pending: string[]; unknown: string[] }> {
+  const present = await q.query<{ present: string | null }>("select to_regclass('schema_migrations') as present");
+  const applied = new Set(present[0]?.present ? (await q.query<{ id: string }>("select id from schema_migrations")).map((r) => r.id) : []);
+  const known = new Set(MIGRATIONS.map((m) => m.id));
+  return { pending: MIGRATIONS.filter((m) => !applied.has(m.id)).map((m) => m.id), unknown: [...applied].filter((id) => !known.has(id)) };
+}
+
+export interface ExplicitMigrationInput {
+  url: string;
+  /** Must equal `describeMigrationTarget(url)`: the operator re-types the target they intend to change. */
+  confirmTarget: string;
+  /** Must equal the newest migration id compiled into this build. */
+  expectLatest: string;
+  /** False reports what would run and changes nothing. */
+  apply: boolean;
+}
+
+/**
+ * The only path that migrates an external database. Refuses unless the target and version were confirmed, and
+ * refuses a database that is ahead of this build. Dry run unless `apply` is true.
+ */
+export async function runExplicitMigration(input: ExplicitMigrationInput): Promise<{ target: string; pending: string[]; applied: string[] }> {
+  const target = describeMigrationTarget(input.url);
+  if (input.confirmTarget !== target) throw new Error(`Target mismatch: the URL points at "${target}" but "${input.confirmTarget}" was confirmed. Nothing was changed.`);
+  const latest = MIGRATIONS[MIGRATIONS.length - 1]!.id;
+  if (input.expectLatest !== latest) throw new Error(`Version check failed: this build's latest migration is "${latest}" but "${input.expectLatest}" was expected. Nothing was changed.`);
+  const pool = await newPool(input.url, 1, PG_CONNECT_TIMEOUT_MS);
+  try {
+    const db = postgresDb(pool);
+    const { pending, unknown } = await migrationState(db);
+    if (unknown.length > 0) throw new Error(`The database has migrations this build does not know (${unknown.join(", ")}); it is newer than this code. Nothing was changed.`);
+    if (!input.apply) return { target, pending, applied: [] };
+    await migrate(db);
+    return { target, pending, applied: pending };
+  } finally {
+    await pool.end().catch(() => undefined);
+  }
+}
+
 export async function openPostgres(connectionString: string, options: PostgresOptions = {}): Promise<Db> {
   const timeout = options.connectionTimeoutMs ?? PG_CONNECT_TIMEOUT_MS;
+  if (!isLoopbackUrl(connectionString)) {
+    // External database: verify only. A migration URL is deliberately ignored here.
+    const pool = await newPool(connectionString, 10, timeout);
+    const db = postgresDb(pool);
+    try {
+      const { pending } = await migrationState(db);
+      if (pending.length > 0) {
+        throw new SchemaNotReadyError(
+          `Database ${describeMigrationTarget(connectionString)} is missing migrations: ${pending.join(", ")}. Startup does not migrate external databases; run "npm run db:migrate" deliberately.`,
+        );
+      }
+    } catch (err) {
+      await pool.end().catch(() => undefined);
+      throw err;
+    }
+    return db;
+  }
   if (options.migrationUrl) {
     const admin = await newPool(options.migrationUrl, 1, timeout);
     try {
