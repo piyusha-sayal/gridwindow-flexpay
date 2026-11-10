@@ -258,7 +258,7 @@ The 2026-10-30 artifacts list these operations as performed in that order.
 
 ---
 
-## C. NEON MIGRATIONS 003 AND 004
+## C. NEON MIGRATIONS 003 TO 005
 
 ### C.1 Migration list (entries in `src/server/db/migrations.ts`, in array order)
 
@@ -380,3 +380,38 @@ Three bounded live attempts returned no model response: `gemini-3.8-flash` HTTP 
 - **Request cap.** The model returns one JSON "tool call" per request (no native function calling). A model-chosen outcome (`MODEL_DECISION`) needs the model to choose `proposeRecovery`, `commitPermittedRecovery` or `requestDriverApproval`, which in practice takes about four requests (candidates, validate, propose, commit or ask for approval). `--max-requests=1` can show at most one tool call, never a completed model-driven decision; the default cap of 6 is sufficient.
 - **Model access** cannot be confirmed without a provider call (`checkModelAccess` is a metadata request). Not run.
 - Flags: `--model=<id>` (wins over `.env.local`) and `--max-requests=N` (can only lower the cap of 6) are covered by `tests/unit/recoveryLiveFlow.test.ts`; 503/504/client-timeout classification by `tests/unit/geminiDiagnostics.test.ts`.
+
+## Final external certification: prepared commands (2026-11-10, main 60b85bb) - NOTHING BELOW HAS BEEN EXECUTED
+
+Run every command from the directory that holds `.env.local` (the agent never opens that file). All three external tracks need the owner's explicit approval first.
+
+### 1. Gemini
+1. **One metadata request** (no generation, no tokens, no retries, sanitized artifact `artifacts/gemini-access-<ISO>.json`):
+   `npm run ai:access -- --model=gemini-3.6-flash --approve-metadata-call`
+   Without the approval flag it is a dry run that opens no file and sends nothing. The client is pinned to one attempt (`retryOptions.attempts = 1`); `tests/unit/geminiAccessCheck.test.ts` proves one HTTP request and the models.get path only, with the network stubbed. Approval needed: the owner's go-ahead for this single metadata request.
+2. **Only if it reports `verdict: PASS`**, a separate approval for one bounded recovery run (up to 6 model requests, USD 0.25 cap, MOCK payments, in-memory database, no retries):
+   `npx tsx scripts/recovery-live.ts --approve-gemini-calls --model=gemini-3.6-flash`
+   Do not use `--max-requests=1` for a certification: a model-chosen outcome needs about four requests.
+3. Provenance is unchanged: a failed or skipped model step is recorded as `DETERMINISTIC_FALLBACK`; `MODEL_DECISION` appears only when the model chose `proposeRecovery`, `commitPermittedRecovery` or `requestDriverApproval`.
+
+### 2. PayPal Sandbox (USD 1.23 each, sandbox only, you approve each checkout on PayPal's page)
+- Dry run (verified today, no network, 0 orders): `npm run -s paypal:smoke`.
+- Authorize and capture only: `npm run paypal:smoke -- --approve-sandbox-orders --capture-only` (1 order).
+- Authorize and void only: `npm run paypal:smoke -- --approve-sandbox-orders --void-only` (1 order).
+- If an order is created but not approved in time, finish that order with `--resume-order <ORDER_ID>` rather than creating another.
+- Evidence is redacted and written to `artifacts/paypal-smoke-<mode>-<runId>.json` and `.progress.json`. New in this preparation: each evidence record now includes `requestIds` (`createOrder`, `authorize`, and `capture` or `void`), the PayPal-Request-Id sent with each write. Older 2026-10-30 artifacts do not have them.
+- Needs: the Sandbox credentials and `PAYPAL_EXPECTED_MERCHANT_ID` in `.env.local`, and a Sandbox buyer account you can sign in with. Approval needed: explicit go-ahead to create orders.
+
+### 3. Neon (isolated branch first, then production separately)
+The fingerprint is the first 12 hex characters of SHA-256 over host, port and database name, so a branch and the production database always have different fingerprints and one cannot confirm the other. Reading it needs a connection, so it is read with `--status` after approval.
+1. In the Neon console create a branch from the production branch (copy-on-write). Record the branch name only. Copy the branch's **direct (non-pooled)** connection string into `MIGRATION_DATABASE_URL`.
+2. `npm run db:migrate -- --status` (read-only). Record the fingerprint and the pending list. Expect 003, 004 and 005 pending; stop on unknown ids or checksum changes.
+3. Before: record read-only row counts for `reservations`, `events`, `payment_operations`, `provider_proofs`.
+4. `npm run db:migrate -- --plan` (read-only), then `npm run db:migrate -- --apply --confirm-database <branch fingerprint>`.
+5. `npm run db:migrate -- --status` must report `schema ready for this build: yes`; repeat `--apply` must report nothing pending. Row counts must equal step 3. No destructive tests against Neon.
+6. Start the app against the branch (`DATABASE_URL` = the branch's pooled URL) and load the home page and operator console; the log must show no `SchemaNotReadyError`.
+7. Delete the branch. **Production** then repeats steps 2 to 6 on its own, with its own fingerprint, after a fresh restore branch, and only on a separate approval.
+Rollback: for the test, delete the branch; for production, restore from the pre-migration branch or point-in-time restore (there is no down migration; see C.8).
+
+### 4. Release
+`docs/DEPLOYMENT_RUNBOOK.md` (environment variables, build, database order, webhook, rollback, smoke test) and the clean-clone check recorded in `docs/FINAL_AUTOMATED_CERTIFICATION.md` stand. `THIRD_PARTY_NOTICES.md` carries the Bryntum Community (MIT) and dependency notices. No deployment, visibility change, video or Devpost step has been taken.

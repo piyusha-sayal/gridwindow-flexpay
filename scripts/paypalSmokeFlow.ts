@@ -42,6 +42,8 @@ export type SmokeStepKind = "order" | "authorization" | "capture" | "void";
 export interface SmokeEvidence {
   flow: SmokeFlow;
   reservationRef: string;
+  /** Client-side PayPal-Request-Id sent with each write (idempotency keys; not provider secrets). */
+  requestIds: { createOrder: string; authorize: string; capture?: string; void?: string };
   order: { id: string; status: string; amountCents: number | null; currency: string | null; merchant: string; createdAt: string };
   authorization: { id: string; status: string; amountCents: number; currency: string; expiresAt: string | null; at: string };
   capture?: { id: string; status: string; amountCents: number; currency: string; authorizationMatches: boolean; at: string };
@@ -113,6 +115,7 @@ async function completeFlow(gw: PaymentGateway, flow: SmokeFlow, ref: string, or
   const evidence: SmokeEvidence = {
     flow,
     reservationRef: ref,
+    requestIds: { createOrder: `${ref}:CREATE_ORDER`, authorize: `${ref}:AUTHORIZE`, ...(flow === "capture" ? { capture: `${ref}:CAPTURE` } : { void: `${ref}:VOID` }) },
     order: { id: redact(order.orderId), status: approved.status, amountCents: approved.amountCents, currency: approved.currency, merchant: redact(approved.payeeMerchantId), createdAt },
     authorization: { id: redact(auth.authorizationId), status: auth.status, amountCents: auth.amountCents, currency: auth.currency, expiresAt: auth.expirationTime, at: iso() },
     operations,

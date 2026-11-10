@@ -109,6 +109,11 @@ describe("PayPal sandbox smoke flow", () => {
     expect(evidence.map((e) => e.flow)).toEqual(["capture", "void"]);
     expect(evidence[0]!.capture).toMatchObject({ status: "COMPLETED", amountCents: 123, currency: "USD", authorizationMatches: true });
     expect(evidence[1]!.void).toMatchObject({ authorizationStatusAfter: "VOIDED" });
+    // The client-side idempotency keys are recorded for each write (they are not provider secrets).
+    const [cap, voided] = evidence;
+    expect(cap!.requestIds).toEqual({ createOrder: `${cap!.reservationRef}:CREATE_ORDER`, authorize: `${cap!.reservationRef}:AUTHORIZE`, capture: `${cap!.reservationRef}:CAPTURE` });
+    expect(voided!.requestIds).toEqual({ createOrder: `${voided!.reservationRef}:CREATE_ORDER`, authorize: `${voided!.reservationRef}:AUTHORIZE`, void: `${voided!.reservationRef}:VOID` });
+    expect(cap!.requestIds.createOrder).not.toBe(voided!.requestIds.createOrder);
     const text = JSON.stringify(evidence);
     expect(text).not.toContain("ORDER1AAAA");
     expect(text).not.toContain("MERCHANT123");

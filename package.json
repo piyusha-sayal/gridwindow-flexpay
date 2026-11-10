@@ -22,6 +22,7 @@
     "paypal:smoke": "tsx scripts/paypal-smoke.ts",
     "paypal:order": "tsx scripts/paypal-order-status.ts",
     "ai:smoke": "tsx scripts/ai-smoke.ts",
+    "ai:access": "tsx scripts/gemini-access-check.ts",
     "payment:preflight": "tsx scripts/payment-preflight.ts",
     "release:scan": "tsx scripts/release-scan.ts",
     "db:migrate": "tsx scripts/migrate.ts"

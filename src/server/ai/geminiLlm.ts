@@ -94,7 +94,7 @@ export class GeminiLlm implements StructuredLlm {
    */
   static async checkModelAccess(apiKey: string, model: string = DEFAULT_GEMINI_MODEL): Promise<{ available: boolean; supportsGenerateContent: boolean; inputTokenLimit?: number; diagnostic?: LlmDiagnostic }> {
     try {
-      const m = await new GoogleGenAI({ apiKey }).models.get({ model });
+      const m = await new GoogleGenAI({ apiKey, httpOptions: { timeout: TIMEOUT_MS, retryOptions: { attempts: 1 } } }).models.get({ model });
       const actions = m.supportedActions ?? [];
       return { available: true, supportsGenerateContent: actions.includes("generateContent"), ...(m.inputTokenLimit ? { inputTokenLimit: m.inputTokenLimit } : {}) };
     } catch (err) {
