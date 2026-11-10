@@ -1,0 +1,248 @@
+{
+  "label": "SYNTHETIC / MOCK",
+  "pages": [
+    {
+      "route": "/",
+      "viewport": "desktop",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/drive",
+      "viewport": "desktop",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/how-it-works",
+      "viewport": "desktop",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/impact-lab",
+      "viewport": "desktop",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/rewards",
+      "viewport": "desktop",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/",
+      "viewport": "tablet",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/drive",
+      "viewport": "tablet",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/how-it-works",
+      "viewport": "tablet",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/impact-lab",
+      "viewport": "tablet",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/rewards",
+      "viewport": "tablet",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/",
+      "viewport": "mobile",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/drive",
+      "viewport": "mobile",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/how-it-works",
+      "viewport": "mobile",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/impact-lab",
+      "viewport": "mobile",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/rewards",
+      "viewport": "mobile",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/operator",
+      "viewport": "desktop",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/operator/schedule?night=2027-01-19",
+      "viewport": "desktop",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": [
+        "critical:aria-required-children",
+        "serious:color-contrast",
+        "serious:scrollable-region-focusable"
+      ]
+    },
+    {
+      "route": "/operator",
+      "viewport": "tablet",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/operator/schedule?night=2027-01-19",
+      "viewport": "tablet",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": [
+        "critical:aria-required-children",
+        "serious:color-contrast",
+        "serious:scrollable-region-focusable"
+      ]
+    },
+    {
+      "route": "/operator",
+      "viewport": "mobile",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": []
+    },
+    {
+      "route": "/operator/schedule?night=2027-01-19",
+      "viewport": "mobile",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "overflowPx": 0,
+      "clipped": [],
+      "axeApp": [],
+      "axeVendor": [
+        "critical:aria-required-children",
+        "serious:color-contrast",
+        "serious:scrollable-region-focusable"
+      ]
+    }
+  ]
+}
