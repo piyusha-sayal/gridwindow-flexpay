@@ -53,7 +53,7 @@ Operator authorization, driver session isolation, input validation, CSRF/origin 
 - By design or bounded: drag and resize disabled; FAILED or CANCELLED rows with an order id but no authorization id stay in bounded sweep rotation.
 
 ## External certification still required (NEEDS USER APPROVAL)
-One bounded real Gemini retry (the earlier attempt returned HTTP 504); up to two PayPal Sandbox transactions with manual buyer approval; Neon migrations 003-005 after a backup or branch; deployment, public release and Devpost. Until then a live Gemini decision, recovery-linked Sandbox evidence and the Neon schema are BLOCKED / NOT TESTED.
+One bounded real Gemini retry (the earlier attempt returned HTTP 504); up to two PayPal Sandbox transactions with manual buyer approval; Neon migration replay and app startup against Neon (the schema itself was later found at 001-005 by a read-only inspection); deployment, public release and Devpost. Until then a live Gemini decision and recovery-linked Sandbox evidence are BLOCKED / NOT TESTED. Update 2026-11-10: Neon was inspected read-only on 2026-11-10 (applied 001 to 005, nothing pending); see the section "Neon read-only inspection of 2026-11-10" in `docs/EXTERNAL_PREFLIGHT.md`.
 
 ## Addendum: final completion run (same branch, later commit)
 Re-run on the final source after the fixes below: `npm ci`, `tsc` and `eslint` clean; Vitest **806 passed, 12 skipped, 0 failed** (802 + 4 new copy tests); real PostgreSQL **47 passed** (serial, disposable cluster, then deleted); Playwright **21 spec files, 0 failed, 6 skipped** (`qa.spec.ts`), one worker per spec; default and `.next-release` builds, `release:scan`, `npm audit --omit=dev` (0 vulnerabilities) all PASS; recovery benchmark twice byte-identical and unchanged from the committed file.
@@ -67,4 +67,4 @@ Fixed in this run:
 
 Unchanged by design: the Kolkata-style half-hour browser-zone tick residual (documented, 2 expected-failure tests), the Bryntum vendor axe findings, and QA-2 (an anonymous caller can briefly lock the operator login; forged forwarding headers cannot bypass the limiter).
 
-Checkpoints NOT executed (NEEDS USER APPROVAL): live Gemini call, PayPal Sandbox transactions, any Neon connection or migration, deployment.
+Checkpoints NOT executed by this run (NEEDS USER APPROVAL): live Gemini call, PayPal Sandbox transactions, any Neon connection or migration, deployment. (Later, owner-approved steps are recorded in `docs/EXTERNAL_PREFLIGHT.md`.)

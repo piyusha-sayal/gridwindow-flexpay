@@ -64,7 +64,7 @@ Source runbook: `docs/PAYPAL_CERTIFICATION.md` (still current), plus the correct
 ### Prerequisites checklist
 - [ ] Sandbox only: `PAYMENT_MODE=paypal_sandbox`, `PAYPAL_ENV=sandbox` (any other value stops startup; the only PayPal host in code is `api-m.sandbox.paypal.com`), Sandbox client id and secret, `PAYPAL_EXPECTED_MERCHANT_ID` = the Sandbox business account id (checked on the approved order)
 - [ ] A Sandbox Personal buyer account; the buyer approval is done by the owner in PayPal's window. It is never automated
-- [ ] **New since QA-1:** the database the app uses must already hold migrations 003 to 005, or the app refuses to start. Use a Neon branch, never the main branch: `npm run db:migrate -- --confirm-target=<host/db> --expect-latest=005_sweep_checked_at` (dry run, read the pending list), then add `--apply`
+- [ ] **New since QA-1:** the database the app uses must already hold migrations 003 to 005, or the app refuses to start. (The existing Neon database was found at 001-005 by a read-only inspection on 2026-11-10, so it needs no migration.) For any other database, use a branch, never the main branch: `npm run db:migrate -- --confirm-target=<host/db> --expect-latest=005_sweep_checked_at` (dry run, read the pending list), then add `--apply`
 - [ ] HTTPS tunnel; `APP_BASE_URL` set to it; `TRUST_PROXY=true`; one Sandbox webhook registered with the seven events listed in `docs/PAYPAL_CERTIFICATION.md` section 3; `PAYPAL_WEBHOOK_ID` set
 - [ ] `npm run build` and `npm start` (not `npm run dev`); no `DEMO_TOOLS`
 - [ ] `npm run payment:preflight -- --night-a <future night> --night-b <future night>` prints READY (prices in the older runbook, $12.43, are examples; re-run, since quotes depend on the night)

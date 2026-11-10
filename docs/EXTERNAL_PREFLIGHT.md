@@ -8,15 +8,15 @@ Nothing below has been executed on the combined release. Each needs the owner's 
 
 1. **Gemini retry**: one live recovery run with `gemini-3.6-flash`, the model with earlier successful responses (section A.5). The owner sets the model in `.env.local`. The agent does not read that file.
 2. **PayPal Sandbox**: two orders (section B and the runbook in `docs/PAYPAL_CERTIFICATION.md`), with Sandbox buyer approval on PayPal's page. Covers an authorize and capture and an authorize and void.
-3. **Neon migrations 003 to 005**: take a backup branch first, then follow the ordered procedure in `docs/MIGRATIONS.md`. The agent must not run `--apply` against Neon.
+3. **Neon**: no migration is needed. The 2026-11-10 read-only inspection found 001 to 005 applied and 0 pending (section "Neon read-only inspection of 2026-11-10"). Still open and needing separate approval: a migration replay on an isolated branch, ledger checksum stamping, and application startup against Neon. The agent must not run `--apply` against Neon.
 
 Status key: PASS / FAIL / BLOCKED / NOT TESTED. Claims not confirmed by an executed check are labelled NOT VERIFIED.
 
 | Track | Status | Reason |
 |---|---|---|
 | A. Gemini retry | BLOCKED (live recovery FAIL on last run) | 504 DEADLINE_EXCEEDED, model not used; retry needs operator approval and a `.env.local` edit |
-| B. PayPal Sandbox | PASS (historical); dry run PASS | Capture and void PASSed on 2026-10-30; no new run needed |
-| C. Neon 003/004 | NOT TESTED | No database access in this preflight; backup not taken; uncommitted 005 needs a decision |
+| B. PayPal Sandbox | PASS (standalone smoke, 2026-10-30 and 2026-11-10) | Capture COMPLETED and void VOIDED, USD 1.23 each, validated from redacted artifacts; not linked to the recovery flow |
+| C. Neon 001-005 | Schema readiness PASS; read-only data inspection PASS; ledger checksums UNVERIFIED (legacy format); migration replay NOT TESTED; external app startup NOT TESTED | Applied 001-005, pending 0, unknown 0; 31 existing reservations; inspection made 0 writes |
 
 ---
 
@@ -260,6 +260,8 @@ The 2026-10-30 artifacts list these operations as performed in that order.
 
 ## C. NEON MIGRATIONS 003 TO 005
 
+> **Superseded by the read-only inspection of 2026-11-10 (see the end of this document).** Neon already holds migrations 001 to 005. C.1 to C.5 and C.7 to C.9 describe the procedure for a database that lacks them and remain valid for any other target. C.6 and C.10 below are historical and are corrected by that section.
+
 ### C.1 Migration list (entries in `src/server/db/migrations.ts`, in array order)
 
 | Id | Status in the file | Contents |
@@ -304,7 +306,7 @@ Note on 005: `npm run db:migrate -- --plan` lists it with 003 and 004 when it is
 | 005 | Adds a nullable column to `reservations`. | Low risk. Additive; see C.1. |
 | Pooled connection | Migrations through a transaction pooler are not recommended here. | Use `MIGRATION_DATABASE_URL` (direct) as `docs/EXTERNAL_INTEGRATION.md` section 0b says. |
 
-### C.6 What is known and unknown about the Neon schema
+### C.6 What is known and unknown about the Neon schema (historical, written before the 2026-11-10 inspection)
 
 Known (from artifacts and docs):
 
@@ -362,7 +364,7 @@ NOT RUN. The migration of the real Neon database needs separate authorization.
 
 ### C.10 Status
 
-NOT TESTED against Neon. The migration command was tested only against PGlite and a disposable local PostgreSQL (see `docs/MIGRATIONS.md`). Reasons: no database access was used; no backup has been taken; the Neon state is unknown.
+Migration replay against Neon: NOT TESTED. The migration command was tested only against PGlite and a disposable local PostgreSQL (see `docs/MIGRATIONS.md`). Neon's schema state is now known from the read-only inspection of 2026-11-10: 001 to 005 applied, 0 pending.
 
 ---
 
@@ -370,7 +372,7 @@ NOT TESTED against Neon. The migration command was tested only against PGlite an
 
 1. Gemini: edit `GEMINI_MODEL` in `.env.local` to `gemini-3.6-flash` (or remove it), then run the command in A.5 once. Read the evidence before any repeat.
 2. PayPal: nothing needed for the smoke track (PASSed 2026-10-30). Do not re-run it.
-3. Neon: decide on 005; check `schema_migrations` with `npm run db:migrate -- --status` (C.9); take the backup in C.7; then run the ordered procedure in C.9. Record the result in `plans/PROGRESS.md`.
+3. Neon: nothing to migrate (001 to 005 applied). Optional, each needing separate approval: replay the migrations on an isolated branch, decide how to stamp ledger checksums, and start the app against Neon once.
 
 ## Gemini live attempts of 2026-11-10: offline diagnosis (no provider calls)
 Three bounded live attempts returned no model response: `gemini-3.8-flash` HTTP 504 (2026-11-09), then `gemini-3.6-flash` HTTP 503 after 4,081 ms and HTTP 504 DEADLINE_EXCEEDED after 19,311 ms (2026-11-10). Findings from reading the code and capturing one request with the network blocked (dummy key, SDK base URL on a closed local port, `fetch` replaced; nothing left the machine):
@@ -402,7 +404,7 @@ Run every command from the directory that holds `.env.local` (the agent never op
 - Evidence is redacted and written to `artifacts/paypal-smoke-<mode>-<runId>.json` and `.progress.json`. New in this preparation: each evidence record now includes `requestIds` (`createOrder`, `authorize`, and `capture` or `void`), the PayPal-Request-Id sent with each write. Older 2026-10-30 artifacts do not have them.
 - Needs: the Sandbox credentials and `PAYPAL_EXPECTED_MERCHANT_ID` in `.env.local`, and a Sandbox buyer account you can sign in with. Approval needed: explicit go-ahead to create orders.
 
-### 3. Neon (isolated branch first, then production separately)
+### 3. Neon (superseded: 001-005 already applied, see the 2026-11-10 inspection; kept for a replay on an isolated branch)
 The fingerprint is the first 12 hex characters of SHA-256 over host, port and database name, so a branch and the production database always have different fingerprints and one cannot confirm the other. Reading it needs a connection, so it is read with `--status` after approval.
 1. In the Neon console create a branch from the production branch (copy-on-write). Record the branch name only. Copy the branch's **direct (non-pooled)** connection string into `MIGRATION_DATABASE_URL`.
 2. `npm run db:migrate -- --status` (read-only). Record the fingerprint and the pending list. Expect 003, 004 and 005 pending; stop on unknown ids or checksum changes.
@@ -422,3 +424,29 @@ Sanitized figures from local, git-ignored artifacts (`artifacts/gemini-access-20
 - **Live recovery run, 2 requests, MOCK payments, 0 gateway calls.** Request 1 succeeded (1,513 ms, 282 in / 15 out tokens, served model `gemini-3.6-flash`): Gemini chose `readStationState`, a valid read-only tool from the allowed set. Request 2 returned HTTP 503 UNAVAILABLE (1,184 ms). The loop ended, the trace recorded `model not used for this step: UNAVAILABLE`, and the deterministic path validated both candidates and committed `c1` (flex_lowest_cost, AUTO_COMMIT, 1,153 c) as schedule version 2, linked to the run.
 - **What this proves.** A real Gemini response and a valid tool step occurred (`aiUsed: true` is correct and is kept). It does **not** prove a model-chosen recovery: the proposing and committing steps were DETERMINISTIC, and the run's provenance is `DETERMINISTIC_FALLBACK · no model decision`, which is correct. Do not describe this run as a Gemini recovery decision.
 - **Verdict correction.** `modelFailureFallsBack` reported FAIL only because it required `aiUsed === false`, which conflates participation with the decision source. It is now `fallbackVerdict` (`scripts/recoveryLiveFlow.ts`): PASS when a provider call failed, the run is terminal, the trace records why the model was skipped and, for a decided run, a decision step exists; its note reports model participation and the final decision source separately. Re-judging the real trace gives PASS (old verdict: FAIL). Regression tests: `tests/unit/recoveryLiveFlow.test.ts` and four orchestrator scenarios in `tests/integration/recoveryOrchestrator.test.ts` (partial success then provider failure, model never responds, fully model-driven run, model decides then fails on the explanation). `MODEL_DECISION` still requires a successful GEMINI step on `proposeRecovery`, `commitPermittedRecovery` or `requestDriverApproval`; that has not been demonstrated live.
+
+## Neon read-only inspection of 2026-11-10 (decision: Option A, no database writes)
+Source: sanitized local artifact `artifacts/neon-readonly-inspection-2026-11-10T13-02-55Z.json` (host redacted, no credentials, no row contents). Target fingerprint `e470199479ac` (pooler, port 5432, database `neondb`, `sslmode=verify-full`). The inspection used `db:migrate -- --status` and read-only queries. Writes performed: 0. Branch created: no. Migration applied: no.
+
+| Item | Result |
+|---|---|
+| Applied migrations | 001, 002, 003, 004, 005 |
+| Pending | 0 |
+| Unknown ids | 0 |
+| Schema readiness for this build | PASS (`schemaReadyForThisBuild` true) |
+| Read-only data inspection | PASS |
+| Ledger checksums | UNVERIFIED: the ledger is in the legacy format (id and `applied_at` only, no checksum column) |
+| Migration replay (isolated branch) | NOT TESTED |
+| External application startup against Neon | NOT TESTED |
+| Existing database | unchanged by this inspection |
+
+- Ledger times (UTC): 001 and 002 on 2026-11-05; 003, 004 and 005 on 2026-11-09. Earlier statements that Neon lacks 003 to 005 were stale and are corrected throughout the documentation.
+- The database holds 31 existing reservations (and related payment and event rows, all from earlier MOCK and PayPal Sandbox testing). No record was modified, and no record content is reproduced here. Recovery tables exist and are empty (0 recovery runs, disruption events and schedule versions).
+- What this does not show: that the migrations replay cleanly from the ledger state, that checksums match this build's SQL, or that the application starts and serves against Neon. Startup against Neon is deliberately not run (owner instruction).
+
+## PayPal Sandbox smoke runs of 2026-11-10 (owner-run, standalone, USD 1.23)
+Artifacts (redacted, local, not committed): `paypal-smoke-capture-only-smoke_1794310608818.json` and `paypal-smoke-void-only-smoke_1794310747785.json`, each with a `.progress.json`. No order was created by the agent.
+- **Capture: PASS (artifact validated).** Order `APPROVED` 123 USD before authorize; authorization `CREATED` 123 USD; capture `COMPLETED` 123 USD with `authorizationMatches` true, read back from PayPal. Sandbox host, `requestIds` recorded for createOrder, authorize and capture.
+- **Void: PASS (artifact validated).** Order `APPROVED` 123 USD; authorization `CREATED` 123 USD; `void.authorizationStatusAfter` `VOIDED` after a GET read-back. Sandbox host, `requestIds` recorded for createOrder, authorize and void.
+- Both runs used the same client fingerprint and the same payee (last 6 characters match). Authorizations are distinct objects; no authorization was both captured and voided.
+- Limits: the agent validated the redacted files and did not query PayPal. The runs are standalone smoke tests: no webhook delivery, no reconciliation and no link to a GridWindow reservation or the recovery engine is shown. Recovery-linked Sandbox evidence remains NOT TESTED.

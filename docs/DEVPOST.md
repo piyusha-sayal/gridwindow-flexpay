@@ -55,7 +55,7 @@ Authorization is a hold, not escrow. "Paid" has to mean the provider confirmed i
 
 ## What's next
 - Run the Gemini recovery retry and the Sandbox recovery settlement, after explicit approval.
-- Apply migrations 003 to 005 to the hosted database, after a backup and the documented procedure.
+- The hosted database already holds migrations 001 to 005 (read-only check, 2026-11-10). Not yet tested: a migration replay on an isolated branch, ledger checksums, and app startup against it.
 - Real tariffs and charger telemetry. A measured pilot is needed before any claim about real savings or grid benefit.
 
 ## Honest limits

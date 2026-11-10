@@ -21,7 +21,7 @@ Branch `feature/final-integration` = `origin/main` + `feature/combined-release-V
 No Critical or High finding remains open.
 
 ## Honest limitations (unchanged)
-Bryntum markup has vendor axe findings (the table is the accessible alternative); manual drag/resize is intentionally disabled; no recovery-linked PayPal Sandbox evidence (standalone smoke artifacts from 2026-10-30 only, PayPal-Request-Id not recorded); no successful live Gemini decision recorded (one bounded attempt returned HTTP 504); Neon is missing migrations 003-005 and was not touched; all charging data, tariffs and savings are synthetic.
+Bryntum markup has vendor axe findings (the table is the accessible alternative); manual drag/resize is intentionally disabled; no recovery-linked PayPal Sandbox evidence (standalone smoke artifacts from 2026-10-30 only, PayPal-Request-Id not recorded); no successful live Gemini decision recorded (one bounded attempt returned HTTP 504); Neon was not touched when this was written (a later read-only inspection, 2026-11-10, found migrations 001-005 applied; see `docs/EXTERNAL_PREFLIGHT.md`); all charging data, tariffs and savings are synthetic.
 
 ## Evidence classes
 REAL PROVIDER: standalone Sandbox smoke artifacts only. MOCK: all payment flows in the test suites. SYNTHETIC: all charging, delivered-energy and savings numbers. UNVERIFIED/BLOCKED: live Gemini decision, recovery-linked Sandbox transaction, deployment.

@@ -23,7 +23,7 @@ Not verified by this QA (documented by earlier work, no independent evidence): l
 ## Findings relevant to this track
 
 - QA-4 (Low, copy accuracy): the reservation page labels a run whose consent was given by the driver as "Recovered automatically" (`src/components/recoveryCopy.ts`, `COMMITTED: "Recovered automatically"`) while the same card says "so it needs your approval. Nothing changes until you approve it." After approval the sentence is stale and the label misdescribes the consent method. The FlexReceipt detail does record "Approved by you". Recommended: label by consent method (auto within pre-approved bounds vs approved by driver) and use past tense after approval. Visible in `evidence/14-flexreceipt.png`.
-- QA-1 relevance: the app now refuses to start against an external database that lacks migrations 003-005. Run `npm run db:migrate` (dry run, then `--apply`) on a Neon branch before the sandbox procedure below.
+- QA-1 relevance: the app now refuses to start against an external database that lacks migrations 003-005. The existing Neon database already holds 001-005 (read-only inspection, 2026-11-10); for any other database run `npm run db:migrate` (dry run, then `--apply`) on a branch first.
 
 ## Controlled sandbox certification (owner only; NEEDS USER APPROVAL)
 

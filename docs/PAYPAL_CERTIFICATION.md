@@ -41,6 +41,15 @@ What they do NOT prove: who approved the order or that a human did (the script s
 
 Recovery linkage: none. These are the 2026-10-30 standalone smoke runs. No new sandbox evidence linked to the recovery work exists. The sandbox order in section 1 below (USD 12.43) has not been executed.
 
+### 0a. Standalone smoke runs of 2026-11-10 (owner-run; validated from redacted artifacts, no order created by the agent)
+
+| Flow | Artifact | Checks | Result |
+|---|---|---|---|
+| Capture | `paypal-smoke-capture-only-smoke_1794310608818.json` | sandbox host; order `APPROVED`, 123 USD; authorization `CREATED`, 123 USD; capture `COMPLETED`, 123 USD, `authorizationMatches` true; `requestIds` for createOrder, authorize, capture | PASS (provider-confirmed COMPLETED, USD 1.23) |
+| Void | `paypal-smoke-void-only-smoke_1794310747785.json` | sandbox host; order `APPROVED`, 123 USD; authorization `CREATED`, 123 USD; `void.authorizationStatusAfter` `VOIDED`; `requestIds` for createOrder, authorize, void | PASS (artifact-validated; the owner also reported success) |
+
+These runs record `requestIds`, which the 2026-10-30 runs lack. Still not shown: webhook delivery, reconciliation, any link to a GridWindow reservation or the recovery engine. Recovery-linked Sandbox evidence stays NOT TESTED. The agent read only the redacted files and did not query PayPal.
+
 ## 1. Proposed transactions (computed from the real backend quote)
 
 Produced by `npm run payment:preflight -- --night-a 2026-11-12 --night-b 2026-11-15` (read-only; Neon opened in a READ ONLY transaction; no quote row, no PayPal call). Both nights have no reservation in Neon, so the price is not shifted by other sessions.
