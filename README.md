@@ -21,14 +21,6 @@
   <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=19&duration=3500&pause=900&color=14B8A6&center=true&vCenter=true&repeat=true&width=760&height=52&lines=Plan+around+the+driver%2C+not+just+the+charger.;Protect+the+site%27s+power+limit.;Authorize+first.+Capture+only+after+delivery.;Recover+from+failures+without+changing+the+deal." alt="Animated introduction to GridWindow FlexPay" />
 </a>
 
-<br />
-
-[![Stars](https://img.shields.io/github/stars/piyusha-sayal/gridwindow-flexpay?style=for-the-badge&logo=github&label=Stars&color=14B8A6)](https://github.com/piyusha-sayal/gridwindow-flexpay/stargazers)
-[![Forks](https://img.shields.io/github/forks/piyusha-sayal/gridwindow-flexpay?style=for-the-badge&logo=github&label=Forks&color=2563EB)](https://github.com/piyusha-sayal/gridwindow-flexpay/forks)
-[![Issues](https://img.shields.io/github/issues/piyusha-sayal/gridwindow-flexpay?style=for-the-badge&logo=github&label=Issues&color=F59E0B)](https://github.com/piyusha-sayal/gridwindow-flexpay/issues)
-[![Last commit](https://img.shields.io/github/last-commit/piyusha-sayal/gridwindow-flexpay?style=for-the-badge&logo=github&label=Updated&color=64748B)](https://github.com/piyusha-sayal/gridwindow-flexpay/commits)
-
-<br />
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-111827?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
