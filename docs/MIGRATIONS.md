@@ -23,7 +23,7 @@ npm run db:migrate -- --apply --confirm-database <fingerprint>
 ```
 
 - Target: `MIGRATION_DATABASE_URL` (direct, non-pooled URL; DDL should not go through a transaction pooler), or `DATABASE_URL` when that is unset. `.env.local` is loaded if present; variables already set in the shell win.
-- `target fingerprint` is the first 12 hex characters of SHA-256 of the target host name. Every mode prints it. The URL, user, password and host name are never printed.
+- `target fingerprint` is the first 12 hex characters of SHA-256 of the target host, port and database name (credentials and query options excluded). Every mode prints it. The URL, user, password and host name are never printed.
 - `--status` is read-only. It prints the ledger state, applied, pending, unknown ids, checksum drift and unverified legacy rows, and exits 0 only when the schema matches this build.
 - `--plan` is read-only. It prints, for each pending migration, the tables, indexes, functions, triggers and columns it creates or adds, in order.
 - `--apply` refuses (exit 2, before connecting) unless `--confirm-database` equals the target fingerprint. The fingerprint is the guard against migrating the wrong database by accident. Read it with `--status` against the same target.

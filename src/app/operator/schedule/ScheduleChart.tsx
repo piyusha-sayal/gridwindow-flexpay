@@ -30,7 +30,7 @@ export function ScheduleChart({ model, lane }: ScheduleChartProps) {
       viewPreset={viewPreset}
       resources={resources}
       events={events}
-      columns={[{ type: "resourceInfo", field: "name", text: "Port", width: 150 }]}
+      columns={[{ type: "resourceInfo", field: "name", text: "Port", width: 150, showImage: false }]}
       readOnly
       rowHeight={56}
       height={260}

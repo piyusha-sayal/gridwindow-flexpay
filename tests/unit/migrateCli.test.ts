@@ -46,9 +46,12 @@ describe("parseMigrateArgs", () => {
 const it60 = (name: string, fn: () => Promise<void> | void) => it(name, fn, 60_000);
 
 describe("databaseFingerprint", () => {
-  it60("is twelve hex characters and depends only on the host name", () => {
+  it60("is twelve hex characters and depends on host, port and database name, not credentials", () => {
     expect(databaseFingerprint(URL_A)).toMatch(/^[0-9a-f]{12}$/);
-    expect(databaseFingerprint(URL_A)).toBe(databaseFingerprint("postgres://other:pw@ep-test-alpha.example.neon.tech/x"));
+    expect(databaseFingerprint(URL_A)).toBe(databaseFingerprint("postgres://other:pw@ep-test-alpha.example.neon.tech/gridwindow?sslmode=disable"));
+    // Two databases on one server (e.g. staging and production) must not share a confirmation code.
+    expect(databaseFingerprint(URL_A)).not.toBe(databaseFingerprint("postgres://gwuser:s3cret-pass@ep-test-alpha.example.neon.tech/other_db"));
+    expect(databaseFingerprint("postgres://u@127.0.0.1:55432/d")).not.toBe(databaseFingerprint("postgres://u@127.0.0.1:55433/d"));
     expect(databaseFingerprint(URL_A)).not.toBe(databaseFingerprint(URL_B));
   });
 

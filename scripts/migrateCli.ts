@@ -61,9 +61,11 @@ export function parseMigrateArgs(argv: readonly string[]): MigrateArgs {
 
 /** Twelve hex characters of SHA-256 over the host name: enough to tell targets apart, reveals nothing usable. */
 export function databaseFingerprint(url: string): string {
-  const host = new URL(url).hostname;
-  if (!host) throw new UsageError("The target URL has no host name.");
-  return createHash("sha256").update(host).digest("hex").slice(0, 12);
+  const u = new URL(url);
+  if (!u.hostname) throw new UsageError("The target URL has no host name.");
+  // Host, port and database name identify the target; credentials and query options are deliberately excluded.
+  const target = `${u.hostname.toLowerCase()}:${u.port || "5432"}${decodeURIComponent(u.pathname)}`;
+  return createHash("sha256").update(target).digest("hex").slice(0, 12);
 }
 
 function printReport(report: SchemaReport, io: MigrateIo): void {
