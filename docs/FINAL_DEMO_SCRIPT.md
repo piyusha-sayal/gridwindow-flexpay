@@ -15,7 +15,7 @@ Pre-flight (off camera): `docs/DEMO_RUNBOOK.md`. Browser time zone set to Pacifi
 | 1:45-2:05 | Reservation page, consent card | Driver reads the change and presses Approve | "The change moves the finish time, so the driver must consent. Nothing changes until they do. The price stays exactly the same." |
 | 2:05-2:20 | Bryntum | Schedule updates to version 2; reload and it is still there | "The validated schedule appears in Bryntum and survives a reload, because it was committed to the database, not drawn in the browser." |
 | 2:20-2:40 | Run synthetic night, FlexReceipt | Press run. Show delivered kWh, captured amount, receipt | "Charging is simulated. Money moves only after delivered energy is recorded. If the charger had failed, the hold would be voided and the driver pays nothing." |
-| 2:40-2:50 | Impact summary slide | Static text | "In a synthetic benchmark, rescheduling repaired 15 percent of disturbed charges; the rest are physically unrecoverable and are handled honestly. Not measured savings." |
+| 2:40-2:50 | Impact summary slide | Static text | "In a synthetic benchmark, rescheduling reached the energy target in 15 percent of disturbed cases, mostly by finishing later with the driver's consent; the rest are physically unrecoverable and are handled honestly. Not measured savings." |
 
 Narrative check: a customer accepts a charging promise (0:35) -> a charger slows (1:05) -> the recovery workflow responds (1:20) -> deterministic validation (1:20-1:45) -> Bryntum shows the change (2:05) -> charging continues (2:20) -> the financial policy decides (2:20) -> FlexReceipt explains it (2:20).
 

@@ -165,3 +165,21 @@ No critical or high-severity security or payment defect was found. Confirmed by 
 
 ## Documents produced
 `docs/BRYNTUM_EVIDENCE.md`, `docs/AGENTIC_COMMERCE_EVIDENCE.md`, `docs/PAYPAL_AI_EVIDENCE.md`, `docs/IMPACT_SUMMARY.md`, `docs/ARCHITECTURE_SUMMARY.md`, `docs/FINAL_DEMO_SCRIPT.md`, `docs/DEMO_RUNBOOK.md` (includes the shot checklist), `docs/DEVPOST_FINAL.md`, and `docs/evidence/` (screenshots and JSON traces).
+
+---
+
+# Update 3 (2026-11-09, evidence finalization; no production code changed)
+
+- **Impact reconciliation** (`tests/unit/independent-benchmark-breakdown.test.ts`, now 6 tests): 56 + 648 + 3,832 + 136 = 4,672 disjoint; the 1,455 charger failures are a subset of the 3,832; the raw infeasible flag (3,882) = 3,832 + 3 pre-existing misses + 47 scenarios that met the target; +2.64 % is over all 5,789 applicable scenarios (+3.49 % over the 4,672 disturbed). New finding: of the 704 repaired scenarios, 592 reach the energy target only by finishing after the agreed ready-by (consent required), 112 do not. `docs/IMPACT_SUMMARY.md`, `docs/DEVPOST_FINAL.md` and `docs/FINAL_DEMO_SCRIPT.md` were corrected to say "reached the energy target after rescheduling", not "restored the schedule".
+- **Operator form verified in a real browser** (`tests/e2e/independent-operator-form.spec.ts`, PASS): the demo's injection path (Night of -> Load -> Recovery engine -> Inject SYNTHETIC disturbance) works, shows "Source FALLBACK" and a "DETERMINISTIC (NO AI)" badge, and leads to the driver consent card. Screenshot `docs/evidence/20-operator-form-injection.png`. Earlier evidence runs injected through the API.
+- **Bryntum Community typings contain no `timeZone` option**, so the QA-3 correction is a station-zone header renderer, not a prop (`docs/QA_FINDINGS_AND_FIX_SPECS.md`).
+- **Local `.env` sets `GEMINI_MODEL=gemini-3.8-flash`**, the model of the HTTP 504 run; the intended retry uses `gemini-3.6-flash` (`docs/LIVE_CERTIFICATION_HANDOFF.md`).
+- New documents: `QA_FINDINGS_AND_FIX_SPECS.md`, `DEMO_RECORDING_PACKAGE.md`, `LIVE_CERTIFICATION_HANDOFF.md`, `FINAL_INTEGRATION_CHECKLIST.md`; Devpost placeholders resolved to evidence-free wording with a claims audit and an owner-decision checklist.
+- Only the two touched test files were run (both PASS, typecheck and lint clean). The full baseline was deliberately not repeated; it is gate G1 to G4 of `docs/FINAL_INTEGRATION_CHECKLIST.md` on the final commit.
+
+| Item | Status |
+|---|---|
+| QA-2, QA-3, QA-4, QA-5, QA-6 | NOT FIXED (specified; need authorization) |
+| Real PostgreSQL concurrency | BLOCKED |
+| Live Gemini, PayPal Sandbox | NEEDS USER APPROVAL |
+| Integrated release | NOT TESTED (no integrated commit yet) |

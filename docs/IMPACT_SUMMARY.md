@@ -20,14 +20,24 @@ The 4,677 static misses are 5 pre-existing plus 4,672 caused by the disturbance.
 
 Why so many are infeasible: a disturbance that removes the physical ability to deliver cannot be repaired by rescheduling.
 
-| Disturbance | Scenarios | Missed (static) | Missed (auto) | Missed (with approval) | No feasible recovery |
+| Disturbance | Scenarios | Missed (static) | Missed (auto) | Missed (with approval) | Raw infeasible flag* |
 |---|---:|---:|---:|---:|---:|
 | Charger failure | 1,455 | 1,455 | 1,455 | 1,455 | 1,455 |
 | Charger power reduction | 1,455 | 1,402 | 1,348 | 799 | 803 |
 | Site cap reduction | 1,455 | 1,066 | 1,064 | 1,021 | 907 |
 | Early departure | 1,424 | 754 | 754 | 700 | 717 |
 
+*The raw flag counts 3,882 across all 5,789 scenarios; 3,832 of those are disturbance-caused misses (the figure used in this document), 3 are pre-existing misses and 47 still met the target. Reconciled by `independent-benchmark-breakdown.test.ts`.
+
 Charger failure is 100 % unrecoverable by design: no power means no energy. Those cases are where the settlement policy matters (an operator-attributable outage voids the authorization and the driver pays nothing). Early departure is a driver-requested deadline change: less time, less energy, recoverable only when a faster plan exists.
+
+## How to read the numbers (denominators and overlaps)
+
+- **Unit.** A scenario is one agreed charge hit by one disturbance (485 charges x up to 12 severities). It is not a distinct driver or a real session. 4,672 means disturbed scenarios.
+- **Disjoint classes.** 56 + 648 + 3,832 + 136 = 4,672. Do not add the raw columns elsewhere in this document to these: the charger-failure row (1,455) is a subset of the 3,832, and the 3,882 raw flag overlaps them (see the footnote above).
+- **"Repaired" means the energy target was met, not that the original promise was kept.** Of the 704 repaired, 112 met the target without finishing after the agreed ready-by (56 automatically, 56 with approval) and 592 met it only by finishing after the agreed ready-by, which always needs the driver's consent. Say "reached the energy target after rescheduling", not "restored the original schedule".
+- **+2.6 %** is delivered energy with driver approval versus keeping the plan, over all 5,789 applicable scenarios (119,776 kWh to 122,943 kWh). Over only the 4,672 disturbed scenarios it is +3.5 %. The first is the conservative figure and the one to quote.
+- **Not measured:** real chargers, real grid conditions, real driver behavior (the model assumes the driver approves in the approval column).
 
 ## Static scheduling versus adaptive recovery on identical scenarios
 
@@ -62,6 +72,6 @@ Capacity: not a recorded benchmark column. A recovery cannot be committed unless
 
 ## Judge-ready statement
 
-"In a seeded model of 485 flexible overnight charges hit by 12 kinds of disturbance, rescheduling could repair 15 % of the disturbed cases (704 of 4,672) and raised modeled delivered energy by 2.6 % when drivers approved; the rest were physically unrecoverable, and the system handles those without charging the driver for energy that was not delivered. These are synthetic model results, not measured savings."
+"In a seeded model of 485 flexible overnight charges, each hit by up to 12 kinds of disturbance (4,672 disturbed scenarios), rescheduling reached the energy target in 704 of them (15 %), 592 of those only by finishing later than agreed with the driver's consent. With driver approval it raised modeled delivered energy by 2.6 %. 3,832 disturbed scenarios, including every charger failure, had no feasible recovery; for those the system does not charge the driver for energy that was not delivered. These are synthetic model results, not measured savings."
 
 Do not state: real energy or cost savings, real grid benefit, or any result from a real charger.
