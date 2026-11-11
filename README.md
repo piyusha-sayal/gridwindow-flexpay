@@ -1,15 +1,13 @@
 
 <!--
   GridWindow FlexPay
-  GitHub-native README: Markdown, HTML, Mermaid, and live SVG badges.
+  GitHub-native README: Markdown, HTML, Mermaid, and image-based charts.
   No JavaScript, custom CSS, or unsupported embeds required.
 -->
 
 <div align="center">
 
-<a href="https://github.com/piyusha-sayal/gridwindow-flexpay">
-  <img src="https://img.shields.io/badge/GRIDWINDOW-FLEXPAY-0B1220?style=for-the-badge&labelColor=0B1220&color=14B8A6" alt="GridWindow FlexPay" />
-</a>
+<img src="https://img.shields.io/badge/GRIDWINDOW-FLEXPAY-0B1220?style=for-the-badge&amp;labelColor=0B1220&amp;color=14B8A6" alt="GridWindow FlexPay" />
 
 # GridWindow FlexPay
 
@@ -17,10 +15,7 @@
 
 **Intelligent EV charging windows · Explainable offers · Delivery-linked payments · Constraint-aware recovery**
 
-<a href="https://github.com/piyusha-sayal/gridwindow-flexpay">
-  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=19&duration=3500&pause=900&color=14B8A6&center=true&vCenter=true&repeat=true&width=760&height=52&lines=Plan+around+the+driver%2C+not+just+the+charger.;Protect+the+site%27s+power+limit.;Authorize+first.+Capture+only+after+delivery.;Recover+from+failures+without+changing+the+deal." alt="Animated introduction to GridWindow FlexPay" />
-</a>
-
+<img src="https://readme-typing-svg.demolab.com?font=Inter&amp;weight=600&amp;size=19&amp;duration=3500&amp;pause=900&amp;color=14B8A6&amp;center=true&amp;vCenter=true&amp;repeat=true&amp;width=760&amp;height=52&amp;lines=Plan+around+the+driver%2C+not+just+the+charger.;Protect+the+site%27s+power+limit.;Authorize+first.+Capture+only+after+delivery.;Recover+from+failures+without+changing+the+deal." alt="Animated introduction to GridWindow FlexPay" />
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-111827?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
@@ -31,15 +26,7 @@
 
 <br />
 
-[**Explore the product**](#the-product-in-pictures) · [**Try the demo**](#run-it-in-minutes) · [**See the results**](#the-numbers-behind-the-scheduler) · [**Inspect the architecture**](#architecture-at-a-glance) · [**Judge walkthrough**](docs/JUDGES.md)
-
-<br />
-
-<a href="docs/screenshots/driver-offers.png">
-  <img src="public/images/nighttime_ev_charging_station.png" width="860" alt="Illustration of an electric vehicle charging at a shared station overnight" />
-</a>
-
-<sub>Illustrated concept above. The product screens below were captured from a working MOCK-mode application.</sub>
+<img src="public/images/nighttime_ev_charging_station.png" width="860" alt="Illustration of an electric vehicle charging at a shared station overnight" />
 
 </div>
 
@@ -59,7 +46,7 @@ GridWindow FlexPay uses that flexibility to coordinate charging at a shared site
 | 🛡️ | **AI without payment authority** | Let AI explain or select prevalidated recovery options, never change prices, grant consent, or move money. |
 
 > [!IMPORTANT]
-> **Prototype, not a live charging network.** Vehicles, building load, energy delivery, forecasts, tariffs, disturbances, and savings are simulated. Payments use MOCK mode or PayPal Sandbox funds. No real vehicle is charged and no real customer money moves. [Read the limits](#what-this-prototype-does-and-does-not-prove).
+> **Prototype, not a live charging network.** Vehicles, building load, energy delivery, forecasts, tariffs, disturbances, and savings are simulated. Payments use MOCK mode or PayPal Sandbox funds. No real vehicle is charged and no real customer money moves. [Read the limits](#an-honest-look-at-the-boundaries).
 
 ---
 
@@ -94,38 +81,30 @@ GridWindow FlexPay uses that flexibility to coordinate charging at a shared site
 
 <div align="center">
 
-### 01 / Find a plan that fits the driver
-
-<a href="docs/screenshots/driver-offers.png">
-  <img src="docs/screenshots/driver-offers.png" alt="Smart Charge shows immediate and flexible charging offers with modeled price comparisons" width="840" />
-</a>
-
-<sub>Tap the image for the full screenshot. Each qualifying offer shows timing, modeled cost, and assumptions before approval.</sub>
-
-<br /><br />
-
 <table>
 <tr>
-<td width="50%" align="center">
-<h3>02 / Run the site</h3>
-<a href="docs/screenshots/operator-console.png">
-<img src="docs/screenshots/operator-console.png" alt="Operator console with reservations, station power usage, and controls" width="100%" />
-</a>
-<sub>Site capacity, reservations, session controls, and payment states.</sub>
+<td align="center" width="50%" valign="top">
+<h3>01 / Find a plan that fits the driver</h3>
+<a href="docs/screenshots/driver-offers.png"><img src="docs/screenshots/driver-offers.png" alt="Smart Charge: compare immediate and flexible charging offers with modeled price assumptions" width="100%" /></a>
+<p><sub>Smart Charge compares qualified offers and displays the assumptions behind each one.</sub></p>
 </td>
-<td width="50%" align="center">
-<h3>03 / Verify the outcome</h3>
-<a href="docs/screenshots/flexreceipt.png">
-<img src="docs/screenshots/flexreceipt.png" alt="FlexReceipt showing the approved terms, simulated energy delivery, and MOCK payment outcome" width="100%" />
-</a>
-<sub>FlexReceipt connects what was approved, what was delivered, and what was settled.</sub>
+<td align="center" width="50%" valign="top">
+<h3>02 / Run the site</h3>
+<a href="docs/screenshots/operator-console.png"><img src="docs/screenshots/operator-console.png" alt="Operator console: reservations, station power usage and simulation controls" width="100%" /></a>
+<p><sub>Monitor site capacity, reservations, simulated charging and payment states.</sub></p>
 </td>
 </tr>
 </table>
 
+<h3>03 / Verify the outcome</h3>
+
+<a href="docs/screenshots/flexreceipt.png"><img src="docs/screenshots/flexreceipt.png" alt="FlexReceipt: approved charging terms, synthetic delivery and MOCK payment result" width="400" /></a>
+
+<sub>FlexReceipt joins the approved terms, delivered energy and settlement outcome in one printable record.</sub>
+
 </div>
 
-<sub>All three product screenshots use seeded synthetic data and MOCK payments. They are not proof of real charging or live transactions.</sub>
+<sub>Product screenshots use seeded synthetic data and MOCK payments. They do not represent real charging or live payments.</sub>
 
 ---
 
@@ -261,25 +240,22 @@ The benchmark replays **500 seeded synthetic nights** containing **1,500 chargin
 
 </div>
 
-### Modeled energy cost per served session
+<table>
+<tr>
+<td width="50%" align="center" valign="top">
+<h3>Modeled energy cost per served session</h3>
+<img src="https://quickchart.io/chart?width=600&amp;height=330&amp;backgroundColor=%230F172A&amp;format=png&amp;c=%7B%22type%22%3A%22horizontalBar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Immediate%22%2C%22Off-peak%22%2C%22Greedy%22%2C%22GridWindow%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22USD%22%2C%22data%22%3A%5B10.61%2C6.01%2C6.86%2C5.44%5D%2C%22backgroundColor%22%3A%5B%22%2364748B%22%2C%22%2364748B%22%2C%22%2364748B%22%2C%22%2314B8A6%22%5D%2C%22borderWidth%22%3A0%7D%5D%7D%2C%22options%22%3A%7B%22responsive%22%3Atrue%2C%22legend%22%3A%7B%22display%22%3Afalse%7D%2C%22layout%22%3A%7B%22padding%22%3A%7B%22left%22%3A6%2C%22right%22%3A20%2C%22top%22%3A12%2C%22bottom%22%3A6%7D%7D%2C%22scales%22%3A%7B%22xAxes%22%3A%5B%7B%22ticks%22%3A%7B%22beginAtZero%22%3Atrue%2C%22max%22%3A12%2C%22fontColor%22%3A%22%23E2E8F0%22%2C%22fontSize%22%3A11%7D%2C%22gridLines%22%3A%7B%22color%22%3A%22%23334155%22%2C%22zeroLineColor%22%3A%22%2364748B%22%7D%7D%5D%2C%22yAxes%22%3A%5B%7B%22ticks%22%3A%7B%22fontColor%22%3A%22%23F1F5F9%22%2C%22fontSize%22%3A12%7D%2C%22gridLines%22%3A%7B%22display%22%3Afalse%7D%7D%5D%7D%2C%22plugins%22%3A%7B%22datalabels%22%3A%7B%22display%22%3Afalse%7D%7D%7D%7D" alt="Horizontal bar chart comparing modeled energy cost per served session in US dollars: immediate 10.61, off-peak 6.01, greedy 6.86, optimized GridWindow 5.44" width="100%" />
+<p><sub>USD per served session. Lower is better.</sub></p>
+</td>
+<td width="50%" align="center" valign="top">
+<h3>Requests served out of 1,500</h3>
+<img src="https://quickchart.io/chart?width=600&amp;height=330&amp;backgroundColor=%230F172A&amp;format=png&amp;c=%7B%22type%22%3A%22horizontalBar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Immediate%22%2C%22Off-peak%22%2C%22Greedy%22%2C%22GridWindow%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Requests%22%2C%22data%22%3A%5B1246%2C1024%2C1243%2C1254%5D%2C%22backgroundColor%22%3A%5B%22%2364748B%22%2C%22%2364748B%22%2C%22%2364748B%22%2C%22%2314B8A6%22%5D%2C%22borderWidth%22%3A0%7D%5D%7D%2C%22options%22%3A%7B%22responsive%22%3Atrue%2C%22legend%22%3A%7B%22display%22%3Afalse%7D%2C%22layout%22%3A%7B%22padding%22%3A%7B%22left%22%3A6%2C%22right%22%3A20%2C%22top%22%3A12%2C%22bottom%22%3A6%7D%7D%2C%22scales%22%3A%7B%22xAxes%22%3A%5B%7B%22ticks%22%3A%7B%22beginAtZero%22%3Atrue%2C%22max%22%3A1500%2C%22fontColor%22%3A%22%23E2E8F0%22%2C%22fontSize%22%3A11%7D%2C%22gridLines%22%3A%7B%22color%22%3A%22%23334155%22%2C%22zeroLineColor%22%3A%22%2364748B%22%7D%7D%5D%2C%22yAxes%22%3A%5B%7B%22ticks%22%3A%7B%22fontColor%22%3A%22%23F1F5F9%22%2C%22fontSize%22%3A12%7D%2C%22gridLines%22%3A%7B%22display%22%3Afalse%7D%7D%5D%7D%2C%22plugins%22%3A%7B%22datalabels%22%3A%7B%22display%22%3Afalse%7D%7D%7D%7D" alt="Horizontal bar chart comparing served requests: immediate 1,246, off-peak 1,024, greedy 1,243, optimized GridWindow 1,254" width="100%" />
+<p><sub>Requests successfully scheduled. Higher is better.</sub></p>
+</td>
+</tr>
+</table>
 
-```mermaid
-xychart-beta
-    title "Mean modeled energy cost per session (USD, lower is better)"
-    x-axis [Immediate, OffPeak, Greedy, Optimized]
-    y-axis "USD" 0 --> 12
-    bar [10.61, 6.01, 6.86, 5.44]
-```
-
-### Requests served out of 1,500
-
-```mermaid
-xychart-beta
-    title "Served requests (higher is better)"
-    x-axis [Immediate, OffPeak, Greedy, Optimized]
-    y-axis "Requests" 0 --> 1500
-    bar [1246, 1024, 1243, 1254]
-```
+<sub>Charts are rendered as image previews from the recorded synthetic benchmark results. They do not update with live charging data.</sub>
 
 | Policy | Served | Mean modeled energy cost / served session | Mean site peak |
 | :--- | ---: | ---: | ---: |
@@ -498,9 +474,9 @@ These are the results recorded in the supplied project evidence, not live CI res
 | Test or check | Reported result | Where to inspect |
 | :--- | :--- | :--- |
 | Strict TypeScript and ESLint | **0 errors / 0 problems** | [Architecture and evidence](docs/AWARD_EVIDENCE.md) |
-| Vitest with embedded database | **968 passed, 12 skipped** | [QA closure](docs/QA_CLOSURE.md) |
-| Real PostgreSQL 18 checks, separate disposable run | **46 passed, 1 skipped; restart run 12 passed** | [QA closure](docs/QA_CLOSURE.md) |
-| Playwright, desktop, mobile and tablet | **126 passed, 0 failed, 6 skipped by design** | [QA closure](docs/QA_CLOSURE.md) |
+| Vitest with embedded database | **806 passed, 12 skipped** | [Skipped-test inventory](docs/SKIPPED_TESTS.md) |
+| Real PostgreSQL 18.1 checks, separate disposable run | **11 passed, 1 skipped** | [Migration guide](docs/MIGRATIONS.md) |
+| Playwright, 21 spec files | **0 failed, 6 skipped by design** | [Judge evidence](docs/AWARD_EVIDENCE.md) |
 | Production build | **PASS** | [Award evidence](docs/AWARD_EVIDENCE.md) |
 | Client-bundle secret/config scan | **PASS** | [License and secrets checklist](docs/LICENSE_AND_SECRETS_CHECKLIST.md) |
 | Production dependency audit | **0 reported vulnerabilities** | [Award evidence](docs/AWARD_EVIDENCE.md) |
@@ -576,16 +552,6 @@ npm start
 ```
 
 </details>
-
-<div align="center">
-
-### Open [http://localhost:3000](http://localhost:3000)
-
-[![Smart Charge](https://img.shields.io/badge/Open-Smart%20Charge-0F766E?style=for-the-badge)](http://localhost:3000/drive)
-[![Operator](https://img.shields.io/badge/Open-Operator%20Console-1D4ED8?style=for-the-badge)](http://localhost:3000/operator)
-[![Impact Lab](https://img.shields.io/badge/Open-Impact%20Lab-7C3AED?style=for-the-badge)](http://localhost:3000/impact-lab)
-
-</div>
 
 The sample values above are **local-only placeholders**, not production secrets. `SESSION_SECRET` must contain at least 32 characters, and `OPERATOR_PASSPHRASE` at least 12. For an enduring local setup, copy [`.env.example`](.env.example) to `.env.local`. The embedded database is stored under `.data/`. Stop the app before deleting that folder to reset locally.
 
@@ -729,35 +695,26 @@ The recovery benchmark may show unfavorable or infeasible results. The settlemen
 
 ---
 
-## Built by people who care about the full charging experience
+## Meet the creators
 
 <div align="center">
 
 <table>
 <tr>
-<td align="center" width="50%">
-<a href="https://github.com/piyusha-sayal">
-<img src="https://github.com/piyusha-sayal.png?size=120" width="88" alt="GitHub avatar for repository owner piyusha-sayal" /><br />
-<strong>Piyusha Sayal</strong>
-</a><br />
-<sub>Project creator</sub><br />
-<a href="https://github.com/piyusha-sayal">GitHub profile</a>
+<td align="center" width="50%" valign="top">
+<a href="https://github.com/piyusha-sayal"><img src="https://github.com/piyusha-sayal.png?size=160" width="104" height="104" alt="Piyusha Sayal's GitHub profile avatar" /></a>
+<h3>Piyusha Sayal</h3>
+<sub>Co-creator of GridWindow FlexPay</sub>
+<p><a href="https://github.com/piyusha-sayal"><strong>GitHub profile</strong></a></p>
 </td>
-<td align="center" width="50%">
-<a href="https://github.com/piyusha-sayal/gridwindow-flexpay/graphs/contributors">
-<img src="https://img.shields.io/badge/See%20contribution%20history-GitHub-181717?logo=github&logoColor=white" alt="View repository contributor history" /><br />
-<strong>Satyam Pandey</strong>
-</a><br />
-<sub>Project creator</sub><br />
-<a href="https://github.com/piyusha-sayal/gridwindow-flexpay/graphs/contributors">Repository contributions</a>
+<td align="center" width="50%" valign="top">
+<a href="https://pandeysatyam.com/#satyam-pandey"><img src="https://ui-avatars.com/api/?name=Satyam+Pandey&amp;size=160&amp;background=0F766E&amp;color=FFFFFF&amp;bold=true" width="104" height="104" alt="Initials avatar for Satyam Pandey" /></a>
+<h3>Satyam Pandey</h3>
+<sub>Co-creator of GridWindow FlexPay</sub>
+<p><a href="https://pandeysatyam.com/#satyam-pandey"><strong>Personal website</strong></a></p>
 </td>
 </tr>
 </table>
-
-[![Contributors](https://img.shields.io/github/contributors/piyusha-sayal/gridwindow-flexpay?style=for-the-badge&logo=github&color=14B8A6)](https://github.com/piyusha-sayal/gridwindow-flexpay/graphs/contributors)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/piyusha-sayal/gridwindow-flexpay?style=for-the-badge&logo=github&label=Monthly%20commits&color=2563EB)](https://github.com/piyusha-sayal/gridwindow-flexpay/commits)
-
-[**View contributors**](https://github.com/piyusha-sayal/gridwindow-flexpay/graphs/contributors) · [**Browse source**](https://github.com/piyusha-sayal/gridwindow-flexpay) · [**Report an issue**](https://github.com/piyusha-sayal/gridwindow-flexpay/issues) · [**See commits**](https://github.com/piyusha-sayal/gridwindow-flexpay/commits)
 
 </div>
 
