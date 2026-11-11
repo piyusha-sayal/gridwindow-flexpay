@@ -402,6 +402,10 @@ flowchart TD
 
 ---
 
+## Let your own AI agent book the charge (MCP)
+
+GridWindow ships an [MCP](https://modelcontextprotocol.io) server, so Claude, Cursor or any MCP-capable agent can shop for a charging window on a driver's behalf: read the site, turn a sentence into a request, compare priced offers, ask the deal agent for a pick, and prepare the PayPal checkout. The agent stops at a PayPal approval link that only the driver can complete; capture or void still follows delivered energy on the server. Setup and the full consent boundary: [docs/MCP.md](docs/MCP.md). Try it with `npm run mcp:smoke`.
+
 ## AI helps explain. The server makes the decisions.
 
 GridWindow can use [Google Gemini](https://ai.google.dev/gemini-api/docs) through the [Google Gen AI SDK](https://github.com/googleapis/js-genai), with an Anthropic provider option. When no key is configured or a provider fails, the app uses a **labeled deterministic parser and explainer**. The main workflow still works.

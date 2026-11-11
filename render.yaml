@@ -1,0 +1,46 @@
+# Render Blueprint: one free web service. Secrets are entered in the Render dashboard (sync: false), never committed.
+# See docs/DEPLOYMENT_RUNBOOK.md. Payments are PayPal Sandbox (test money) or MOCK only.
+services:
+  - type: web
+    name: gridwindow-flexpay
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: PAYMENT_MODE
+        sync: false
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: PAYPAL_EXPECTED_MERCHANT_ID
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+      - key: TRUST_PROXY
+        value: "true"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: OPERATOR_PASSPHRASE
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: AI_PROVIDER
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+      - key: DEMO_TOOLS
+        value: "true"

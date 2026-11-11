@@ -4977,3 +4977,22 @@ body::after {
     line-height: 1.45;
   }
 }
+
+/* AG Grid reservation grid */
+.reservation-grid {
+  width: 100%;
+  min-height: 240px;
+}
+.reservation-grid .grid-row-attention {
+  background-color: var(--amber-soft);
+}
+.reservation-grid .badge {
+  vertical-align: middle;
+}
+
+/* The decorative depot banner is a wide-screen flourish; narrow screens skip it */
+@media (max-width: 759px) {
+  .ops-scene-banner {
+    display: none;
+  }
+}
