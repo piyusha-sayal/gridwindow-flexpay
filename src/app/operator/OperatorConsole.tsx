@@ -13,6 +13,7 @@ import { NightKpis } from "./NightKpis";
 import { OperatorScene } from "./OperatorScene";
 import { PortTimeline } from "./PortTimeline";
 import { RecoveryPanel } from "./RecoveryPanel";
+import { ReservationGrid } from "./ReservationGrid";
 import { ReservationTable, type OperatorAction } from "./ReservationTable";
 
 export function OperatorConsole() {
@@ -128,6 +129,7 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [gridOpen, setGridOpen] = useState(false);
   const [version, setVersion] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   const [config, setConfig] = useState<StationConfig | null>(null);
@@ -194,7 +196,7 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
   return (
     <div className="space-y-8">
       <div className="ops-scene-banner" aria-hidden="true">
-        <OperatorScene />
+        <OperatorScene view="0 150 1000 220" />
       </div>
       <header className="ops-head flex flex-wrap items-end justify-between gap-5">
         <div className="space-y-2">
@@ -254,6 +256,20 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
         <>
           <PortTimeline d={d} selectedId={selectedId} onSelect={setSelectedId} />
           <ReservationTable d={d} busyId={busyId} selectedId={selectedId} onAct={(s, a) => void act(s, a)} onSelect={setSelectedId} />
+          <section className="card ops-panel p-5 sm:p-6 space-y-4" aria-labelledby="grid-title">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 id="grid-title" className="panel-title text-[22px] font-semibold">
+                  Reservation data grid
+                </h2>
+                <p className="meta">Sort, filter, search and export every reservation of the night. Powered by AG Grid.</p>
+              </div>
+              <button type="button" className="btn" aria-expanded={gridOpen} aria-controls="reservation-grid" onClick={() => setGridOpen((o) => !o)}>
+                {gridOpen ? "Hide data grid" : "Open data grid"}
+              </button>
+            </div>
+            <div id="reservation-grid">{gridOpen && <ReservationGrid d={d} selectedId={selectedId} onSelect={setSelectedId} />}</div>
+          </section>
         </>
       )}
       <LoadPanel d={d} />
