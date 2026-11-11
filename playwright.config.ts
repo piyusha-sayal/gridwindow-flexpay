@@ -38,6 +38,9 @@ export default defineConfig({
       ANTHROPIC_API_KEY: "",
       GEMINI_API_KEY: "",
       AI_PROVIDER: "",
+      // The optional failover provider must also stay off, even if .env.local configures it.
+      OPENROUTER_API_KEY: "",
+      AI_FALLBACK_PROVIDER: "",
       DEMO_TOOLS: "true",
     },
   },

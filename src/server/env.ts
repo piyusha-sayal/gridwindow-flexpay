@@ -76,8 +76,13 @@ export class ConfigError extends Error {
   }
 }
 
+/** Empty and whitespace-only values are treated as absent, so a blanked key can never activate a provider. */
+function isBlank(v: string | undefined): boolean {
+  return v === undefined || v.trim() === "";
+}
+
 export function loadEnv(source: Record<string, string | undefined> = process.env): AppEnv {
-  const env = schema.parse(Object.fromEntries(Object.entries(source).map(([k, v]) => [k, v === "" ? undefined : v])));
+  const env = schema.parse(Object.fromEntries(Object.entries(source).map(([k, v]) => [k, isBlank(v) ? undefined : v])));
   if (env.PAYPAL_ENV !== undefined && env.PAYPAL_ENV !== "sandbox") {
     throw new ConfigError(`PAYPAL_ENV must be "sandbox"; live mode is forbidden in this build (got a non-sandbox value).`);
   }

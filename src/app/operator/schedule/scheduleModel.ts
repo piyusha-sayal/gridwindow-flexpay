@@ -2,6 +2,7 @@
  * Pure mapping from the persisted schedule read model to what the operator schedule shows.
  * Display only: nothing here decides a plan, a price or a capacity. Every value comes from the server view.
  */
+import { holdsCapacity } from "@/domain/capacity";
 import { SLOT_MS } from "@/domain/units";
 import type { ScheduleDisruptionView, ScheduleSessionView, ScheduleView } from "@/server/services/scheduleView";
 
@@ -38,13 +39,20 @@ export interface SessionSummary {
   peakKw: number;
   serviceState: ScheduleSessionView["serviceState"];
   paymentState: ScheduleSessionView["paymentState"];
+  /** False for released sessions (voided, failed, cancelled, never committed): shown in the table, never drawn or counted as load. */
+  holdsCapacity: boolean;
 }
 
 export interface CapacityBucket {
   slot: number;
   startMs: number;
+  /** Scheduled EV demand in this slot. */
   drawKw: number;
+  /** Synthetic forecast of non-EV site load in this slot. */
+  baseKw: number;
+  /** Usable site limit: the site cap (as lowered by any cap reduction) minus the safety headroom. */
   capKw: number;
+  /** True when EV demand plus forecast base load exceeds the usable limit. Equal to the limit is not over. */
   over: boolean;
 }
 
@@ -125,13 +133,13 @@ export function currentPowerW(session: ScheduleSessionView): number[] {
   return version ? version.powerW : session.originalPowerW;
 }
 
-/** Site cap in each slot: the station cap, lowered from each SITE_CAP_REDUCTION's effective slot onward. */
+/** Usable site limit in each slot, as the validator applies it: the station cap (lowered from each SITE_CAP_REDUCTION's effective slot onward) minus the safety headroom. */
 export function siteCapKwPerSlot(view: ScheduleView): number[] {
   const slots = Math.max(0, ...view.sessions.map((s) => s.originalPowerW.length));
-  const caps = new Array<number>(slots).fill(view.stationCapW / W_TO_KW);
+  const caps = new Array<number>(slots).fill((view.stationCapW - view.safetyHeadroomW) / W_TO_KW);
   for (const d of view.disruptions) {
     if (d.type !== "SITE_CAP_REDUCTION") continue;
-    const capKw = (d.params.stationCapW ?? view.stationCapW) / W_TO_KW;
+    const capKw = ((d.params.stationCapW ?? view.stationCapW) - view.safetyHeadroomW) / W_TO_KW;
     for (let i = d.effectiveSlot; i < slots; i++) caps[i] = Math.min(caps[i]!, capKw);
   }
   return caps;
@@ -142,7 +150,10 @@ function buildCapacity(view: ScheduleView, sessions: readonly ScheduleSessionVie
   return caps.map((capKw, slot) => {
     const sumW = sessions.reduce((a, s) => a + (currentPowerW(s)[slot] ?? 0), 0);
     const drawKw = sumW / W_TO_KW;
-    return { slot, startMs: view.gridStartMs + slot * SLOT_MS, drawKw, capKw, over: sumW / W_TO_KW > capKw };
+    const baseKw = (view.forecastBaseLoadW[slot] ?? 0) / W_TO_KW;
+    // Compare in watts so a load exactly at the limit is never reported over through rounding.
+    const overW = sumW + (view.forecastBaseLoadW[slot] ?? 0) > capKw * W_TO_KW;
+    return { slot, startMs: view.gridStartMs + slot * SLOT_MS, drawKw, baseKw, capKw, over: overW };
   });
 }
 
@@ -163,13 +174,15 @@ function summarise(s: ScheduleSessionView): SessionSummary {
     peakKw: Math.max(0, ...current) / W_TO_KW,
     serviceState: s.serviceState,
     paymentState: s.paymentState,
+    holdsCapacity: holdsCapacity(s),
   };
 }
 
 /** Maps the read model to chart-ready records. Both lanes are always produced so a toggle never refetches. */
 export function buildScheduleModel(view: ScheduleView, proposals: readonly ProposalInput[] = []): ScheduleModel {
   const sessionById = new Map(view.sessions.map((s) => [s.reservationId, s]));
-  const bursts = view.sessions.flatMap((s) => [
+  const held = view.sessions.filter(holdsCapacity);
+  const bursts = held.flatMap((s) => [
     ...deriveBursts(s, s.originalPowerW, "ORIGINAL", view.gridStartMs, false),
     ...deriveBursts(s, currentPowerW(s), "CURRENT", view.gridStartMs, s.currentVersion > 1),
   ]);
@@ -178,7 +191,7 @@ export function buildScheduleModel(view: ScheduleView, proposals: readonly Propo
     if (!session) continue;
     bursts.push(...deriveBursts({ reservationId: p.runId, portId: p.portId, effectiveDepartMs: p.effectiveDepartMs }, p.powerW, "PROPOSAL", view.gridStartMs, true));
   }
-  const capacity = buildCapacity(view, view.sessions);
+  const capacity = buildCapacity(view, held);
   return {
     nightOf: view.nightOf,
     timeZone: view.timeZone,
@@ -186,8 +199,8 @@ export function buildScheduleModel(view: ScheduleView, proposals: readonly Propo
     gridEndMs: view.gridStartMs + capacity.length * SLOT_MS,
     resources: view.ports.map((p) => ({ id: p.id, label: p.label, tier: p.tier, ratedKw: p.maxPowerW / W_TO_KW })),
     bursts,
-    occupancy: view.sessions.map((s) => ({ id: `${s.reservationId}:occupancy`, sessionId: s.reservationId, portId: s.portId, startMs: s.plugInMs, endMs: s.effectiveDepartMs })),
-    deadlines: view.sessions.map((s) => ({ sessionId: s.reservationId, portId: s.portId, atMs: s.effectiveDepartMs, shortened: s.effectiveDepartMs < s.departMs })),
+    occupancy: held.map((s) => ({ id: `${s.reservationId}:occupancy`, sessionId: s.reservationId, portId: s.portId, startMs: s.plugInMs, endMs: s.effectiveDepartMs })),
+    deadlines: held.map((s) => ({ sessionId: s.reservationId, portId: s.portId, atMs: s.effectiveDepartMs, shortened: s.effectiveDepartMs < s.departMs })),
     capacity,
     disruptions: view.disruptions.map((d) => ({
       eventId: d.eventId,
@@ -202,12 +215,18 @@ export function buildScheduleModel(view: ScheduleView, proposals: readonly Propo
   };
 }
 
-/** Changes whenever a session's committed version, the disruption set or a pending proposal changes. */
-export function revisionKey(view: Pick<ScheduleView, "sessions" | "disruptions">, proposals: readonly ProposalInput[] = []): string {
+/** Recovery changes that warrant a recovery notice, separate from reservation lifecycle updates. */
+export function recoveryRevisionKey(view: Pick<ScheduleView, "sessions" | "disruptions">, proposals: readonly ProposalInput[] = []): string {
   const versions = view.sessions.map((s) => `${s.reservationId}@${s.currentVersion}`).sort();
   const disruptions = view.disruptions.map((d) => `${d.eventId}:${d.runStatus ?? "-"}`).sort();
   const pending = proposals.map((p) => `${p.runId}:${p.powerW.join(".")}`).sort();
   return `${versions.join(",")}|${disruptions.join(",")}|${pending.join(",")}`;
+}
+
+/** Lifecycle changes must refresh the chart even when the charging plan version is unchanged. */
+export function revisionKey(view: Pick<ScheduleView, "sessions" | "disruptions">, proposals: readonly ProposalInput[] = []): string {
+  const states = view.sessions.map((s) => `${s.reservationId}:${s.paymentState}:${s.serviceState}:${s.slotsCommitted}`).sort();
+  return `${recoveryRevisionKey(view, proposals)}|${states.join(",")}`;
 }
 
 /** Bursts for one lane, the only data the timeline draws. */
@@ -222,8 +241,11 @@ export function timeLabel(ms: number, timeZone: string): string {
 /** Plain-English summary for aria-label and the screen-reader text. */
 export function scheduleSummary(model: ScheduleModel): string {
   const over = model.capacity.filter((c) => c.over).length;
+  const live = model.sessions.filter((s) => s.holdsCapacity).length;
+  const released = model.sessions.length - live;
+  const releasedText = released > 0 ? ` ${released} released (voided, failed or cancelled) and not counted as load.` : "";
   const recovered = model.sessions.filter((s) => s.recovered).length;
   const shortened = model.sessions.filter((s) => s.departureShortened).length;
   const pending = model.pendingProposals > 0 ? ` ${model.pendingProposals} proposal(s) awaiting driver approval, not committed.` : "";
-  return `${model.sessions.length} sessions on ${model.resources.length} ports. ${recovered} recovered, ${shortened} with shortened departure, ${over} time slot(s) over the site cap.${pending}`;
+  return `${live} sessions on ${model.resources.length} ports. ${recovered} recovered, ${shortened} with shortened departure, ${over} time slot(s) over the site limit.${releasedText}${pending}`;
 }

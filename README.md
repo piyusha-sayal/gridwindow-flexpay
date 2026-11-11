@@ -498,9 +498,9 @@ These are the results recorded in the supplied project evidence, not live CI res
 | Test or check | Reported result | Where to inspect |
 | :--- | :--- | :--- |
 | Strict TypeScript and ESLint | **0 errors / 0 problems** | [Architecture and evidence](docs/AWARD_EVIDENCE.md) |
-| Vitest with embedded database | **806 passed, 12 skipped** | [Skipped-test inventory](docs/SKIPPED_TESTS.md) |
-| Real PostgreSQL 18.1 checks, separate disposable run | **11 passed, 1 skipped** | [Migration guide](docs/MIGRATIONS.md) |
-| Playwright, 21 spec files | **0 failed, 6 skipped by design** | [Judge evidence](docs/AWARD_EVIDENCE.md) |
+| Vitest with embedded database | **968 passed, 12 skipped** | [QA closure](docs/QA_CLOSURE.md) |
+| Real PostgreSQL 18 checks, separate disposable run | **46 passed, 1 skipped; restart run 12 passed** | [QA closure](docs/QA_CLOSURE.md) |
+| Playwright, desktop, mobile and tablet | **126 passed, 0 failed, 6 skipped by design** | [QA closure](docs/QA_CLOSURE.md) |
 | Production build | **PASS** | [Award evidence](docs/AWARD_EVIDENCE.md) |
 | Client-bundle secret/config scan | **PASS** | [License and secrets checklist](docs/LICENSE_AND_SECRETS_CHECKLIST.md) |
 | Production dependency audit | **0 reported vulnerabilities** | [Award evidence](docs/AWARD_EVIDENCE.md) |

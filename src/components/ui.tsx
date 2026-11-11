@@ -95,11 +95,26 @@ const FALLBACK_COPY: Record<string, string> = {
  * Provenance stays one click away instead of a banner: the text says whether a model wrote this or the
  * deterministic fallback did, so a fallback answer is never presented as an AI answer.
  */
+/**
+ * What the provenance details say. A model answer names the model; a fallback is always labelled deterministic and never as
+ * a model. When the fallback was used because a configured provider failed (not because none is configured), the summary
+ * says so too, so an operator can see a provider failure without opening the details.
+ */
+export function aiSourceText(src: AiSource): { summary: string; detail: string } {
+  if (src.source === "MODEL") return { summary: "How this was generated", detail: `AI · ${src.model} · numbers verified against backend` };
+  const failed = src.reason !== "NOT_CONFIGURED";
+  return {
+    summary: failed ? "How this was generated · fallback used" : "How this was generated",
+    detail: `Deterministic fallback (no AI) · ${FALLBACK_COPY[src.reason] ?? src.reason}`,
+  };
+}
+
 export function AiSourceBadge({ src }: { src: AiSource }) {
+  const t = aiSourceText(src);
   return (
     <details className="text-[12px] text-muted">
-      <summary className="cursor-pointer underline underline-offset-4">How this was generated</summary>
-      <p className="mt-1">{src.source === "MODEL" ? `AI · ${src.model} · numbers verified against backend` : `Deterministic fallback (no AI) · ${FALLBACK_COPY[src.reason] ?? src.reason}`}</p>
+      <summary className="cursor-pointer underline underline-offset-4">{t.summary}</summary>
+      <p className="mt-1">{t.detail}</p>
     </details>
   );
 }

@@ -6,6 +6,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { OPERATOR_PASSPHRASE, OPERATOR_STATE } from "./constants";
+import { settleAnimations } from "./settle";
 
 test.describe.configure({ mode: "serial" });
 test.use({ storageState: OPERATOR_STATE });
@@ -223,6 +224,7 @@ test("layout and full axe report per viewport (all impacts)", async ({ page }, i
   const layout: LayoutIssue[] = [];
   const axe: { page: string; id: string; impact: string | null | undefined; help: string; nodes: number; targets: string[] }[] = [];
   const audit = async (name: string) => {
+    await settleAnimations(page);
     layout.push(...(await layoutIssues(page, name)));
     const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"]).analyze();
     for (const v of r.violations) axe.push({ page: name, id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.length, targets: v.nodes.slice(0, 3).map((n) => n.target.join(" ")) });

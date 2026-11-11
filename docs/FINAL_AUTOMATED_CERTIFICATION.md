@@ -68,3 +68,7 @@ Fixed in this run:
 Unchanged by design: the Kolkata-style half-hour browser-zone tick residual (documented, 2 expected-failure tests), the Bryntum vendor axe findings, and QA-2 (an anonymous caller can briefly lock the operator login; forged forwarding headers cannot bypass the limiter).
 
 Checkpoints NOT executed by this run (NEEDS USER APPROVAL): live Gemini call, PayPal Sandbox transactions, any Neon connection or migration, deployment. (Later, owner-approved steps are recorded in `docs/EXTERNAL_PREFLIGHT.md`.)
+
+## Addendum, 2026-11-10: post-UI QA closure
+
+A later certification run on base `2a9985d` plus the QA-closure changes (I1, I2, I3, I9 and accessibility fixes) is recorded in `docs/QA_CLOSURE.md`: Vitest 968 passed, 12 skipped; real PostgreSQL 46 passed, 1 skipped, plus the restart run 12 passed; migration CLI PASS; benchmark byte-identical twice; build, release scan and npm audit PASS; Playwright 126 passed, 0 failed, 6 skipped. The figures above in this file describe the earlier tree and are kept for history.

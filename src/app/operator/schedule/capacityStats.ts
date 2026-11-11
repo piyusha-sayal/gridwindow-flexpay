@@ -40,7 +40,7 @@ export function summarizeCapacity(buckets: readonly CapacityBucket[]): CapacityS
   }
   close();
   return {
-    peakKw: Math.max(0, ...buckets.map((b) => b.drawKw)),
+    peakKw: Math.max(0, ...buckets.map((b) => Math.round((b.drawKw + b.baseKw) * 1000) / 1000)),
     minLimitKw: buckets.length ? Math.min(...buckets.map((b) => b.capKw)) : 0,
     maxLimitKw: Math.max(0, ...buckets.map((b) => b.capKw)),
     overSlots: overloads.reduce((a, r) => a + r.slots, 0),

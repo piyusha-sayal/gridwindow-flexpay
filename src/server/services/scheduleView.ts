@@ -29,6 +29,8 @@ export interface ScheduleSessionView {
   effectiveDepartMs: number;
   paymentState: PaymentState;
   serviceState: ServiceState;
+  /** True while the plan holds station capacity (see holdsCapacity). */
+  slotsCommitted: boolean;
   currentVersion: number;
   versions: ScheduleVersionView[];
   originalPowerW: number[];
@@ -59,6 +61,10 @@ export interface ScheduleView {
   gridStartMs: number;
   slotMs: number;
   stationCapW: number;
+  /** Headroom the validator keeps free: the usable site limit is stationCapW minus this. */
+  safetyHeadroomW: number;
+  /** Synthetic forecast of non-EV site load per slot, from the same scenario the validator uses. */
+  forecastBaseLoadW: number[];
   ports: { id: string; label: string; maxPowerW: number; tier: string }[];
   sessions: ScheduleSessionView[];
   disruptions: ScheduleDisruptionView[];
@@ -70,6 +76,7 @@ interface ReservationRowLite {
   created_at: Date;
   payment_state: PaymentState;
   service_state: ServiceState;
+  slots_committed: boolean;
   amount_cents: number;
   night_of: string;
   terms: { plugInMs: number; departMs: number; powerW: number[] };
@@ -88,7 +95,7 @@ async function buildView(deps: AppDeps, nightOf: string, driverSession: string |
   const q: Queryable = deps.db;
   const { scenario, envelope } = await nightContext(q, deps.station, nightOf);
   const reservations = await q.query<ReservationRowLite>(
-    `select id, port_id, created_at, payment_state, service_state, amount_cents, night_of, terms from reservations
+    `select id, port_id, created_at, payment_state, service_state, slots_committed, amount_cents, night_of, terms from reservations
      where station_id = $1 and night_of = $2 and ($3::text is null or driver_session = $3) order by created_at, id`,
     [deps.station.id, nightOf, driverSession],
   );
@@ -114,6 +121,8 @@ async function buildView(deps: AppDeps, nightOf: string, driverSession: string |
     gridStartMs: scenario.grid.startMs,
     slotMs: SLOT_MS,
     stationCapW: deps.station.stationCapW,
+    safetyHeadroomW: deps.station.safetyHeadroomW,
+    forecastBaseLoadW: [...scenario.forecastBaseLoadW],
     ports: deps.station.ports.map((p) => ({ id: p.id, label: p.label, maxPowerW: p.maxPowerW, tier: p.tier })),
     sessions: reservations.map((r) => {
       const own = versions.filter((v) => v.reservation_id === r.id);
@@ -134,6 +143,7 @@ async function buildView(deps: AppDeps, nightOf: string, driverSession: string |
         effectiveDepartMs: effectiveDepartMs(envelope, r.id, r.terms.departMs),
         paymentState: r.payment_state,
         serviceState: r.service_state,
+        slotsCommitted: r.slots_committed,
         currentVersion: latest?.version ?? 1,
         versions: versionViews,
         originalPowerW: r.terms.powerW,

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { OPERATOR_STATE } from "./constants";
+import type { ScheduleView } from "../../src/server/services/scheduleView";
 
 /** Final UI refinement: runs against the production build in MOCK mode with a throwaway database. */
 const ORIGIN = "http://localhost:3107";
@@ -24,6 +25,24 @@ test("FAQ uses the full content width and every answer opens", async ({ page }) 
   const first = page.locator("#faq").locator("xpath=..").locator("details").first();
   await first.locator("summary").click();
   await expect(first).toHaveAttribute("open", "");
+});
+
+test("the visually hidden Walkthrough heading stays in the heading structure for screen readers", async ({ page }) => {
+  await page.goto("/how-it-works");
+  const heading = page.getByRole("heading", { level: 2, name: "Walkthrough" });
+  await expect(heading).toHaveCount(1);
+  await expect(heading).toHaveClass(/sr-only/);
+});
+
+test("port cards are reachable by keyboard and show a visible focus indicator", async ({ page }) => {
+  await page.goto("/drive");
+  const portC = page.getByRole("radio", { name: /^Port C/ });
+  await portC.focus();
+  await expect(portC).toBeFocused();
+  const outline = await portC.locator("xpath=..").evaluate((el) => getComputedStyle(el).outlineStyle);
+  expect(outline).not.toBe("none");
+  await expect(portC).toHaveAccessibleName(/^Port C/);
+  await expect(portC).toHaveAccessibleDescription(/Why choose this port\?/);
 });
 
 test.describe("driver choices", () => {
@@ -111,14 +130,48 @@ test.describe("operator capacity graph", () => {
   test("shows title, limit, peak, legend and a text summary of overload periods", async ({ page }) => {
     const night = await seeded(page);
     await page.goto(`/operator/schedule?night=${night}`);
-    const section = page.getByRole("region", { name: "Scheduled demand vs site limit" });
+    const section = page.getByRole("region", { name: "Site demand vs usable limit" });
     await expect(section).toBeVisible();
-    await expect(section.getByText("Peak scheduled demand")).toBeVisible();
-    await expect(section.getByText("Site limit", { exact: true }).first()).toBeVisible();
-    await expect(section.getByText("24 kW").first()).toBeVisible();
+    await expect(section.getByText("Peak site demand")).toBeVisible();
+    await expect(section.getByText("Usable site limit", { exact: true }).first()).toBeVisible();
+    await expect(section.getByText("23 kW").first()).toBeVisible();
     await expect(section.getByText("Over capacity")).toBeVisible();
-    await expect(section.getByRole("list", { name: "Legend" })).toContainText("Scheduled demand");
+    await expect(section.getByRole("list", { name: "Legend" })).toContainText("Scheduled charging");
     await expect(section.getByRole("list", { name: "Scheduled demand against the site limit, per quarter-hour" })).toBeVisible();
     await expect(page.getByRole("region", { name: /Schedule table/ })).toBeVisible();
+  });
+  test("operator reservation rows state their provider mode and a matching row keeps its actions", async ({ page }) => {
+    const night = await seeded(page);
+    await page.goto("/operator");
+    await page.getByLabel("Night of").fill(night);
+    await page.getByRole("button", { name: "Load" }).click();
+    const badges = page.getByText("MOCK (simulated)", { exact: true });
+    await expect(badges.first()).toBeAttached();
+    // The server runs MOCK, so these rows match it: no mismatch note and Reconcile stays enabled.
+    await expect(page.getByText(/Actions are unavailable here/)).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Reconcile" }).locator("visible=true").first()).toBeEnabled();
+  });
+
+  test("polling removes voided capacity without a reload or a recovery notice", async ({ page }) => {
+    const night = await seeded(page);
+    const response = await page.request.get(`/api/schedule?nightOf=${night}`);
+    const { schedule } = await response.json() as { schedule: ScheduleView };
+    const active = schedule.sessions.find((s) => s.slotsCommitted)!;
+    expect(active).toBeTruthy();
+    let next: ScheduleView = { ...schedule, sessions: [active], disruptions: [] };
+    await page.route("**/api/schedule?*", (route) => route.fulfill({ json: { schedule: next } }));
+    await page.goto(`/operator/schedule?night=${night}`);
+    await expect(page.locator("#schedule-summary")).toContainText("1 sessions");
+    const buckets = page.getByRole("list", { name: "Scheduled demand against the site limit, per quarter-hour" }).getByRole("listitem");
+    const initialLabels = await buckets.evaluateAll((els) => els.map((el) => el.getAttribute("aria-label")!));
+    expect(initialLabels.length).toBeGreaterThan(0);
+    expect(initialLabels.some((label) => !label.includes(": 0 kW scheduled charging"))).toBe(true);
+    next = { ...next, sessions: [{ ...active, paymentState: "VOIDED", serviceState: "FAILED", slotsCommitted: false }] };
+    await expect(page.locator("#schedule-summary")).toContainText("0 sessions", { timeout: 15_000 });
+    await expect(page.locator("#schedule-summary")).toContainText("1 released");
+    for (const label of await buckets.evaluateAll((els) => els.map((el) => el.getAttribute("aria-label")))) {
+      expect(label).toContain(": 0 kW scheduled charging");
+    }
+    await expect(page.getByRole("status").filter({ hasText: "Schedule updated by recovery" })).toHaveCount(0);
   });
 });

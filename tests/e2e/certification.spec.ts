@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { OPERATOR_STATE } from "./constants";
+import { settleAnimations } from "./settle";
 
 /**
  * Automated certification sweep (MOCK payments, synthetic data, throwaway database). For every page at three viewports:
@@ -67,6 +68,8 @@ async function clippedText(page: Page): Promise<string[]> {
     const out: string[] = [];
     for (const el of Array.from(document.querySelectorAll<HTMLElement>("body *:not(script):not(style)"))) {
       if (el.closest(".b-scheduler, .b-grid")) continue;
+      // Visually hidden text (.sr-only) is clipped to 1px on purpose and stays in the accessibility tree.
+      if (el.closest(".sr-only")) continue;
       const cs = getComputedStyle(el);
       if (cs.display === "none" || cs.visibility === "hidden" || !el.offsetParent) continue;
       if (cs.overflowX !== "hidden" && cs.overflowX !== "clip") continue;
@@ -83,6 +86,7 @@ async function sweep(page: Page, route: string, vp: (typeof VIEWPORTS)[number], 
   await page.goto(route);
   await ready();
   await page.waitForLoadState("networkidle").catch(() => undefined);
+  await settleAnimations(page);
   const overflowPx = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
   const serious = axe.violations.filter((v) => v.impact === "serious" || v.impact === "critical");

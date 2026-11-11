@@ -1,10 +1,10 @@
 "use client";
 
-import { ATTENTION_STATES, PaymentBadge, ServiceBadge } from "@/components/ui";
+import { ATTENTION_STATES, Badge, PaymentBadge, ServiceBadge } from "@/components/ui";
 import { formatLocalTime } from "@/domain/time";
 import { formatKWh, formatUsd } from "@/domain/units";
 import type { DashboardSession, OperatorDashboard } from "@/server/services/viewService";
-import { hasCaptureConflict, needsAttention } from "./metrics";
+import { hasCaptureConflict, needsAttention, rowProvider } from "./metrics";
 
 export type OperatorAction =
   | { kind: "simulate" }
@@ -118,11 +118,12 @@ function Row({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps)
       <td className="pr-3">
         <PaymentBadge state={s.paymentState} capacityConfirmed={s.slotsCommitted} />
         <code className="block meta mt-0.5">{s.paymentState}</code>
+        <ProviderTag s={s} runtimeMode={d.providerMode} />
         {hasCaptureConflict(s) && <span className="block meta mt-0.5 text-[var(--amber-ink)]">Provider captured. Reconcile</span>}
         <ResolutionNote s={s} timeZone={d.timeZone} />
       </td>
       <td className="py-3">
-        <Actions s={s} mock={mock} busy={busy} working={working} onAct={onAct} />
+        <Actions s={s} mock={mock} busy={busy || rowProvider(s, d.providerMode).mismatch} working={working} onAct={onAct} />
       </td>
     </tr>
   );
@@ -155,10 +156,11 @@ function Card({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps
         <CardField label="Payment" wide>
           <PaymentBadge state={s.paymentState} capacityConfirmed={s.slotsCommitted} />
           <code className="block text-xs text-muted mt-0.5">{s.paymentState}</code>
+          <ProviderTag s={s} runtimeMode={d.providerMode} />
           <ResolutionNote s={s} timeZone={d.timeZone} />
         </CardField>
       </dl>
-      <Actions s={s} mock={mock} busy={busy} working={working} onAct={onAct} />
+      <Actions s={s} mock={mock} busy={busy || rowProvider(s, d.providerMode).mismatch} working={working} onAct={onAct} />
     </li>
   );
 }
@@ -231,6 +233,17 @@ export function resolutionText(s: Pick<DashboardSession, "operatorResolutionRequ
   if (!s.operatorResolutionRequired || !s.resolutionDeadline) return s.operatorResolutionRequired ? "Operator decision required" : null;
   const time = formatLocalTime(Date.parse(s.resolutionDeadline), timeZone);
   return `Resolve by ${time}${s.resolutionOverdue ? " (overdue)" : ""}`;
+}
+
+/** Which provider mode this reservation lives in. A row from the other mode is flagged, so it is not read as a real failure. */
+function ProviderTag({ s, runtimeMode }: { s: DashboardSession; runtimeMode: string }) {
+  const p = rowProvider(s, runtimeMode);
+  return (
+    <span className="block mt-1">
+      <Badge tone={s.providerMode === "MOCK" ? "warn" : "neutral"}>{p.label}</Badge>
+      {p.note && <span className="block meta mt-0.5">{p.note}</span>}
+    </span>
+  );
 }
 
 function ResolutionNote({ s, timeZone }: { s: DashboardSession; timeZone: string }) {

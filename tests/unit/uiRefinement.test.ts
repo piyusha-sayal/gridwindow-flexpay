@@ -73,7 +73,7 @@ describe("port and preference copy", () => {
   });
 });
 
-const bucket = (slot: number, drawKw: number, capKw = 24): CapacityBucket => ({ slot, startMs: slot * SLOT_MS, drawKw, capKw, over: drawKw > capKw });
+const bucket = (slot: number, drawKw: number, capKw = 24): CapacityBucket => ({ slot, startMs: slot * SLOT_MS, drawKw, baseKw: 0, capKw, over: drawKw > capKw });
 
 describe("summarizeCapacity", () => {
   it("groups consecutive over-limit slots into one range and computes peak and limit from the buckets", () => {

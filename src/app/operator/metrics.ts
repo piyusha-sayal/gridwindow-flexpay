@@ -1,10 +1,29 @@
+import { holdsCapacity } from "@/domain/capacity";
 import { economicOutcome } from "@/domain/paymentState";
 import { SLOTS_PER_HOUR } from "@/domain/units";
 import type { DashboardSession, OperatorDashboard } from "@/server/services/viewService";
 
 /** Sessions that hold (or held) station capacity on this night. */
 export function activeSessions(d: OperatorDashboard): DashboardSession[] {
-  return d.sessions.filter((s) => s.slotsCommitted || s.paymentState === "CAPTURED" || s.paymentState === "CAPTURE_PENDING" || s.paymentState === "CAPTURE_DECLINED");
+  return d.sessions.filter(holdsCapacity);
+}
+
+export interface RowProvider {
+  /** Short label for the row badge. */
+  label: string;
+  /** True when the row was created under a different provider mode than the one this server runs. */
+  mismatch: boolean;
+  /** Plain-English note for the mismatch, or null. Actions on a mismatched row are refused by the server (409). */
+  note: string | null;
+}
+
+const MODE_LABEL: Record<string, string> = { PAYPAL_SANDBOX: "PayPal Sandbox", MOCK: "MOCK (simulated)" };
+
+/** Provider identity of one reservation row against the provider mode this server runs. Display only. */
+export function rowProvider(s: Pick<DashboardSession, "providerMode">, runtimeMode: string): RowProvider {
+  const label = MODE_LABEL[s.providerMode] ?? s.providerMode;
+  const mismatch = s.providerMode !== runtimeMode;
+  return { label, mismatch, note: mismatch ? `Created under ${label}, but this server runs ${MODE_LABEL[runtimeMode] ?? runtimeMode}. Actions are unavailable here.` : null };
 }
 
 export function sumSeries(sessions: DashboardSession[], slots: number, pick: (s: DashboardSession) => readonly number[]): number[] {

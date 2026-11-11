@@ -102,3 +102,7 @@ Claim: money follows delivered energy, also when a disturbance changes the plan.
 - No claim of Bryntum accessibility compliance for the timeline.
 - No claim of a recorded demo video or a hosted live demo URL. None exists.
 - No screenshot of the recovery UI is claimed; the screenshots in `docs/screenshots/` predate this release.
+
+## Update, 2026-11-10
+
+Post-UI QA closure (operator capacity semantics, provider-mode badges, OpenRouter test isolation, accessibility fixes) and its full test matrix: `docs/QA_CLOSURE.md`. The schedule capacity chart now matches the validator's limit (cap minus headroom, with forecast base load) and excludes released sessions.

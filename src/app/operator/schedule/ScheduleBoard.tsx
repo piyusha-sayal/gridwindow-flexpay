@@ -124,7 +124,7 @@ export function ScheduleBoard({ nightOf }: { nightOf: string | null }) {
 
       <section className="card p-4 sm:p-5 space-y-4" aria-labelledby="capacity-title">
         <h2 id="capacity-title" className="text-[20px] font-semibold">
-          Scheduled demand vs site limit
+          Site demand vs usable limit
         </h2>
         <CapacityStrip model={model} />
       </section>

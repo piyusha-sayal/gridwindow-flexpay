@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/components/api";
 import type { ScheduleView } from "@/server/services/scheduleView";
-import { buildScheduleModel, type ProposalInput, type ScheduleModel } from "./scheduleModel";
+import { buildScheduleModel, recoveryRevisionKey, type ProposalInput, type ScheduleModel } from "./scheduleModel";
 
 export const POLL_MS = 3_000;
 
@@ -51,6 +51,7 @@ export function useScheduleView(nightOf: string | null): ScheduleState {
   const [notice, setNotice] = useState<ScheduleVersionNotice | null>(null);
   const [tick, setTick] = useState(0);
   const revisionRef = useRef<string | null>(null);
+  const recoveryRevisionRef = useRef<string | null>(null);
   const nightRef = useRef<string | null>(nightOf);
 
   const retry = useCallback(() => setTick((t) => t + 1), []);
@@ -60,6 +61,7 @@ export function useScheduleView(nightOf: string | null): ScheduleState {
     if (nightRef.current !== nightOf) {
       nightRef.current = nightOf;
       revisionRef.current = null;
+      recoveryRevisionRef.current = null;
       setNotice(null);
     }
   }, [nightOf]);
@@ -72,9 +74,11 @@ export function useScheduleView(nightOf: string | null): ScheduleState {
         const proposals = proposalsFor(next);
         if (!alive) return;
         const nextModel = buildScheduleModel(next, proposals);
-        const changed = revisionRef.current !== null && revisionRef.current !== nextModel.revision;
+        const recoveryRevision = recoveryRevisionKey(next, proposals);
+        const changed = recoveryRevisionRef.current !== null && recoveryRevisionRef.current !== recoveryRevision;
         if (revisionRef.current === nextModel.revision) return;
         revisionRef.current = nextModel.revision;
+        recoveryRevisionRef.current = recoveryRevision;
         setView(next);
         setModel(nextModel);
         setError(null);

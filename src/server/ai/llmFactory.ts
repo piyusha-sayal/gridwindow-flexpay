@@ -20,17 +20,20 @@ export interface AiEnv {
 /** Per-attempt timeout of the primary when a fallback exists, so a failing primary does not hold the user for its full default. */
 export const PRIMARY_TIMEOUT_WITH_FALLBACK_MS = 8_000;
 
+/** A key counts only when it holds a non-blank value. */
+const hasKey = (v: string | undefined): v is string => typeof v === "string" && v.trim() !== "";
+
 /** An explicit AI_PROVIDER wins; otherwise Gemini when its key is set, else Anthropic when its key is set. */
 export function selectProvider(env: AiEnv): AiProvider | null {
-  if (env.AI_PROVIDER === "gemini") return env.GEMINI_API_KEY ? "gemini" : null;
-  if (env.AI_PROVIDER === "anthropic") return env.ANTHROPIC_API_KEY ? "anthropic" : null;
-  if (env.GEMINI_API_KEY) return "gemini";
-  return env.ANTHROPIC_API_KEY ? "anthropic" : null;
+  if (env.AI_PROVIDER === "gemini") return hasKey(env.GEMINI_API_KEY) ? "gemini" : null;
+  if (env.AI_PROVIDER === "anthropic") return hasKey(env.ANTHROPIC_API_KEY) ? "anthropic" : null;
+  if (hasKey(env.GEMINI_API_KEY)) return "gemini";
+  return hasKey(env.ANTHROPIC_API_KEY) ? "anthropic" : null;
 }
 
 /** The fallback is on only when explicitly requested AND its key is present; otherwise behaviour is unchanged. */
 export function fallbackConfigured(env: AiEnv): boolean {
-  return env.AI_FALLBACK_PROVIDER === "openrouter" && Boolean(env.OPENROUTER_API_KEY);
+  return env.AI_FALLBACK_PROVIDER === "openrouter" && hasKey(env.OPENROUTER_API_KEY);
 }
 
 /** Null when no usable credentials exist; the assistant then runs its labeled deterministic fallback. */

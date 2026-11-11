@@ -4,8 +4,9 @@ import { timeLabel, type ScheduleModel } from "./scheduleModel";
 const TICK_EVERY_SLOTS = 8; // two hours of quarter-hour slots
 
 /**
- * Scheduled EV demand against the site limit, per quarter-hour, in plain React (Bryntum Community has no summary row).
- * It plots the schedule as planned, not measured consumption, and it does not include the site's base load.
+ * Scheduled EV demand plus the synthetic forecast base load against the usable site limit, per quarter-hour, in plain React
+ * (Bryntum Community has no summary row). The limit is the station cap minus the safety headroom, as the validator applies it.
+ * It plots the schedule as planned, not measured consumption; the base load is a forecast, not a meter reading.
  * Over-limit slots are hatched and listed as time ranges, so the state never relies on colour alone.
  */
 export function CapacityStrip({ model }: { model: ScheduleModel }) {
@@ -18,12 +19,12 @@ export function CapacityStrip({ model }: { model: ScheduleModel }) {
   return (
     <div className="space-y-4">
       <p className="text-[14px] text-text-2">
-        Scheduled charging demand for every quarter-hour of the night, compared with the site limit. This is the plan, not measured consumption, and it does not include the site&apos;s base load.
+        Scheduled charging demand plus forecast base load for every quarter-hour of the night, compared with the usable site limit (station cap minus safety headroom). Voided, failed and cancelled sessions are not counted. This is the plan and a synthetic forecast, not measured consumption.
       </p>
 
       <dl className="grid gap-px overflow-hidden rounded-[var(--r-card-sm)] border border-line bg-line sm:grid-cols-3">
-        <Stat label="Peak scheduled demand" value={formatKw(s.peakKw)} />
-        <Stat label="Site limit" value={limitText} />
+        <Stat label="Peak site demand" value={formatKw(s.peakKw)} />
+        <Stat label="Usable site limit" value={limitText} />
         <Stat
           label="Over capacity"
           value={s.overloads.length === 0 ? "None" : s.overloads.map((r) => range(r.startMs, r.endMs)).join(", ")}
@@ -47,10 +48,11 @@ export function CapacityStrip({ model }: { model: ScheduleModel }) {
             ))}
             <div className="absolute inset-0 flex items-end gap-px">
               {model.capacity.map((c) => {
-                const label = `${timeLabel(c.startMs, model.timeZone)}: ${formatKw(c.drawKw)} scheduled of ${formatKw(c.capKw)} limit${c.over ? ", over capacity" : ""}`;
+                const label = `${timeLabel(c.startMs, model.timeZone)}: ${formatKw(c.drawKw)} scheduled charging plus ${formatKw(c.baseKw)} forecast base load of ${formatKw(c.capKw)} limit${c.over ? ", over capacity" : ""}`;
                 return (
                   <div key={c.slot} role="listitem" aria-label={label} title={label} className="relative h-full min-w-[3px] flex-1">
-                    <div className={`absolute inset-x-0 bottom-0 rounded-t-[2px] ${c.over ? "gw-capacity-over" : "bg-teal"}`} style={{ height: `${(c.drawKw / topKw) * 100}%` }} aria-hidden="true" />
+                    <div className="absolute inset-x-0 bottom-0 bg-line-strong" style={{ height: `${(c.baseKw / topKw) * 100}%` }} aria-hidden="true" />
+                    <div className={`absolute inset-x-0 rounded-t-[2px] ${c.over ? "gw-capacity-over" : "bg-teal"}`} style={{ bottom: `${(c.baseKw / topKw) * 100}%`, height: `${(c.drawKw / topKw) * 100}%` }} aria-hidden="true" />
                     <div className="absolute inset-x-0 border-t-2 border-ink" style={{ bottom: `${(c.capKw / topKw) * 100}%` }} aria-hidden="true" />
                   </div>
                 );
@@ -71,13 +73,16 @@ export function CapacityStrip({ model }: { model: ScheduleModel }) {
 
       <ul className="flex flex-wrap gap-x-5 gap-y-1.5 text-[13px] text-text-2" aria-label="Legend">
         <li className="flex items-center gap-1.5">
-          <span aria-hidden="true" className="h-3 w-4 rounded-[2px] bg-teal" /> Scheduled demand
+          <span aria-hidden="true" className="h-3 w-4 rounded-[2px] bg-teal" /> Scheduled charging
+        </li>
+        <li className="flex items-center gap-1.5">
+          <span aria-hidden="true" className="h-3 w-4 bg-line-strong" /> Forecast base load
         </li>
         <li className="flex items-center gap-1.5">
           <span aria-hidden="true" className="gw-capacity-over h-3 w-4 rounded-[2px]" /> Over the site limit
         </li>
         <li className="flex items-center gap-1.5">
-          <span aria-hidden="true" className="inline-block w-4 border-t-2 border-ink" /> Site limit
+          <span aria-hidden="true" className="inline-block w-4 border-t-2 border-ink" /> Usable site limit
         </li>
       </ul>
     </div>

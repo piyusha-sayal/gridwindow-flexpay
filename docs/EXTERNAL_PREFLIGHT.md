@@ -450,3 +450,7 @@ Artifacts (redacted, local, not committed): `paypal-smoke-capture-only-smoke_179
 - **Void: PASS (artifact validated).** Order `APPROVED` 123 USD; authorization `CREATED` 123 USD; `void.authorizationStatusAfter` `VOIDED` after a GET read-back. Sandbox host, `requestIds` recorded for createOrder, authorize and void.
 - Both runs used the same client fingerprint and the same payee (last 6 characters match). Authorizations are distinct objects; no authorization was both captured and voided.
 - Limits: the agent validated the redacted files and did not query PayPal. The runs are standalone smoke tests: no webhook delivery, no reconciliation and no link to a GridWindow reservation or the recovery engine is shown. Recovery-linked Sandbox evidence remains NOT TESTED.
+
+## Note, 2026-11-10
+
+No external preflight was re-run for the QA closure (`docs/QA_CLOSURE.md`): no PayPal, Gemini, OpenRouter or Neon call was made. Blank or whitespace-only provider keys are now treated as absent, so a blanked key can no longer switch a provider on.

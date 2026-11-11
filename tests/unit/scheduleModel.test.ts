@@ -27,6 +27,8 @@ function view(sessions: ScheduleSessionView[], extra: Partial<ScheduleView> = {}
     gridStartMs: GRID,
     slotMs: SLOT_MS,
     stationCapW: 10_000,
+    safetyHeadroomW: 0,
+    forecastBaseLoadW: [],
     ports: [
       { id: "port_a", label: "A", maxPowerW: 3_600, tier: "Lower-power AC" },
       { id: "port_b", label: "B", maxPowerW: 7_200, tier: "Standard AC" },
@@ -117,7 +119,7 @@ describe("buildScheduleModel", () => {
   });
 
   it("builds a plain-English summary and a stable revision key", () => {
-    expect(scheduleSummary(model)).toBe("2 sessions on 2 ports. 1 recovered, 1 with shortened departure, 1 time slot(s) over the site cap.");
+    expect(scheduleSummary(model)).toBe("2 sessions on 2 ports. 1 recovered, 1 with shortened departure, 1 time slot(s) over the site limit.");
     expect(buildScheduleModel(view([recovered, other])).revision).not.toBe(model.revision);
     expect(buildScheduleModel(view([recovered, other], { disruptions: [] })).revision).toBe(buildScheduleModel(view([recovered, other], { disruptions: [] })).revision);
   });

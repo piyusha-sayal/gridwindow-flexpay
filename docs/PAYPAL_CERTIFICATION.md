@@ -157,3 +157,7 @@ This is a different, non-recovery run from sections 1-2. It uses the standalone 
 - Redacted artifacts only: `artifacts/paypal-smoke-<mode>-<runId>.progress.json` after each response, and `.json` on pass. Both are created with `wx` and never overwritten.
 - Reconciliation: each capture or void is re-read from PayPal (`GET` capture or authorization). Webhook delivery is not part of this run and is not checked by it.
 - Not to be executed without a separate, explicit approval from the owner.
+
+## Note, 2026-11-10
+
+The QA-closure changes did not modify payment, checkout, settlement, webhook or PayPal client code (`src/payments`, `src/app/api` and the checkout and settlement services are unchanged). No PayPal Sandbox call was made for this closure, so the PayPal evidence in this file was not re-run and still describes its original dates. Configuration loading now treats empty or whitespace-only values as absent.
