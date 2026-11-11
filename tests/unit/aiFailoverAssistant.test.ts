@@ -163,3 +163,27 @@ describe("operator AI status", () => {
     expect(JSON.stringify(aiStatusOf(llm))).not.toMatch(/key|prompt|Bearer/i);
   });
 });
+
+describe("second Gemini model on the same key (free-tier quotas are per model)", () => {
+  const g = { AI_PROVIDER: "gemini", GEMINI_API_KEY: "k", GEMINI_MODEL: "gemini-3.6-flash" };
+
+  it("wraps the primary in a failover to the second Gemini model", () => {
+    const made = createLlm({ ...g, GEMINI_FALLBACK_MODEL: "gemini-3.5-flash-lite" });
+    expect(made?.llm).toBeInstanceOf(FailoverLlm);
+    expect(made?.llm.model).toBe("gemini-3.6-flash");
+    expect(made?.provider).toBe("gemini");
+  });
+
+  it("is off when unset, blank, the same model, or the provider is not Gemini", () => {
+    expect(createLlm(g)?.llm).not.toBeInstanceOf(FailoverLlm);
+    expect(createLlm({ ...g, GEMINI_FALLBACK_MODEL: "  " })?.llm).not.toBeInstanceOf(FailoverLlm);
+    expect(createLlm({ ...g, GEMINI_FALLBACK_MODEL: "gemini-3.6-flash" })?.llm).not.toBeInstanceOf(FailoverLlm);
+    expect(createLlm({ AI_PROVIDER: "anthropic", ANTHROPIC_API_KEY: "a", GEMINI_FALLBACK_MODEL: "gemini-3.5-flash-lite" })?.llm).not.toBeInstanceOf(FailoverLlm);
+  });
+
+  it("leaves an explicitly configured OpenRouter fallback in charge", () => {
+    const made = createLlm({ ...g, GEMINI_FALLBACK_MODEL: "gemini-3.5-flash-lite", AI_FALLBACK_PROVIDER: "openrouter", OPENROUTER_API_KEY: "o", OPENROUTER_MODEL: "vendor/model" });
+    expect(made?.llm).toBeInstanceOf(FailoverLlm);
+    expect(made?.llm.health?.().fallback?.model).toBe("vendor/model");
+  });
+});

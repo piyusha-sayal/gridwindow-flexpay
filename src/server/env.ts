@@ -40,6 +40,8 @@ const schema = z
     AI_PROVIDER: z.enum(["gemini", "anthropic"]).optional(),
     GEMINI_API_KEY: z.string().optional(),
     GEMINI_MODEL: z.string().min(1).max(64).optional(),
+    /** Optional second Gemini model (same key) used once when the primary is rate-limited or unavailable. */
+    GEMINI_FALLBACK_MODEL: z.string().min(1).max(64).optional(),
     /** Optional second provider used once when the primary model has a transient failure. Never required. */
     OPENROUTER_API_KEY: z.string().optional(),
     OPENROUTER_MODEL: z

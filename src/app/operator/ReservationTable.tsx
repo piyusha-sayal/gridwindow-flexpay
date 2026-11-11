@@ -181,8 +181,8 @@ function Actions({ s, mock, busy, working, onAct }: Pick<RowProps, "s" | "mock" 
   const pending = s.paymentState === "CAPTURE_PENDING";
   const secondary = "btn btn-sm btn-text text-[13px]";
   return (
-    <div className="space-y-1.5">
-      <div className="flex flex-wrap gap-1.5">
+    <div className="row-actions space-y-1.5">
+      <div className="row-actions-main flex flex-wrap gap-1.5">
         {mock && pending ? (
           <>
             <button className="btn btn-sm btn-primary" disabled={busy} onClick={() => onAct(s, { kind: "resolve-capture", status: "COMPLETED" })}>
@@ -203,7 +203,7 @@ function Actions({ s, mock, busy, working, onAct }: Pick<RowProps, "s" | "mock" 
           </>
         )}
       </div>
-      <div className="flex flex-wrap gap-x-1 gap-y-0.5" role="group" aria-label="More actions">
+      <div className="row-actions-more flex flex-wrap gap-x-1 gap-y-0.5" role="group" aria-label="More actions">
         {mock && ready && (
           <>
             <button className={secondary} disabled={busy} onClick={() => onAct(s, { kind: "simulate-pending" })}>
