@@ -25,10 +25,17 @@ function jarFetch(base: string): typeof fetch {
   };
 }
 
-// ---------- LIVE, read-only ----------
-const live = new GridWindowFlexPayApiClient({ serverEnvironment: "production" });
+// ---------- LIVE: read-only, plus one quote (no order, no reservation) ----------
+const LIVE_BASE = "https://gridwindow-flexpay.onrender.com";
+const live = new GridWindowFlexPayApiClient({ serverEnvironment: "production", fetch: jarFetch(LIVE_BASE) });
 await step("LIVE", "site.getSiteConfig", () => live.site.getSiteConfig(), (c) => `providerMode=${c.providerMode} ports=${c.station.ports.length} ai=${JSON.stringify(c.ai)}`);
 await step("LIVE", "gear.findEvGear", () => live.gear.findEvGear({ limit: 3 }), (g) => `enabled=${g.enabled} items=${g.items.length} https=${g.items.every((i) => i.url.startsWith("https://"))}`);
+const liveNight = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date(Date.now() + 3 * 86_400_000));
+await step("LIVE", "offers.requestOffers", () => live.offers.requestOffers({ body: { portId: "port_b", nightOf: liveNight, plugInLocal: "19:00", departLocal: "07:00", targetBatteryKWh: 20, spendCapCents: 2000 } }), (q) => `offers=${q.quote.offers.length} (quote only; no order)`);
+const livePass = (await import("node:fs")).readFileSync("D:/Gridwindow-flexpay/.env", "utf8").match(/^OPERATOR_PASSPHRASE=(.*)$/m)![1].trim().replace(/^["']|["']$/g, "");
+await step("LIVE", "operator.operatorSignIn", () => live.operator.operatorSignIn({ body: { passphrase: livePass } }), () => "session cookie set");
+await step("LIVE", "operator.getOperatorSession", () => live.operator.getOperatorSession(), (s) => `operator=${(s as { operator: boolean }).operator}`);
+await step("LIVE", "operator.getOperatorDashboard", () => live.operator.getOperatorDashboard({ night: "2026-11-11" }), (d) => `sessions=${((d as { dashboard: { sessions: unknown[] } }).dashboard.sessions).length}`);
 
 // ---------- LOCAL isolated MOCK server, full flow ----------
 const local = new GridWindowFlexPayApiClient({ serverEnvironment: "environment2", serverOptions: { baseUrl: LOCAL }, fetch: jarFetch(LOCAL) });

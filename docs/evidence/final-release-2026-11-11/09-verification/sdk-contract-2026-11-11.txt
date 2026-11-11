@@ -1,5 +1,9 @@
 PASS LIVE site.getSiteConfig providerMode=PAYPAL_SANDBOX ports=3 ai={"enabled":true,"model":"gemini-3.6-flash"}
 PASS LIVE gear.findEvGear enabled=true items=3 https=true
+PASS LIVE offers.requestOffers offers=2 (quote only; no order)
+PASS LIVE operator.operatorSignIn session cookie set
+PASS LIVE operator.getOperatorSession operator=true
+PASS LIVE operator.getOperatorDashboard sessions=6
 PASS LOCAL site.getSiteConfig providerMode=MOCK
 PASS LOCAL aiApi.parseChargingRequest source=DETERMINISTIC_FALLBACK
 PASS LOCAL offers.requestOffers offers=2
@@ -11,4 +15,4 @@ PASS LOCAL aiApi.askAboutReservation source=DETERMINISTIC_FALLBACK inScope=true
 PASS LOCAL reservations.listMyReservations count=1
 PASS LOCAL operator.operatorSignIn session cookie set
 PASS LOCAL operator.getOperatorDashboard sessions=1
-SUMMARY 13/13 passed
+SUMMARY 17/17 passed

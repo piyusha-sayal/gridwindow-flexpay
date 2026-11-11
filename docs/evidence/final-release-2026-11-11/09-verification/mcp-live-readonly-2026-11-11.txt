@@ -1,4 +1,4 @@
-# MCP check (live) against https://gridwindow-flexpay.onrender.com at 2026-11-11T16:29:24.301Z
+# MCP check (live) against https://gridwindow-flexpay.onrender.com at 2026-11-11T17:36:43.199Z
 tools (7): get_site_info, parse_charging_request, request_charging_offers, recommend_offer, prepare_paypal_checkout, get_reservation_status, find_ev_gear
   get_site_info()
   parse_charging_request(text)

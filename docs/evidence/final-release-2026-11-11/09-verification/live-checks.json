@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-11-11T16:47:18.069Z",
+  "capturedAt": "2026-11-11T17:35:14.609Z",
   "base": "https://gridwindow-flexpay.onrender.com",
   "portal": "https://gridwindow-flexpay-developers.onrender.com",
   "records": [
@@ -10,14 +10,15 @@
       "viewport": "1440x900",
       "feature": "Home page",
       "note": "",
-      "bytes": 418945,
+      "bytes": 417585,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
-          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED"
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED"
         ],
         "http": []
       }
@@ -29,14 +30,13 @@
       "viewport": "1440x900",
       "feature": "Smart Charge request form (filled in the browser, not submitted: submitting runs the live AI deal agent)",
       "note": "",
-      "bytes": 361095,
+      "bytes": 369620,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
-          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED"
+          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED"
         ],
         "http": []
       }
@@ -48,15 +48,13 @@
       "viewport": "1440x900",
       "feature": "How it works",
       "note": "",
-      "bytes": 179837,
+      "bytes": 177576,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
-          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED"
+          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED"
         ],
         "http": []
       }
@@ -68,20 +66,17 @@
       "viewport": "1440x900",
       "feature": "Impact Lab (synthetic benchmark, labelled modeled)",
       "note": "",
-      "bytes": 184887,
+      "bytes": 172969,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
-          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
           "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED"
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED"
         ],
         "http": []
       }
@@ -93,16 +88,15 @@
       "viewport": "1440x900",
       "feature": "Rewards overview (modeled savings)",
       "note": "",
-      "bytes": 170750,
+      "bytes": 172912,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
           "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED",
           "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED"
         ],
         "http": []
@@ -138,6 +132,7 @@
         "page": [],
         "failed": [
           "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
           "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED"
         ],
         "http": []
@@ -150,17 +145,17 @@
       "viewport": "1440x900",
       "feature": "Operator console (live PayPal Sandbox deployment)",
       "note": "",
-      "bytes": 142430,
+      "bytes": 142002,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
-          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
           "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED"
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/operator/schedule net::ERR_ABORTED"
         ],
         "http": []
       }
@@ -220,7 +215,7 @@
       "viewport": "1440x900",
       "feature": "Row click opens the reservation details panel",
       "note": "",
-      "bytes": 192126,
+      "bytes": 191966,
       "overflowPx": 0,
       "errors": {
         "console": [],
@@ -238,13 +233,20 @@
       "viewport": "1440x900",
       "feature": "Live Sandbox reservation after delivery: capture confirmed by PayPal",
       "note": "",
-      "bytes": 191742,
+      "bytes": 170486,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
-          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED"
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED"
         ],
         "http": []
       }
@@ -272,14 +274,16 @@
       "viewport": "1440x900",
       "feature": "Live Sandbox reservation after a synthetic charger failure: authorization voided by PayPal",
       "note": "",
-      "bytes": 197895,
+      "bytes": 207393,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
           "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
-          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED"
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED"
         ],
         "http": []
       }
@@ -339,7 +343,7 @@
       "viewport": "1440x900",
       "feature": "Accept offer API reference",
       "note": "",
-      "bytes": 136113,
+      "bytes": 140535,
       "overflowPx": 0,
       "errors": {
         "console": [],
@@ -355,7 +359,7 @@
       "viewport": "1440x900",
       "feature": "Request and response examples for accept offer",
       "note": "",
-      "bytes": 136113,
+      "bytes": 140535,
       "overflowPx": 0,
       "errors": {
         "console": [],
@@ -387,13 +391,12 @@
       "viewport": "390x844",
       "feature": "Home page on a phone",
       "note": "",
-      "bytes": 397705,
+      "bytes": 395307,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
-          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
           "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED"
         ],
         "http": []
@@ -406,7 +409,7 @@
       "viewport": "390x844",
       "feature": "Home page on a phone, second screen, with the bottom navigation (no horizontal scroll)",
       "note": "",
-      "bytes": 143811,
+      "bytes": 141348,
       "overflowPx": 0,
       "errors": {
         "console": [],
@@ -422,12 +425,15 @@
       "viewport": "390x844",
       "feature": "Smart Charge form on a phone (energy, window and ports)",
       "note": "",
-      "bytes": 157920,
+      "bytes": 151658,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
-        "failed": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED"
+        ],
         "http": []
       }
     },
@@ -438,7 +444,7 @@
       "viewport": "390x844",
       "feature": "Rewards on a phone",
       "note": "",
-      "bytes": 169828,
+      "bytes": 167561,
       "overflowPx": 0,
       "errors": {
         "console": [],
@@ -486,13 +492,15 @@
       "viewport": "820x1180",
       "feature": "Operator console on a tablet",
       "note": "",
-      "bytes": 324520,
+      "bytes": 323211,
       "overflowPx": 0,
       "errors": {
         "console": [],
         "page": [],
         "failed": [
-          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED"
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED"
         ],
         "http": []
       }

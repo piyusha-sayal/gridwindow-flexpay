@@ -94,9 +94,9 @@ FlexReceipt: $0.00 collected, authorization voided by the provider. *[LIVE, SAND
 ## 03. Operator console and AG Grid
 
 ### 01-operator-dashboard.png
-Operator console on the live deployment (PayPal Sandbox mode). *[LIVE, SANDBOX]*
+Operator console. The AI status reads "AI degraded: fallback gemini-3.5-flash-lite is answering": after the smoke test the primary model was rate-limited and the second Gemini model answered. *[LIVE, SANDBOX]*
 
-![Operator console on the live deployment (PayPal Sandbox mode).](03-operator-ag-grid/01-operator-dashboard.png)
+![Operator console. The AI status reads "AI degraded: fallback gemini-3.5-flash-lite is answering": after the smoke test the primary model was rate-limited and the second Gemini model answered.](03-operator-ag-grid/01-operator-dashboard.png)
 
 ### 02-ag-grid-reservations.png
 AG Grid: every reservation of the night with payment and service badges. *[LIVE]*
@@ -237,9 +237,9 @@ API reference. *[LIVE]*
 ![API reference.](07-apimatic/02-openapi-endpoints.png)
 
 ### 03-accept-offer-api-reference.png
-Accept offer: consent, terms hash and the approval link. *[LIVE]*
+Accept offer: `consent` is a boolean that must be `true` (regenerated spec), terms hash and the approval link. *[LIVE]*
 
-![Accept offer: consent, terms hash and the approval link.](07-apimatic/03-accept-offer-api-reference.png)
+![Accept offer: `consent` is a boolean that must be `true` (regenerated spec), terms hash and the approval link.](07-apimatic/03-accept-offer-api-reference.png)
 
 ### 04-request-response-example.png
 Generated request and response samples for requesting offers. *[LIVE]*
@@ -279,7 +279,7 @@ Rewards, 390 px. *[LIVE]*
 ![Rewards, 390 px.](08-responsive/04-mobile-rewards.png)
 
 ### 05-tablet-operator.png
-Operator console, 820 px tablet. *[LIVE]*
+Operator console, 820 px tablet (AI status as above). *[LIVE]*
 
-![Operator console, 820 px tablet.](08-responsive/05-tablet-operator.png)
+![Operator console, 820 px tablet (AI status as above).](08-responsive/05-tablet-operator.png)
 

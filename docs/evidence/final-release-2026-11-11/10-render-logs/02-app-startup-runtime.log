@@ -1,0 +1,53 @@
+# Application startup and runtime logs (gridwindow-flexpay, srv-dbq002tg1s2s739p32sg)
+# Source: Render REST API GET /v1/logs (official), captured 2026-11-11T17:35:39.137Z
+# Window (UTC): 2026-11-11T17:05:00Z to 2026-11-11T17:35:36Z; release commit 7959a1b570cc2b82037ffbf0201d3827e17a429e; 50 entries; sanitized (see README.md)
+2026-11-11T17:13:28.046539699Z [app] [INFO] ==> Deploying...
+2026-11-11T17:13:28.129217937Z [app] [INFO] ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-11-11T17:13:59.2851949Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] ==> Running 'npm start'
+2026-11-11T17:14:00.385358981Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] 
+2026-11-11T17:14:00.385402644Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] > gridwindow-flexpay@0.1.0 start
+2026-11-11T17:14:00.385408944Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] > next start
+2026-11-11T17:14:00.385411334Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] 
+2026-11-11T17:14:02.964435545Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] ▲ Next.js 16.4.3
+2026-11-11T17:14:02.964760354Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] - Local:         http://localhost:10000
+2026-11-11T17:14:02.964840949Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] - Network:       http://10.195.21.57:10000
+2026-11-11T17:14:02.96536011Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] ✓ Ready in 1592ms
+2026-11-11T17:14:03.271034494Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] ✓ Running next.config.ts took 304ms
+2026-11-11T17:14:13.278240022Z [app] [INFO] ==> Your service is live 🎉
+2026-11-11T17:14:13.481776252Z [app] [INFO] ==> 
+2026-11-11T17:14:13.485326512Z [app] [INFO] ==> ///////////////////////////////////////////////////////////
+2026-11-11T17:14:13.489276412Z [app] [INFO] ==> 
+2026-11-11T17:14:13.492526354Z [app] [INFO] ==> Available at your primary URL https://gridwindow-flexpay.onrender.com
+2026-11-11T17:14:13.498112536Z [app] [INFO] ==> 
+2026-11-11T17:14:13.504027795Z [app] [INFO] ==> ///////////////////////////////////////////////////////////
+2026-11-11T17:15:11.256848346Z [app] [ERROR] [srv-dbq002tg1s2s739p32sg-bd68j] [gridwindow] model call failed: REQUEST_REJECTED (gemini) http=400 status=INVALID_ARGUMENT error=ApiError
+2026-11-11T17:15:13.603446395Z [app] [ERROR] [srv-dbq002tg1s2s739p32sg-bd68j] [gridwindow] model call failed: REQUEST_REJECTED (gemini) http=400 status=INVALID_ARGUMENT error=ApiError
+2026-11-11T17:15:13.603896962Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-bd68j] [gridwindow] deal-agent status=RECOMMENDED source=FALLBACK:REQUEST_REJECTED qualifying=2/2
+2026-11-11T17:15:14.354963242Z [app] [ERROR] [srv-dbq002tg1s2s739p32sg-bd68j] [gridwindow] model call failed: REQUEST_REJECTED (gemini) http=400 status=INVALID_ARGUMENT error=ApiError
+2026-11-11T17:19:15.383875161Z [app] [INFO] ==> Detected service running on port 10000
+2026-11-11T17:19:15.473882011Z [app] [INFO] ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2026-11-11T17:28:14.263003268Z [app] [INFO] ==> Deploying...
+2026-11-11T17:28:14.379625584Z [app] [INFO] ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-11-11T17:28:47.015462368Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] ==> Running 'npm start'
+2026-11-11T17:28:49.914945638Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] 
+2026-11-11T17:28:49.914974448Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] > gridwindow-flexpay@0.1.0 start
+2026-11-11T17:28:49.914981669Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] > next start
+2026-11-11T17:28:49.914986459Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] 
+2026-11-11T17:28:52.426364925Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] ▲ Next.js 16.4.3
+2026-11-11T17:28:52.511073759Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] - Local:         http://localhost:10000
+2026-11-11T17:28:52.51110141Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] - Network:       http://10.192.8.226:10000
+2026-11-11T17:28:52.511477677Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] ✓ Ready in 1590ms
+2026-11-11T17:28:52.819639166Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] ✓ Running next.config.ts took 307ms
+2026-11-11T17:29:06.092293198Z [app] [INFO] ==> Your service is live 🎉
+2026-11-11T17:29:06.364858523Z [app] [INFO] ==> 
+2026-11-11T17:29:06.367520483Z [app] [INFO] ==> ///////////////////////////////////////////////////////////
+2026-11-11T17:29:06.370421257Z [app] [INFO] ==> 
+2026-11-11T17:29:06.373100907Z [app] [INFO] ==> Available at your primary URL https://gridwindow-flexpay.onrender.com
+2026-11-11T17:29:06.375308867Z [app] [INFO] ==> 
+2026-11-11T17:29:06.377862033Z [app] [INFO] ==> ///////////////////////////////////////////////////////////
+2026-11-11T17:32:06.042329302Z [app] [ERROR] [srv-dbq002tg1s2s739p32sg-v55z4] [gridwindow] model call failed: QUOTA_EXHAUSTED (gemini) http=429 status=RESOURCE_EXHAUSTED error=ApiError
+2026-11-11T17:32:07.087194091Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] [gridwindow] ai failover: gemini QUOTA_EXHAUSTED -> gemini ok
+2026-11-11T17:32:07.100258037Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] [gridwindow] deal-agent status=RECOMMENDED source=MODEL qualifying=2/2
+2026-11-11T17:32:08.259851204Z [app] [INFO] [srv-dbq002tg1s2s739p32sg-v55z4] [gridwindow] ai failover: gemini skipped (cooldown) -> gemini ok
+2026-11-11T17:34:04.971361382Z [app] [INFO] ==> Detected service running on port 10000
+2026-11-11T17:34:05.065335727Z [app] [INFO] ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
