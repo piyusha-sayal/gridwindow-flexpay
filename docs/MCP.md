@@ -13,8 +13,8 @@ The agent can **find, compare and prepare** a deal. It can never **pay**.
 | Get priced offers with exact terms and a terms hash | Agent | `request_charging_offers` |
 | Ask the deal agent which offer fits the goal | Agent | `recommend_offer` |
 | Create the PayPal authorize order for one exact offer | Agent, **only after the driver says yes to the exact terms** | `prepare_paypal_checkout` |
-| Approve the payment in PayPal | **Driver only** (opens the returned `approveUrl`) | — |
-| Capture for delivered energy, or void | Server, from the energy ledger | — |
+| Approve the payment in PayPal | **Driver only** (opens the returned `approveUrl`) | No tool |
+| Capture for delivered energy, or void | Server, from the energy ledger | No tool |
 | Check payment and charging state | Agent | `get_reservation_status` |
 | Find in-stock EV accessories (adapters, cables, organizers) across merchants, optionally under a budget | Agent (read-only, powered by [Channel3](https://trychannel3.com)) | `find_ev_gear` |
 

@@ -111,11 +111,11 @@ AI_SMOKE_BUDGET_USD=0.50 npm run ai:smoke -- --approve-paid-calls  # at most 8 r
 - Before each call, the remaining budget is checked against the worst-case estimate. These are estimates; actual usage is reported afterwards. The projected worst case for 5 calls on `claude-opus-5-5` is about $0.15.
 - Results go to `artifacts/ai-smoke.json`: tokens, cost computed from reported usage, latency and per-case pass/fail. No prompts or keys are written.
 - The app enables Anthropic's server-side model fallback. `servedModels` in the output lists the models that actually answered. Each call is priced at the served model's rate, and an unlisted model is priced at the highest known rate. The pre-call check uses the requested model's rate, so one fallback call can exceed its estimate by at most the price difference.
-- Cases 1–3 pass only when `source` is `MODEL`: a `DETERMINISTIC_FALLBACK` answer never counts as a real model response. Case 4 (injection) checks that the injected price or capture claim never reaches the customer, whichever source answered. Case 5 records that the fault cases run offline only.
+- Cases 1-3 pass only when `source` is `MODEL`: a `DETERMINISTIC_FALLBACK` answer never counts as a real model response. Case 4 (injection) checks that the injected price or capture claim never reaches the customer, whichever source answered. Case 5 records that the fault cases run offline only.
 
 ## 3. Real webhooks (approval: "public webhook endpoint")
 
-A webhook needs a public HTTPS URL that reaches your machine, such as a tunnel you choose. This exposes the whole app, not just the webhook route. While it is up:
+A webhook needs a public HTTPS URL that reaches your machine, such as a tunnel you choose. The tunnel exposes the whole app, including every route besides the webhook. While it is up:
 - Run in sandbox mode only (demo reset tools are disabled automatically).
 - Use a strong `OPERATOR_PASSPHRASE`.
 - Stop the tunnel right after testing.

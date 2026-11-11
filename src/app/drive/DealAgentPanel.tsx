@@ -23,7 +23,7 @@ interface DealAgentPanelProps {
 
 /**
  * Flex Deal Agent summary on the offers step. Every figure comes from the backend evaluation; the
- * panel never accepts, approves or pays — choosing and approving stay with the driver.
+ * panel never accepts, approves or pays; choosing and approving stay with the driver.
  */
 export function DealAgentPanel({ deal, tz, expired, onRun, onEdit }: DealAgentPanelProps) {
   return (
@@ -67,7 +67,7 @@ function DealResultView({ evaluation: e, summary, points, tz, expired, onEdit }:
             ["Offer", rec.label],
             ["Price", formatUsd(rec.priceCents)],
             ["Validated saving", formatUsd(rec.discountCents)],
-            ["Charges", `${formatLocalTime(rec.chargeStartMs, tz)}–${formatLocalTime(rec.chargeEndMs, tz)}`],
+            ["Charges", `${formatLocalTime(rec.chargeStartMs, tz)}-${formatLocalTime(rec.chargeEndMs, tz)}`],
           ].map(([k, v]) => (
             <div key={k} className="min-w-0">
               <dt className="meta">{k}</dt>

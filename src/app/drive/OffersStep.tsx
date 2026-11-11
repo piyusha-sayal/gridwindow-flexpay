@@ -49,7 +49,7 @@ export function OffersStep({ quote, tz, selected, offer, recommendedKind, deal, 
     <div className="step-enter space-y-6">
       <header className="space-y-3">
         <p className="meta step-kicker">
-          {formatKWh(quote.request.targetBatteryWh)} to battery · parked {formatLocalTime(quote.request.plugInMs, tz)}–{formatLocalTime(quote.request.departMs, tz)}
+          {formatKWh(quote.request.targetBatteryWh)} to battery · parked {formatLocalTime(quote.request.plugInMs, tz)}-{formatLocalTime(quote.request.departMs, tz)}
         </p>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <h1 id="offers-title" tabIndex={-1} className="step-title max-w-[22ch] font-semibold leading-[1.05] text-[clamp(30px,4vw,46px)]">

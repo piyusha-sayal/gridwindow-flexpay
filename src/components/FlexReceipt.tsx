@@ -160,7 +160,7 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
             <dd className="receipt-amount num-rise text-right text-[clamp(28px,4.4vw,48px)] font-semibold leading-tight [overflow-wrap:anywhere]">{total.value}</dd>
           </div>
           <Row k="Energy delivered" v={deliveredLine(r)} />
-          <Row k="Charging schedule" v={`Port ${r.portLabel} · ${formatLocalTime(r.plugInMs, r.timeZone)}–${formatLocalTime(r.departMs, r.timeZone)}`} />
+          <Row k="Charging schedule" v={`Port ${r.portLabel} · ${formatLocalTime(r.plugInMs, r.timeZone)}-${formatLocalTime(r.departMs, r.timeZone)}`} />
           <Row k="Merchant" v={r.merchantName} />
           <Row k="Payment provider" v={verifiedLabel} />
           <Row k="Reservation ref" v={r.id} />

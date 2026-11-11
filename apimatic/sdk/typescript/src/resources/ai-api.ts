@@ -49,7 +49,7 @@ export class AiApi {
    *
    * @returns Grounded answer and its source
    *
-   * @throws {@link AiApi.AskAboutReservationError} when the API answers with an error status —
+   * @throws {@link AiApi.AskAboutReservationError} when the API answers with an error status - 
    * narrow on `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection
@@ -86,7 +86,7 @@ export class AiApi {
    *
    * @returns Explanation and its source
    *
-   * @throws {@link AiApi.ExplainOfferError} when the API answers with an error status — narrow on
+   * @throws {@link AiApi.ExplainOfferError} when the API answers with an error status - narrow on
    * `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection
@@ -124,7 +124,7 @@ export class AiApi {
    *
    * @returns Parsed fields and their source
    *
-   * @throws {@link AiApi.ParseChargingRequestError} when the API answers with an error status —
+   * @throws {@link AiApi.ParseChargingRequestError} when the API answers with an error status - 
    * narrow on `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection
@@ -161,7 +161,7 @@ export class AiApi {
    *
    * @returns The recommendation and the evaluation behind it
    *
-   * @throws {@link AiApi.RecommendOfferError} when the API answers with an error status — narrow on
+   * @throws {@link AiApi.RecommendOfferError} when the API answers with an error status - narrow on
    * `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection

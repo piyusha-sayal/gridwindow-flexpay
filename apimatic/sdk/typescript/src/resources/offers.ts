@@ -32,7 +32,7 @@ export class Offers {
    *
    * @returns The quote set
    *
-   * @throws {@link Offers.RequestOffersError} when the API answers with an error status — narrow on
+   * @throws {@link Offers.RequestOffersError} when the API answers with an error status - narrow on
    * `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection

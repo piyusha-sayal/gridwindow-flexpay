@@ -22,7 +22,7 @@ Machine: Windows 11, Node 24.20.0. Code: commit `11cf209` on `chore/final-releas
 
 ## Playwright
 
-Run 2026-11-11 16:35–16:47 UTC, build `11cf209` (`UwTffMwWzXAmMCrRcM0fg`), one device profile at a time, isolated server (MOCK provider, throwaway PGlite, no model or Channel3 key, `GW_ISOLATED_DB=true`).
+Run 2026-11-11 16:35-16:47 UTC, build `11cf209` (`UwTffMwWzXAmMCrRcM0fg`), one device profile at a time, isolated server (MOCK provider, throwaway PGlite, no model or Channel3 key, `GW_ISOLATED_DB=true`).
 
 | Profile | Result | Time |
 |---|---|---|

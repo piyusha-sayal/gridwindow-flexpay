@@ -72,7 +72,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;SiteConfig, ApiError&gt;</code>, with `result.value` of type <code>[SiteConfig](src/models/site-config.ts)</code>
 - **OnError**: `result.payload` always the <code>[Undeclared](src/core/api-error.ts)</code> arm, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -184,7 +184,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ApiQuotesResponse, Offers.RequestOffersError&gt;</code>, with `result.value` of type <code>[ApiQuotesResponse](src/models/api-quotes-response.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -280,7 +280,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;AskResult, AiApi.AskAboutReservationError&gt;</code>, with `result.value` of type <code>[AskResult](src/models/ask-result.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -372,7 +372,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ExplainResult, AiApi.ExplainOfferError&gt;</code>, with `result.value` of type <code>[ExplainResult](src/models/explain-result.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -462,7 +462,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ParseResult, AiApi.ParseChargingRequestError&gt;</code>, with `result.value` of type <code>[ParseResult](src/models/parse-result.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -556,7 +556,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;DealResult, AiApi.RecommendOfferError&gt;</code>, with `result.value` of type <code>[DealResult](src/models/deal-result.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -666,7 +666,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ApiOffersAcceptResponse, Checkout.AcceptOfferError&gt;</code>, with `result.value` of type <code>[ApiOffersAcceptResponse](src/models/api-offers-accept-response.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -756,7 +756,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;undefined, Checkout.CheckoutCancelError&gt;</code>, with `result.value` of type <code>undefined</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -851,7 +851,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;undefined, Checkout.CheckoutReturnError&gt;</code>, with `result.value` of type <code>undefined</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -943,7 +943,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ApiReservationsResponse1, Reservations.GetReservationError&gt;</code>, with `result.value` of type <code>[ApiReservationsResponse1](src/models/api-reservations-response1.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -1019,7 +1019,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ApiReservationsResponse, ApiError&gt;</code>, with `result.value` of type <code>[ApiReservationsResponse](src/models/api-reservations-response.ts)</code>
 - **OnError**: `result.payload` always the <code>[Undeclared](src/core/api-error.ts)</code> arm, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -1111,7 +1111,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;Record&lt;string, unknown&gt;, Operator.GetOperatorDashboardError&gt;</code>, with `result.value` of type <code>Record&lt;string, unknown&gt;</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -1187,7 +1187,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ApiOperatorSessionResponse, ApiError&gt;</code>, with `result.value` of type <code>[ApiOperatorSessionResponse](src/models/api-operator-session-response.ts)</code>
 - **OnError**: `result.payload` always the <code>[Undeclared](src/core/api-error.ts)</code> arm, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -1277,7 +1277,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;OperatorSessionState, Operator.OperatorSignInError&gt;</code>, with `result.value` of type <code>[OperatorSessionState](src/models/operator-session-state.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -1353,7 +1353,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;OperatorSessionState, ApiError&gt;</code>, with `result.value` of type <code>[OperatorSessionState](src/models/operator-session-state.ts)</code>
 - **OnError**: `result.payload` always the <code>[Undeclared](src/core/api-error.ts)</code> arm, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -1444,7 +1444,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;undefined, Webhooks.PaypalWebhookError&gt;</code>, with `result.value` of type <code>undefined</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>
@@ -1544,7 +1544,7 @@ if (result.ok) {
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ApiGearResponse, Gear.FindEvGearError&gt;</code>, with `result.value` of type <code>[ApiGearResponse](src/models/api-gear-response.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
-**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure - a caller abort and a programmer error stay outside the family and reach you raw
 
 </dd>
 </dl>

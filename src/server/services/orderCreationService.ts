@@ -1,8 +1,8 @@
 /**
  * Crash-safe PayPal order creation (review finding #9).
  *
- * The CREATE_ORDER operation — stable PayPal-Request-Id, exact request payload and the accepted
- * offer's terms hash/amount — is committed in the same transaction as the reservation, before any
+ * The CREATE_ORDER operation (stable PayPal-Request-Id, exact request payload and the accepted
+ * offer's terms hash/amount) is committed in the same transaction as the reservation, before any
  * provider call. A retry replays that stored request under the same key, so a lost response returns
  * the order PayPal already created instead of a second one. Replays happen only while the accepted
  * quote is unexpired and only by the worker holding the operation lease. The approve link is never
@@ -74,8 +74,8 @@ async function fail(deps: AppDeps, r: ReservationRow, key: string, code: string,
 
 /**
  * One provider attempt. The caller must hold the operation lease (see `leaseOperation`).
- * Any error that is not a definitive provider rejection — including a failure after the provider
- * applied the request — is AMBIGUOUS and resolved by replaying the same key later.
+ * Any error that is not a definitive provider rejection (including a failure after the provider
+ * applied the request) is AMBIGUOUS and resolved by replaying the same key later.
  */
 export async function attemptCreateOrder(deps: AppDeps, rid: string, op: OperationRow): Promise<ReservationRow> {
   const r = (await getReservation(deps.db, rid))!;

@@ -6,8 +6,8 @@ import { SchemaError, issuesList, issuesMessage } from "./schema-error.js";
  * What a value looks like on the wire.
  *
  * @remarks
- * Only `Date` and `Uint8Array` change shape — a `Date` becomes its serialized form and a
- * `Uint8Array` a string in the RFC 4648 alphabet its field declares — recursing through arrays and
+ * Only `Date` and `Uint8Array` change shape - a `Date` becomes its serialized form and a
+ * `Uint8Array` a string in the RFC 4648 alphabet its field declares - recursing through arrays and
  * objects. Everything else is unchanged, because the schema layer stops at *values*: how a number
  * is written into a query string versus a JSON body is the engine's decision, not the schema's.
  */
@@ -29,7 +29,7 @@ export type Encoded<T, K extends string = BagKey<T>> = T extends Date
  *
  * @remarks
  * This is what an untyped `additionalProperties` record holds, and it is zod's `JSONType` under
- * the SDK's name. Narrow it the way JSON is narrowed — `typeof`, `Array.isArray`, `=== null` — or
+ * the SDK's name. Narrow it the way JSON is narrowed - `typeof`, `Array.isArray`, `=== null` - or
  * hand it to an exported schema's `decode`. A `Date`, a `Uint8Array`, a `Map`, a function,
  * `undefined` and a non-finite number are not JSON values and are refused on `encode` rather than
  * silently rewritten by `JSON.stringify`: write a `Date` as the string the service expects, and
@@ -89,7 +89,7 @@ type Bag = readonly [key: string, entry: Entry<unknown>];
  * The codec exported beside every model: `decode` from the wire, `encode` back to it.
  *
  * @remarks
- * Both directions are complete on their own — one call each, never a pair. `decode` accepts the
+ * Both directions are complete on their own - one call each, never a pair. `decode` accepts the
  * wire form only and `encode` the SDK form only, so passing one direction's value to the other is
  * rejected rather than waved through. A failure throws `SchemaError`; through an operation the
  * same failure reaches you one level down, on the `cause` of a `DecodeError` or an
@@ -114,7 +114,7 @@ export type Schema<T, W = Encoded<T>> = {
 /**
  * The outcome of `validate`: `success` says whether the value passed, and on failure `message` is
  * the list of failing fields, each with its reason, as `code: expected regex format; attributes:
- * must have at most 10 properties` — the same list a `SchemaError` from `encode` carries after
+ * must have at most 10 properties` - the same list a `SchemaError` from `encode` carries after
  * its leading sentence.
  */
 export type ValidationResult =
@@ -125,7 +125,7 @@ export type ValidationResult =
  * The codec of an open enum, which also exposes the known members at run time.
  *
  * @remarks
- * `values` is the set the spec declared. It is **not** enforced — an open enum validates the base
+ * `values` is the set the spec declared. It is **not** enforced - an open enum validates the base
  * type only, so an unrecognized server value round-trips instead of throwing. Test membership
  * yourself against `values` when you need to.
  */

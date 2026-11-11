@@ -26,7 +26,7 @@ Two presentation changes were made after redaction, nothing else: terminal colou
 
 ## What the logs show
 
-- Two complete app builds (`npm ci && npm run build`, "Build successful") and startups ("Ready", "Your service is live"): commit `6265654` (release, PR #9) at 17:11–17:14 UTC and commit `7959a1b` (Gemini hotfix, PR #10) at 17:26–17:29 UTC. No build or startup error in either.
+- Two complete app builds (`npm ci && npm run build`, "Build successful") and startups ("Ready", "Your service is live"): commit `6265654` (release, PR #9) at 17:11-17:14 UTC and commit `7959a1b` (Gemini hotfix, PR #10) at 17:26-17:29 UTC. No build or startup error in either.
 - On `6265654`, three `model call failed: REQUEST_REJECTED (gemini) http=400 status=INVALID_ARGUMENT` lines at 17:15 UTC: the defect fixed by PR #10 (Gemini rejected an 8 s server deadline).
 - On `7959a1b`, the backup chain working: `QUOTA_EXHAUSTED (gemini) http=429`, then `ai failover: gemini QUOTA_EXHAUSTED -> gemini ok` and `deal-agent ... source=MODEL` at 17:32 UTC (the second Gemini model answered).
 - Two static-site deploys of the developer portal ("Your site is live"). A static site has no runtime, so no runtime logs exist for it.

@@ -103,7 +103,7 @@ function Row({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps)
         {s.lastEvent && <span className="block meta mt-0.5">{s.lastEvent.type}</span>}
       </td>
       <td className="pr-3">
-        {d.ports.find((p) => p.id === s.portId)?.label} · {formatLocalTime(s.plugInMs, d.timeZone)}–{formatLocalTime(s.departMs, d.timeZone)}
+        {d.ports.find((p) => p.id === s.portId)?.label} · {formatLocalTime(s.plugInMs, d.timeZone)}-{formatLocalTime(s.departMs, d.timeZone)}
       </td>
       <td className="pr-3">{formatKWh(s.targetBatteryWh)}</td>
       <td className="pr-3">
@@ -146,7 +146,7 @@ function Card({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps
       <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
         <CardField label="Port">{d.ports.find((p) => p.id === s.portId)?.label}</CardField>
         <CardField label="Parked">
-          {formatLocalTime(s.plugInMs, d.timeZone)}–{formatLocalTime(s.departMs, d.timeZone)}
+          {formatLocalTime(s.plugInMs, d.timeZone)}-{formatLocalTime(s.departMs, d.timeZone)}
         </CardField>
         <CardField label="Energy">{formatKWh(s.targetBatteryWh)}</CardField>
         <CardField label="Customer amount">{formatUsd(s.amountCents)}</CardField>

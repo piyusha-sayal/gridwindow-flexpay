@@ -85,7 +85,7 @@ function isoDate(d: { year: number; month: number; day: number }): string {
   return `${d.year}-${String(d.month).padStart(2, "0")}-${String(d.day).padStart(2, "0")}`;
 }
 
-/** Seeded requests: one per port, evening arrivals, morning departures, 10–55 kWh. */
+/** Seeded requests: one per port, evening arrivals, morning departures, 10-55 kWh. */
 export function scenarioRequests(station: StationConfig, seed: number): { nightOf: string; requests: ChargeRequest[] } {
   const rand = mulberry32(seed * 104_729 + 7);
   const nightOf = isoDate(addLocalDays({ year: 2026, month: 1, day: 1 }, Math.floor(rand() * 365)));
@@ -93,8 +93,8 @@ export function scenarioRequests(station: StationConfig, seed: number): { nightO
   const slot = (i: number) => slotStartMs(scenario.grid, i);
   const lastSlot = scenario.grid.slotCount;
   const requests = station.ports.map((port) => {
-    const plugIn = Math.floor(rand() * 22); // 18:00–23:15
-    const departFromEnd = 4 + Math.floor(rand() * 17); // 05:00–09:00 (non-DST nights)
+    const plugIn = Math.floor(rand() * 22); // 18:00-23:15
+    const departFromEnd = 4 + Math.floor(rand() * 17); // 05:00-09:00 (non-DST nights)
     const targetBatteryWh = (10 + Math.floor(rand() * 46)) * 1000;
     return {
       portId: port.id,
@@ -213,7 +213,7 @@ export function runBenchmark(station: StationConfig, economics: EconomicsConfig,
     generatedAt,
     scenarioCount: seeds.length,
     requestCount: rows.length,
-    seedRange: `${Math.min(...seeds)}–${Math.max(...seeds)}`,
+    seedRange: `${Math.min(...seeds)}-${Math.max(...seeds)}`,
     provenance: "SYNTHETIC",
     policies: names.map((n) => ({
       policy: n,
@@ -238,7 +238,7 @@ export function runBenchmark(station: StationConfig, economics: EconomicsConfig,
       validatorFailures: offerStats.validatorFailures,
     },
     methodology: [
-      "Each scenario: one seeded synthetic night (date drawn across 2026, including DST nights) on the demo station (24 kW cap, 1 kW safety headroom, ports of 3.6, 7.2 and 11 kW), one request per port with plug-in 18:00–23:15, departure ~05:00–09:00 local, 10–55 kWh battery target, 92 % efficiency.",
+      "Each scenario: one seeded synthetic night (date drawn across 2026, including DST nights) on the demo station (24 kW cap, 1 kW safety headroom, ports of 3.6, 7.2 and 11 kW), one request per port with plug-in 18:00-23:15, departure ~05:00-09:00 local, 10-55 kWh battery target, 92 % efficiency.",
       "Requests arrive in plug-in order; each policy allocates every request against the commitments it already made (no re-optimization of earlier sessions).",
       "Policies: immediate = max power from plug-in; static_offpeak = start at 00:00 local at max power; greedy_tariff = cheapest TOU slots first at max power, ignoring congestion; optimized = marginal-cost greedy over TOU + congestion surcharge in 100 W steps.",
       "Cost = synthetic TOU energy + congestion surcharge attributable to the session (forecast base load), rounded up to cents. Pairwise comparisons pair the same request; because earlier commitments differ by policy, a later request can be cheaper under a baseline.",

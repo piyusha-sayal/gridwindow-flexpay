@@ -1,7 +1,7 @@
 /**
  * Visual evidence (MOCK): drives the real app into each reviewable state, captures screenshots into
  * artifacts/qa/sprint11, checks layout geometry at seven viewport widths and checks print media.
- * Runs once, in the desktop project; nights 40–43 are reserved for this spec.
+ * Runs once, in the desktop project; nights 40-43 are reserved for this spec.
  */
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -156,7 +156,7 @@ test("state gallery: validation, infeasible, terms, authorized, captured, pendin
   await shot(page, "state-13-benchmark");
 });
 
-test("viewport matrix: no horizontal overflow on core screens at 320–1440 px", async ({ page }) => {
+test("viewport matrix: no horizontal overflow on core screens at 320-1440 px", async ({ page }) => {
   expect(ids.captured, "state gallery must run first").toBeTruthy();
   const screens: [string, (p: Page) => Promise<void>][] = [
     ["home", async (p) => void (await p.goto("/"))],

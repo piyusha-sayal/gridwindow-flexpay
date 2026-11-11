@@ -1,6 +1,6 @@
 # Evidence manifest: final release, 2026-11-11
 
-Commit under test: `11cf209` (branch `chore/final-release-verification-satyam`). **LIVE** images were captured on the deployed release `7959a1b` (17:33–17:35 UTC); **LOCAL** images on `11cf209`, whose runtime code equals the release except the Gemini server-deadline hotfix (PR #10), which local captures (no model key) do not exercise. See `docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md`.
+Commit under test: `11cf209` (branch `chore/final-release-verification-satyam`). **LIVE** images were captured on the deployed release `7959a1b` (17:33-17:35 UTC); **LOCAL** images on `11cf209`, whose runtime code equals the release except the Gemini server-deadline hotfix (PR #10), which local captures (no model key) do not exercise. See `docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md`.
 Captured 2026-11-11 with Playwright (Chromium headless), time zone America/Los_Angeles. Desktop 1440×900 at 1×, phone 390×844 at 2×, tablet 820×1180 at 2×.
 
 Labels: **LIVE** = the public Render deployment (PayPal Sandbox mode, real Gemini key, real Channel3 key). **SANDBOX** = a state confirmed by the PayPal Sandbox API. **MOCK** = the built-in mock payment provider on an isolated local server (no PayPal call). **SYNTHETIC** = simulated charging, disturbances and tariffs. **FALLBACK** = the labelled deterministic answer (no model call).

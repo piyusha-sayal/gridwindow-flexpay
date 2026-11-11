@@ -42,7 +42,7 @@ export class Operator {
    *
    * @returns Dashboard data
    *
-   * @throws {@link Operator.GetOperatorDashboardError} when the API answers with an error status —
+   * @throws {@link Operator.GetOperatorDashboardError} when the API answers with an error status - 
    * narrow on `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection
@@ -112,7 +112,7 @@ export class Operator {
    *
    * @returns Signed in; sets the operator cookie
    *
-   * @throws {@link Operator.OperatorSignInError} when the API answers with an error status — narrow
+   * @throws {@link Operator.OperatorSignInError} when the API answers with an error status - narrow
    * on `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection

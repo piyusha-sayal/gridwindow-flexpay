@@ -29,7 +29,7 @@ export class Webhooks {
    *
    * @returns Accepted
    *
-   * @throws {@link Webhooks.PaypalWebhookError} when the API answers with an error status — narrow
+   * @throws {@link Webhooks.PaypalWebhookError} when the API answers with an error status - narrow
    * on `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection

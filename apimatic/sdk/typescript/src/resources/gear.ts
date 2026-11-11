@@ -31,7 +31,7 @@ export class Gear {
    *
    * @returns Search result
    *
-   * @throws {@link Gear.FindEvGearError} when the API answers with an error status — narrow on
+   * @throws {@link Gear.FindEvGearError} when the API answers with an error status - narrow on
    * `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection

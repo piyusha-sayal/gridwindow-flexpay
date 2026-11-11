@@ -1,6 +1,6 @@
 /**
  * Payment-safety reconciliation (2026-10-31): reproductions for gaps found while re-verifying
- * review findings #1–#10, plus direct checks for findings that had no dedicated test.
+ * review findings #1-#10, plus direct checks for findings that had no dedicated test.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { approvalDeadlineMs } from "@/domain/terms";

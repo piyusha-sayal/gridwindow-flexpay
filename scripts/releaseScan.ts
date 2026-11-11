@@ -48,7 +48,7 @@ export async function scanClientAssets(dir: string, configured: Record<string, s
   } catch {
     return { findings, unreadable: [dir], scannedFiles: 0 };
   }
-  if (files.length === 0) unreadable.push(`${dir} (empty — run npm run build first)`);
+  if (files.length === 0) unreadable.push(`${dir} (empty: run npm run build first)`);
   let scannedFiles = 0;
   for (const file of files) {
     const rel = path.relative(dir, file);

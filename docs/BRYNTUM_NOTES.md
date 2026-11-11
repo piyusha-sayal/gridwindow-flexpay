@@ -152,4 +152,4 @@ Used: custom event rendering, event tooltips, resize and drag events (disabled b
 
 ## Capacity strip update (2026-11-10)
 
-The plain-React capacity strip below the timeline now plots scheduled EV demand stacked on the synthetic forecast base load against the usable site limit (station cap minus the 1 kW safety headroom), the same limit the validator applies. Only capacity-holding sessions are drawn or counted; voided, failed and cancelled sessions stay in the table, flagged. It shows a plan and a forecast, not measured demand. See `docs/QA_CLOSURE.md`.
+The plain-React capacity strip below the timeline now plots scheduled EV demand stacked on the synthetic forecast base load against the usable site limit (station cap minus the 1 kW safety headroom), the same limit the validator applies. Only capacity-holding sessions are drawn or counted; voided, failed and cancelled sessions stay in the table, flagged. It shows a plan and a forecast, not measured demand.

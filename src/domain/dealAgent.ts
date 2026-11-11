@@ -1,5 +1,5 @@
 /**
- * Flex Deal Agent — deterministic qualification and ranking of backend-priced offers against a
+ * Flex Deal Agent: deterministic qualification and ranking of backend-priced offers against a
  * driver's goals. Pure: it reads a stored QuoteSet and never computes, adjusts or rounds a price;
  * every amount it returns is copied from the quote. It recommends; only the driver can accept.
  */

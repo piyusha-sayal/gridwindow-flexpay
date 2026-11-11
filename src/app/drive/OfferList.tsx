@@ -17,7 +17,7 @@ const REJECTION_COPY: Record<string, string> = {
   WINDOW_TOO_SHORT: "your parking window is too short for this variant",
   NO_COMPARABLE_FEASIBLE_BASELINE: "immediate charging is not feasible, so no saving can be claimed",
   PORT_OCCUPIED: "another vehicle is parked at this port during your window",
-  OUTSIDE_HORIZON: "the window is outside tonight's schedule (18:00–10:00)",
+  OUTSIDE_HORIZON: "the window is outside tonight's schedule (18:00-10:00)",
 };
 
 export const VARIANT_NAME: Record<string, string> = { flex_lowest_cost: "Lowest-cost window", flex_early_finish: "Ready 1 hour early", flex_gentle: "Gentle Charging" };
@@ -150,7 +150,7 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
                 </span>
                 <PowerBars powerW={o.powerW} maxW={maxW} color="var(--teal)" parked={parked} className={`h-9 col-span-2 ${CELL_RESET}`} />
                 <span className={`col-span-2 font-mono text-[13px] ${CELL_RESET}`}>
-                  <span className="min-[760px]:hidden text-muted">Charges {formatLocalTime(o.chargeStartMs, tz)}–{formatLocalTime(o.chargeEndMs, tz)} · ready </span>
+                  <span className="min-[760px]:hidden text-muted">Charges {formatLocalTime(o.chargeStartMs, tz)}-{formatLocalTime(o.chargeEndMs, tz)} · ready </span>
                   {formatLocalTime(t.readyByMs, tz)}
                 </span>
                 <span className={`col-start-2 row-start-1 text-right tabular ${CELL_RESET}`}>

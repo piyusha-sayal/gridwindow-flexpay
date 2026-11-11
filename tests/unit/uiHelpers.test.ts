@@ -197,7 +197,7 @@ describe("driver default night", () => {
   });
 
   it("uses station wall time across DST changes", () => {
-    // 2026-11-01 01:30 occurs twice (PDT then PST); 2026-03-08 02:00–03:00 does not exist.
+    // 2026-11-01 01:30 occurs twice (PDT then PST); 2026-03-08 02:00-03:00 does not exist.
     for (const utc of [Date.UTC(2026, 10, 1, 8, 30), Date.UTC(2026, 10, 1, 9, 30)]) expect(driverDefaultWindow(DEMO_STATION, utc)).toEqual({ nightOf: "2026-11-01", plugInLocal: "19:00", departLocal: "07:00" });
     expect(driverDefaultWindow(DEMO_STATION, Date.UTC(2026, 2, 8, 10, 30))).toEqual({ nightOf: "2026-03-08", plugInLocal: "19:00", departLocal: "07:00" });
     expect(driverDefaultWindow(DEMO_STATION, Date.UTC(2026, 2, 8, 6, 10)).plugInLocal).toBe("22:30"); // 22:10 PST on 2026-03-07

@@ -62,7 +62,7 @@ export function SelectedCard({ offer, tz, expired, onReview }: SelectedProps) {
           {offer.label}
         </h2>
         <p className="font-mono text-[13px] text-on-navy-body">
-          Charges {formatLocalTime(offer.chargeStartMs, tz)}–{formatLocalTime(offer.chargeEndMs, tz)}
+          Charges {formatLocalTime(offer.chargeStartMs, tz)}-{formatLocalTime(offer.chargeEndMs, tz)}
         </p>
       </div>
       <p className="flex items-baseline gap-3 tabular">

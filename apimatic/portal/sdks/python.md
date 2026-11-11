@@ -21,7 +21,7 @@ and never moves money.
 
 ## Installation [#installation]
 
-Add the SDK to your project from its folder, with whichever package manager your project uses. Give each tool a path containing a slash, such as `../grid-window-flex-pay-api` — a bare folder name is looked up on PyPI instead, and resolves to whatever project holds that name there:
+Add the SDK to your project from its folder, with whichever package manager your project uses. Give each tool a path containing a slash, such as `../grid-window-flex-pay-api` - a bare folder name is looked up on PyPI instead, and resolves to whatever project holds that name there:
 
 ```bash
 pip install <path-to-sdk>
@@ -49,11 +49,11 @@ client = GridWindowFlexPayApiClient(operator_cookie="YOUR_API_KEY", environment=
 client.close()
 ```
 
-Alternatively, scope it — `with GridWindowFlexPayApiClient(...) as client:` closes the pool on exit.
+Alternatively, scope it - `with GridWindowFlexPayApiClient(...) as client:` closes the pool on exit.
 
 ### Asynchronous client [#asynchronous-client]
 
-`AsyncGridWindowFlexPayApiClient` mirrors `GridWindowFlexPayApiClient` with **identical method names**, and every endpoint method is a coroutine. It takes the same arguments, with some differences — for example, the transport argument is `custom_async_http_client`.
+`AsyncGridWindowFlexPayApiClient` mirrors `GridWindowFlexPayApiClient` with **identical method names**, and every endpoint method is a coroutine. It takes the same arguments, with some differences - for example, the transport argument is `custom_async_http_client`.
 
 ```python
 from asyncio import run
@@ -67,4 +67,4 @@ async def main() -> None:
 run(main())
 ```
 
-Alternatively, scope it — `async with AsyncGridWindowFlexPayApiClient(...) as client:` closes the pool on exit.
+Alternatively, scope it - `async with AsyncGridWindowFlexPayApiClient(...) as client:` closes the pool on exit.

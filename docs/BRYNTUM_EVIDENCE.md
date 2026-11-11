@@ -1,6 +1,6 @@
-# Bryntum sponsor evidence (independent QA)
+# Bryntum evidence
 
-Status vocabulary: PASS / FAIL / BLOCKED / NOT TESTED / NEEDS USER APPROVAL. All schedule data is SYNTHETIC (MOCK payments, simulated charging).
+Status vocabulary: PASS / FAIL / NOT TESTED. All schedule data in these screenshots is SYNTHETIC (MOCK payments, simulated charging). The same schedule runs on the live site with PayPal Sandbox bookings.
 Evidence files are in `docs/evidence/`. Screenshots were captured from the running production build by `tests/e2e/independent-recovery-evidence.spec.ts`, not mocked up.
 
 ## What the judge should see
@@ -38,13 +38,12 @@ License caveat: Bryntum's website describes an end-user and an OEM license and d
 
 ## Known defects and vendor issues (not hidden)
 
-### QA-3: the Bryntum time axis follows the browser's time zone, not the station's (Medium for a time-labelled demo)
-- Where: `src/app/operator/schedule/ScheduleChart.tsx`; the table and all app labels use the station zone `America/Los_Angeles`.
-- Observed (real browser, `evidence/bryntum-axis-by-browser-zone.json`): for the night 2027-11-06 the Los Angeles browser shows 6 PM ... 7 AM with 1 AM twice; an `Asia/Kolkata` browser shows 6 AM ... 8 PM and a UTC browser shows 1 AM ... 3 PM. The table in all three says parked 18:30, departs 06:30.
-- Impact: event bars are positioned by absolute time, so the data is correct, but an operator outside the station zone reads axis ticks that disagree with the table and the event labels.
-- Test: four `QA-3 (known defect)` tests in `independent-bryntum-tz.spec.ts` are marked `test.fail()`. They will report "unexpected pass" once the axis is corrected.
-- Recommended correction (needs separate authorization; not made here): configure the scheduler's time zone to the station zone (the notes record that the installed React wrapper rejected a `timeZone` prop, so verify the supported property in the Bryntum 8 API) or render the axis headers through a station-zone formatter.
-- Demo mitigation today: record the demo in a browser set to Pacific time (the default for the presenter if the machine is in the Pacific zone).
+### QA-3: the Bryntum time axis and the browser's time zone (labels fixed, one residual)
+- Where: `src/app/operator/schedule/ScheduleChart.tsx` and `scheduleAxis.ts`. The table and all app labels use the station zone `America/Los_Angeles`.
+- What we found first (real browser, `evidence/bryntum-axis-by-browser-zone.json`): the axis followed the browser's zone. For the night 2027-11-06, a Los Angeles browser showed 6 PM to 7 AM, an `Asia/Kolkata` browser 6 AM to 8 PM, and a UTC browser 1 AM to 3 PM, while the table said parked 18:30, departs 06:30. Bars were always placed by absolute time, so the data was right; the labels were not.
+- Fix: the axis headers are now formatted in the station zone (`scheduleAxis.ts`), so labels match the table in Pacific, UTC and Kolkata browsers. See [BRYNTUM_NOTES.md](BRYNTUM_NOTES.md).
+- Residual: Bryntum still places tick boundaries on the browser's own hours. In a half-hour-offset zone such as Kolkata, the ticks read 6:30 PM, 7:30 PM and so on, still in station time.
+- Tests: `independent-bryntum-tz.spec.ts` checks two DST nights in UTC and Kolkata browsers. The two UTC tests pass. The two Kolkata tests are marked `test.fail()` for the residual and will report "unexpected pass" if Bryntum ever lines the ticks up.
 
 ### Vendor accessibility findings inside Bryntum's DOM (recorded by axe on 2026-11-09)
 | Rule | Impact | Nodes |
@@ -56,7 +55,7 @@ License caveat: Bryntum's website describes an end-user and an OEM license and d
 These are in Bryntum's own grid markup; app code does not override them. The timeline is not claimed to be fully accessible. The table view and the text summary are the accessible path.
 
 ### UX observations from the screenshots
-- Port labels in the resource column are clipped ("Port A (3.6 k"). Cosmetic.
+- An earlier build clipped the port labels in the resource column ("Port A (3.6 k"). At desktop width they now show in full.
 - The chart is read-only. Drag-to-edit is not a feature, which is the safe choice because no endpoint would persist it.
 
 ## Limitations to state in the submission

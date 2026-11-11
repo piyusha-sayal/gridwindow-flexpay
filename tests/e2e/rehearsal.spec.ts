@@ -1,5 +1,5 @@
 /**
- * Timed MOCK rehearsal of plans/DEMO_PLAN.md (success, service failure, provider pending and
+ * Timed MOCK rehearsal of the demo walkthrough (success, service failure, provider pending and
  * infeasible request). Measures app response time per step, not presenter pace, and writes
  * artifacts/qa/demo-rehearsal.json. Never resets data: other specs share this database.
  */
@@ -31,7 +31,7 @@ async function loadNight(page: Page, night: string) {
   await expect(page.getByRole("heading", { level: 1, name: / at Harbor Lane/ })).toBeVisible();
 }
 
-test("demo rehearsal (MOCK): timed per DEMO_PLAN", async ({ page }) => {
+test("demo rehearsal (MOCK): timed walkthrough", async ({ page }) => {
   test.setTimeout(180_000);
   const steps: { step: string; ms: number }[] = [];
   const step = async (name: string, fn: () => Promise<void>) => {

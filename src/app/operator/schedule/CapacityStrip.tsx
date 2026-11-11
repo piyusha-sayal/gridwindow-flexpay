@@ -14,7 +14,7 @@ export function CapacityStrip({ model }: { model: ScheduleModel }) {
   const topKw = Math.max(6, Math.ceil(Math.max(s.peakKw, s.maxLimitKw) / 6) * 6);
   const yTicks = [topKw, topKw / 2, 0];
   const limitText = s.minLimitKw === s.maxLimitKw ? formatKw(s.maxLimitKw) : `${formatKw(s.minLimitKw)} to ${formatKw(s.maxLimitKw)}, varies by time`;
-  const range = (startMs: number, endMs: number) => `${timeLabel(startMs, model.timeZone)}–${timeLabel(endMs, model.timeZone)}`;
+  const range = (startMs: number, endMs: number) => `${timeLabel(startMs, model.timeZone)}-${timeLabel(endMs, model.timeZone)}`;
 
   return (
     <div className="space-y-4">

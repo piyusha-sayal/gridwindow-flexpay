@@ -24,7 +24,7 @@ function stationWithPortPower(maxPowerW: number): StationConfig {
   return { ...DEMO_STATION, safetyHeadroomW: 0, ports: DEMO_STATION.ports.map((p) => ({ ...p, maxPowerW })) };
 }
 
-/** 01:00–04:00 local on the 2026-10-20 night = slots 28..39 (grid starts 18:00). */
+/** 01:00-04:00 local on the 2026-10-20 night = slots 28..39 (grid starts 18:00). */
 const oneToFour = (overrides: Partial<ChargeRequest> = {}): ChargeRequest => ({
   portId: "port_a",
   plugInMs: at(28),

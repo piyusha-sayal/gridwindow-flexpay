@@ -1,23 +1,23 @@
-<!-- Generated file — do not edit; regenerated with the SDK. -->
+<!-- Generated file - do not edit; regenerated with the SDK. -->
 
-# AiApi — operations
+# AiApi - operations
 
 Accessor: `client.aiApi` · Source: `src/resources/ai-api.ts` · 4 operations · Request and error types: namespace `AiApi`
 
-**Type sources**: every type an operation names, with the file that declares it and the schema value exported beside it. Import every name from `grid-window-flex-pay-api`; the `Source` path is where to **read** the shape, never what to import. `ApiError`, the runtime error family and the file vocabulary are excluded — see sdk-map.md.
+**Type sources**: every type an operation names, with the file that declares it and the schema value exported beside it. Import every name from `grid-window-flex-pay-api`; the `Source` path is where to **read** the shape, never what to import. `ApiError`, the runtime error family and the file vocabulary are excluded - see sdk-map.md.
 
 ### askAboutReservation
 
 - **Signature**: `askAboutReservation(request: AiApi.AskAboutReservationRequest, options?: RequestOptions): ApiPromise<AskResult, AiApi.AskAboutReservationError>`
 - **Wire**: `POST /api/assist/ask`
-- **Auth**: none — public; no credential is sent
-- **Request body**: `application/json` — the `body` field
+- **Auth**: none - public; no credential is sent
+- **Request body**: `application/json` - the `body` field
 - **SDK-sent**: `header Idempotency-Key` (minted per call)
 - **Returns**: `AskResult`
-- **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.AskAboutReservationError` — **typed arms**, narrowed on `err.payload.kind`
+- **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.AskAboutReservationError` - **typed arms**, narrowed on `err.payload.kind`
 - **Error arms**: `"error"` [404] `Error` · `"undeclared"` [any other] `rawBody: ArrayBuffer`
 
-**Fields** — `AiApi.AskAboutReservationRequest` (1):
+**Fields** - `AiApi.AskAboutReservationRequest` (1):
 
 | Field | Channel | Type | Req |
 | --- | --- | --- | --- |
@@ -33,14 +33,14 @@ Accessor: `client.aiApi` · Source: `src/resources/ai-api.ts` · 4 operations ·
 
 - **Signature**: `explainOffer(request: AiApi.ExplainOfferRequest, options?: RequestOptions): ApiPromise<ExplainResult, AiApi.ExplainOfferError>`
 - **Wire**: `POST /api/assist/explain`
-- **Auth**: none — public; no credential is sent
-- **Request body**: `application/json` — the `body` field
+- **Auth**: none - public; no credential is sent
+- **Request body**: `application/json` - the `body` field
 - **SDK-sent**: `header Idempotency-Key` (minted per call)
 - **Returns**: `ExplainResult`
-- **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.ExplainOfferError` — **typed arms**, narrowed on `err.payload.kind`
+- **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.ExplainOfferError` - **typed arms**, narrowed on `err.payload.kind`
 - **Error arms**: `"error"` [404] `Error` · `"undeclared"` [any other] `rawBody: ArrayBuffer`
 
-**Fields** — `AiApi.ExplainOfferRequest` (1):
+**Fields** - `AiApi.ExplainOfferRequest` (1):
 
 | Field | Channel | Type | Req |
 | --- | --- | --- | --- |
@@ -56,14 +56,14 @@ Accessor: `client.aiApi` · Source: `src/resources/ai-api.ts` · 4 operations ·
 
 - **Signature**: `parseChargingRequest(request: AiApi.ParseChargingRequestRequest, options?: RequestOptions): ApiPromise<ParseResult, AiApi.ParseChargingRequestError>`
 - **Wire**: `POST /api/quotes/parse`
-- **Auth**: none — public; no credential is sent
-- **Request body**: `application/json` — the `body` field
+- **Auth**: none - public; no credential is sent
+- **Request body**: `application/json` - the `body` field
 - **SDK-sent**: `header Idempotency-Key` (minted per call)
 - **Returns**: `ParseResult`
-- **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.ParseChargingRequestError` — **typed arms**, narrowed on `err.payload.kind`
+- **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.ParseChargingRequestError` - **typed arms**, narrowed on `err.payload.kind`
 - **Error arms**: `"error"` [400] `Error` · `"error2"` [429] `Error` · `"undeclared"` [any other] `rawBody: ArrayBuffer`
 
-**Fields** — `AiApi.ParseChargingRequestRequest` (1):
+**Fields** - `AiApi.ParseChargingRequestRequest` (1):
 
 | Field | Channel | Type | Req |
 | --- | --- | --- | --- |
@@ -79,14 +79,14 @@ Accessor: `client.aiApi` · Source: `src/resources/ai-api.ts` · 4 operations ·
 
 - **Signature**: `recommendOffer(request: AiApi.RecommendOfferRequest, options?: RequestOptions): ApiPromise<DealResult, AiApi.RecommendOfferError>`
 - **Wire**: `POST /api/agent/deals`
-- **Auth**: none — public; no credential is sent
-- **Request body**: `application/json` — the `body` field
+- **Auth**: none - public; no credential is sent
+- **Request body**: `application/json` - the `body` field
 - **SDK-sent**: `header Idempotency-Key` (minted per call)
 - **Returns**: `DealResult`
-- **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.RecommendOfferError` — **typed arms**, narrowed on `err.payload.kind`
+- **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.RecommendOfferError` - **typed arms**, narrowed on `err.payload.kind`
 - **Error arms**: `"error"` [404] `Error` · `"error2"` [409] `Error` · `"undeclared"` [any other] `rawBody: ArrayBuffer`
 
-**Fields** — `AiApi.RecommendOfferRequest` (1):
+**Fields** - `AiApi.RecommendOfferRequest` (1):
 
 | Field | Channel | Type | Req |
 | --- | --- | --- | --- |

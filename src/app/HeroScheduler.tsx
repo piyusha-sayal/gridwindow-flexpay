@@ -118,7 +118,7 @@ export function HeroScheduler() {
                 </span>
               </p>
               <p className="meta text-ink">
-                Charges {heroTimeLabel(r.startSlot)}–{heroTimeLabel(r.endSlot)}
+                Charges {heroTimeLabel(r.startSlot)}-{heroTimeLabel(r.endSlot)}
               </p>
               <p className="text-[13px] text-muted">Ready by {readyStr} · same 30 kWh</p>
             </>
