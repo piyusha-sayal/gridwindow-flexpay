@@ -6,7 +6,7 @@
  */
 import { allocate, committedLoadW, sessionCostMicrocents, slotsWithin, type AllocationContext, type AllocationPolicy } from "./allocator";
 import { contribution, microcentsToCentsCeil, validateOfferEconomics, type EconomicsConfig } from "./economics";
-import { chargeEndMs, effectiveDepartMs, portCapAt, validateWithEnvelope, type NightEnvelope } from "./disturbance";
+import { chargeEndMs, effectiveDepartMs, portCapAt, violationsIntroducedBy, type NightEnvelope } from "./disturbance";
 import type { TariffModel } from "./forecast";
 import { VARIANTS, type OfferKind } from "./quotes";
 import { decideConsent, type ConsentDecision } from "./recoveryConsent";
@@ -221,12 +221,15 @@ function evaluateCandidate(
   kind: OfferKind,
   powerW: number[],
 ): { candidate: RecoveryCandidate } | { reason: string } {
-  const violations = validateWithEnvelope({
+  // Only what this candidate causes counts: another session's existing problem (e.g. its own charger was cut with no
+  // feasible recovery) must not make every later recovery on the night infeasible. Overloaded slots stay off limits.
+  const violations = violationsIntroducedBy({
     station: ctx.station,
     grid: ctx.grid,
     forecastBaseLoadW: ctx.forecastBaseLoadW,
     envelope: ctx.envelope,
-    plans: [...ctx.others, { sessionId: session.reservationId, portId: session.portId, plugInMs: snap.plugInMs, departMs: snap.departMs, powerW }],
+    committed: ctx.others,
+    candidate: { sessionId: session.reservationId, portId: session.portId, plugInMs: snap.plugInMs, departMs: snap.departMs, powerW },
     targets: [{ sessionId: session.reservationId, targetBatteryWh: session.targetBatteryWh, efficiencyBp: session.efficiencyBp }],
   });
   if (violations.length > 0) return { reason: `VALIDATOR_REJECTED: ${[...new Set(violations.map((v) => v.code))].join(", ")}` };

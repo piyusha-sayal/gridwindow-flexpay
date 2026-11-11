@@ -28,17 +28,17 @@ Provenance: SYNTHETIC. Seeded synthetic nights, a synthetic station and assumed 
 | --- | --- | --- | --- |
 | Scenarios run (applicable) | 5789 | 5789 | 5789 |
 | Sessions affected (static delivery below undisturbed plan) | 4672 | 4672 | 4672 |
-| Satisfied on time (battery target met, of scenarios run) | 1112 / 5789 | 1168 / 5789 | 1814 / 5789 |
+| Satisfied on time (battery target met, of scenarios run) | 1112 / 5789 | 1168 / 5789 | 1846 / 5789 |
 | Changed without driver approval | - | 71 | 71 |
-| Served only after driver approval (target met) | - | 0 (not applied) | 706 (of 768 approval changes) |
-| Awaiting driver approval (not applied under auto-only) | - | 1350 | - |
-| Infeasible (no schedule passes checks), by binding constraint | - | 3882 (PORT_POWER 870, SITE_CAPACITY 814, TIME 650, PORT_FAILED 1455, VALIDATION 44, OPERATOR_ECONOMICS 49) | 3882 (PORT_POWER 870, SITE_CAPACITY 814, TIME 650, PORT_FAILED 1455, VALIDATION 44, OPERATOR_ECONOMICS 49) |
-| Energy shortfall, battery kWh (realized replay) | 51489.36 | 51373.88 | 48331.31 |
-| Operator contribution change, modeled cents (agreed price held) | n/m | -5862 | -24871 |
+| Served only after driver approval (target met) | - | 0 (not applied) | 738 (of 835 approval changes) |
+| Awaiting driver approval (not applied under auto-only) | - | 1417 | - |
+| Infeasible (no schedule passes checks), by binding constraint | - | 3812 (PORT_POWER 843, SITE_CAPACITY 814, TIME 650, PORT_FAILED 1455, OPERATOR_ECONOMICS 50) | 3812 (PORT_POWER 843, SITE_CAPACITY 814, TIME 650, PORT_FAILED 1455, OPERATOR_ECONOMICS 50) |
+| Energy shortfall, battery kWh (realized replay) | 51489.36 | 51373.88 | 48003.17 |
+| Operator contribution change, modeled cents (agreed price held) | n/m | -5862 | -25570 |
 | Lowest operator margin vs immediate baseline, applied changes (cents; minimum 1) | - | 1 | 1 |
 | Applied changes below minimum operator margin (expect 0) | - | 0 | 0 |
-| Finishes after agreed ready-by time | - | 0 | 665 |
-| Higher energy cost than agreed plan | - | 56 | 352 |
+| Finishes after agreed ready-by time | - | 0 | 732 |
+| Higher energy cost than agreed plan | - | 56 | 376 |
 | Recovery delivered less than static (known shortfall cases, see RECOVERY_BENCHMARK_FINDINGS.md) | - | 1 | 3 |
 
 ## Per disturbance type
@@ -72,17 +72,17 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | --- | --- | --- | --- |
 | Scenarios run (applicable) | 1455 | 1455 | 1455 |
 | Sessions affected (static delivery below undisturbed plan) | 1065 | 1065 | 1065 |
-| Satisfied on time (battery target met, of scenarios run) | 389 / 1455 | 391 / 1455 | 434 / 1455 |
+| Satisfied on time (battery target met, of scenarios run) | 389 / 1455 | 391 / 1455 | 466 / 1455 |
 | Changed without driver approval | - | 8 | 8 |
-| Served only after driver approval (target met) | - | 0 (not applied) | 45 (of 94 approval changes) |
-| Awaiting driver approval (not applied under auto-only) | - | 94 | - |
-| Infeasible (no schedule passes checks), by binding constraint | - | 907 (SITE_CAPACITY 814, PORT_POWER 42, VALIDATION 44, OPERATOR_ECONOMICS 7) | 907 (SITE_CAPACITY 814, PORT_POWER 42, VALIDATION 44, OPERATOR_ECONOMICS 7) |
-| Energy shortfall, battery kWh (realized replay) | 10850.18 | 10848.74 | 10472.30 |
-| Operator contribution change, modeled cents (agreed price held) | n/m | -14 | -269 |
-| Lowest operator margin vs immediate baseline, applied changes (cents; minimum 1) | - | 139 | 42 |
+| Served only after driver approval (target met) | - | 0 (not applied) | 77 (of 161 approval changes) |
+| Awaiting driver approval (not applied under auto-only) | - | 161 | - |
+| Infeasible (no schedule passes checks), by binding constraint | - | 837 (SITE_CAPACITY 814, PORT_POWER 15, OPERATOR_ECONOMICS 8) | 837 (SITE_CAPACITY 814, PORT_POWER 15, OPERATOR_ECONOMICS 8) |
+| Energy shortfall, battery kWh (realized replay) | 10850.18 | 10848.74 | 10144.17 |
+| Operator contribution change, modeled cents (agreed price held) | n/m | -14 | -968 |
+| Lowest operator margin vs immediate baseline, applied changes (cents; minimum 1) | - | 139 | 24 |
 | Applied changes below minimum operator margin (expect 0) | - | 0 | 0 |
-| Finishes after agreed ready-by time | - | 0 | 94 |
-| Higher energy cost than agreed plan | - | 1 | 26 |
+| Finishes after agreed ready-by time | - | 0 | 161 |
+| Higher energy cost than agreed plan | - | 1 | 50 |
 | Recovery delivered less than static (known shortfall cases, see RECOVERY_BENCHMARK_FINDINGS.md) | - | 1 | 1 |
 
 ### EARLY_DEPARTURE
@@ -134,9 +134,9 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | CHARGER_POWER_REDUCTION | limited to 75% of rated power | 485 | 437 | 48 | 86 | 330 | 159 | 244 |
 | CHARGER_POWER_REDUCTION | limited to 50% of rated power | 485 | 480 | 5 | 21 | 236 | 249 | 215 |
 | CHARGER_POWER_REDUCTION | limited to 25% of rated power | 485 | 485 | 0 | 0 | 90 | 395 | 90 |
-| SITE_CAP_REDUCTION | site cap 18 kW | 485 | 117 | 367 | 367 | 373 | 44 | 11 |
-| SITE_CAP_REDUCTION | site cap 12 kW | 485 | 463 | 22 | 24 | 61 | 378 | 83 |
-| SITE_CAP_REDUCTION | site cap 6 kW | 485 | 485 | 0 | 0 | 0 | 485 | 0 |
+| SITE_CAP_REDUCTION | site cap 18 kW | 485 | 117 | 367 | 367 | 373 | 42 | 11 |
+| SITE_CAP_REDUCTION | site cap 12 kW | 485 | 463 | 22 | 24 | 90 | 317 | 143 |
+| SITE_CAP_REDUCTION | site cap 6 kW | 485 | 485 | 0 | 0 | 3 | 478 | 7 |
 | EARLY_DEPARTURE | departs 1 h early | 485 | 194 | 288 | 288 | 314 | 176 | 309 |
 | EARLY_DEPARTURE | departs 2 h early | 483 | 255 | 227 | 227 | 245 | 244 | 239 |
 | EARLY_DEPARTURE | departs 3 h early | 456 | 301 | 155 | 155 | 165 | 297 | 159 |
@@ -151,6 +151,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 1 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 1 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 1 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 45 c vs agreed plan |
+| 1 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 11 c vs agreed plan |
 | 2 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 2 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 33 c vs agreed plan |
 | 2 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 9 c vs agreed plan |
@@ -170,6 +171,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 7 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 7 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 7 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 20 c vs agreed plan |
+| 7 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 7 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 7 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 7 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
@@ -185,6 +187,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 9 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 79 c vs agreed plan |
 | 10 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 10 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 25 c vs agreed plan |
+| 10 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 90 c vs agreed plan |
 | 10 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 113 c vs agreed plan |
 | 11 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 68 c vs agreed plan |
 | 11 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 33 c vs agreed plan |
@@ -193,6 +196,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 12 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 12 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 12 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 12 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 12 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 12 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 12 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
@@ -214,12 +218,15 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 16 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 16 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 16 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 6 c vs agreed plan |
+| 16 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 45 c vs agreed plan |
 | 16 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 5 c vs agreed plan |
 | 16 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 64 c vs agreed plan |
 | 16 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 37 c vs agreed plan |
 | 17 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 17 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 17 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 40 c vs agreed plan |
 | 17 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 17 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 17 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 86 c vs agreed plan |
 | 17 | port_a | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 90 c vs agreed plan |
 | 18 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -227,10 +234,13 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 19 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 19 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 19 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 15 c vs agreed plan |
+| 19 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 19 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 19 | port_a | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 19 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 19 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 19 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 19 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 19 | port_c | EARLY_DEPARTURE | departs 2 h early | needs driver approval; energy cost up 23 c vs agreed plan |
 | 19 | port_c | EARLY_DEPARTURE | departs 3 h early | needs driver approval; energy cost up 23 c vs agreed plan |
 | 20 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -244,6 +254,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 22 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 22 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 22 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 22 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 58 c vs agreed plan |
 | 22 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 66 c vs agreed plan |
 | 22 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 68 c vs agreed plan |
 | 23 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 25 c vs agreed plan |
@@ -254,19 +265,23 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 24 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 3 c vs agreed plan |
 | 24 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 33 c vs agreed plan |
 | 24 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 125 c vs agreed plan |
+| 24 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 100 c vs agreed plan |
 | 25 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 25 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 25 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 45 c vs agreed plan |
 | 26 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 26 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 26 | port_c | SITE_CAP_REDUCTION | site cap 18 kW | needs driver approval; finishes after agreed ready-by |
+| 26 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 26 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; finishes after agreed ready-by |
 | 26 | port_c | EARLY_DEPARTURE | departs 2 h early | needs driver approval; finishes after agreed ready-by |
 | 26 | port_c | EARLY_DEPARTURE | departs 3 h early | needs driver approval; finishes after agreed ready-by |
 | 27 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 27 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 27 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 27 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 67 c vs agreed plan |
 | 27 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 16 c vs agreed plan |
+| 27 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 52 c vs agreed plan |
 | 28 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 28 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 29 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -291,6 +306,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 33 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 33 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 33 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 33 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 34 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 34 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 34 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -308,6 +324,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 37 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 37 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 37 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 37 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 12 c vs agreed plan |
 | 37 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 18 c vs agreed plan |
 | 37 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 105 c vs agreed plan |
 | 37 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 18 c vs agreed plan |
@@ -326,11 +343,13 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 43 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 43 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 43 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 44 c vs agreed plan |
+| 43 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 43 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 43 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 93 c vs agreed plan |
 | 43 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 94 c vs agreed plan |
 | 43 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 43 | port_a | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 19 c vs agreed plan |
+| 43 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 28 c vs agreed plan |
 | 44 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 44 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 44 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -345,6 +364,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 46 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 46 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 46 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 46 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 45 c vs agreed plan |
 | 47 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 47 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 47 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -368,6 +388,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 51 | port_c | EARLY_DEPARTURE | departs 2 h early | needs driver approval; energy cost up 96 c vs agreed plan |
 | 52 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 52 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 25 c vs agreed plan |
+| 52 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 89 c vs agreed plan |
 | 52 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 52 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 62 c vs agreed plan |
 | 52 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 88 c vs agreed plan |
@@ -386,15 +407,19 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 56 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 56 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 70 c vs agreed plan |
 | 56 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 22 c vs agreed plan |
+| 56 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 37 c vs agreed plan |
 | 57 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 57 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 57 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 57 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 57 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 57 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
+| 57 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | needs driver approval; finishes after agreed ready-by |
 | 57 | port_b | EARLY_DEPARTURE | departs 3 h early | needs driver approval; energy cost up 2 c vs agreed plan |
 | 59 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 59 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 59 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 59 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 42 c vs agreed plan |
 | 59 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 60 c vs agreed plan |
 | 60 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 18 c vs agreed plan |
 | 60 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 76 c vs agreed plan |
@@ -418,8 +443,10 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 64 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 64 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 64 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 10 c vs agreed plan |
+| 64 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 64 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 64 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 64 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 64 | port_c | EARLY_DEPARTURE | departs 3 h early | needs driver approval; energy cost up 41 c vs agreed plan |
 | 65 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 65 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -427,6 +454,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 65 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 65 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 65 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 65 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 65 | port_b | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 46 c vs agreed plan |
 | 65 | port_b | EARLY_DEPARTURE | departs 2 h early | needs driver approval; energy cost up 46 c vs agreed plan |
 | 66 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -436,6 +464,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 67 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 67 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
 | 67 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
+| 67 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | needs driver approval; finishes after agreed ready-by |
 | 68 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 68 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 68 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 45 c vs agreed plan |
@@ -487,14 +516,17 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 84 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 84 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 84 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 84 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 2 c vs agreed plan |
 | 85 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 85 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 24 c vs agreed plan |
 | 86 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 86 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 86 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 86 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 7 c vs agreed plan |
 | 87 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 87 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 87 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 87 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 87 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 50 c vs agreed plan |
 | 88 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 88 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 123 c vs agreed plan |
@@ -551,6 +583,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 100 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 100 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 100 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 100 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 102 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 54 c vs agreed plan |
 | 102 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 102 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -561,6 +594,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 103 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 103 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 103 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 103 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 104 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 190 c vs agreed plan |
 | 104 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | energy cost up 190 c vs agreed plan |
 | 104 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 190 c vs agreed plan |
@@ -571,8 +605,10 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 106 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 106 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 106 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 106 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 106 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 106 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 106 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 107 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 23 c vs agreed plan |
 | 107 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 98 c vs agreed plan |
 | 107 | port_b | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 180 c vs agreed plan |
@@ -594,10 +630,12 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 114 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 114 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 114 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 114 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 115 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 145 c vs agreed plan |
 | 116 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 116 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 116 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 104 c vs agreed plan |
+| 116 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 26 c vs agreed plan |
 | 116 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 117 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 107 c vs agreed plan |
 | 117 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | energy cost up 23 c vs agreed plan |
@@ -612,6 +650,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 120 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | energy cost up 59 c vs agreed plan |
 | 121 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 121 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 121 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 95 c vs agreed plan |
 | 122 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 122 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 123 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 29 c vs agreed plan |
@@ -619,6 +658,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 124 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 124 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 124 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 40 c vs agreed plan |
+| 124 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 124 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 124 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 74 c vs agreed plan |
 | 125 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -639,6 +679,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 128 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 128 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
 | 128 | port_c | SITE_CAP_REDUCTION | site cap 18 kW | needs driver approval; finishes after agreed ready-by |
+| 128 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 128 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; finishes after agreed ready-by |
 | 128 | port_c | EARLY_DEPARTURE | departs 2 h early | needs driver approval; finishes after agreed ready-by |
 | 128 | port_c | EARLY_DEPARTURE | departs 3 h early | needs driver approval; finishes after agreed ready-by |
@@ -657,6 +698,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 131 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 13 c vs agreed plan |
 | 131 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 131 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 131 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 131 | port_b | EARLY_DEPARTURE | departs 3 h early | needs driver approval; energy cost up 84 c vs agreed plan |
 | 132 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 132 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -678,6 +720,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 135 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 135 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 135 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 13 c vs agreed plan |
+| 135 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 135 | port_b | EARLY_DEPARTURE | departs 2 h early | needs driver approval; energy cost up 85 c vs agreed plan |
 | 135 | port_b | EARLY_DEPARTURE | departs 3 h early | needs driver approval; energy cost up 85 c vs agreed plan |
 | 136 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -692,6 +735,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 137 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 137 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 137 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 137 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 139 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 33 c vs agreed plan |
 | 139 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 154 c vs agreed plan |
 | 139 | port_c | EARLY_DEPARTURE | departs 2 h early | needs driver approval; energy cost up 154 c vs agreed plan |
@@ -701,9 +745,11 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 140 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 140 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
 | 140 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
+| 140 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | needs driver approval; finishes after agreed ready-by |
 | 140 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 140 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
 | 140 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
+| 140 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | needs driver approval; finishes after agreed ready-by |
 | 141 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 47 c vs agreed plan |
 | 141 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 104 c vs agreed plan |
 | 141 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 166 c vs agreed plan |
@@ -719,6 +765,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 144 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 144 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 144 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 144 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 144 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 144 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 144 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
@@ -729,6 +776,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 146 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 146 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 146 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 146 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 146 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 146 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 146 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 21 c vs agreed plan |
@@ -744,6 +792,8 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 148 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 148 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 148 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 148 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
+| 148 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | needs driver approval; finishes after agreed ready-by |
 | 148 | port_b | EARLY_DEPARTURE | departs 3 h early | needs driver approval; energy cost up 9 c vs agreed plan |
 | 149 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 149 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -751,6 +801,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 151 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 220 c vs agreed plan |
 | 151 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | energy cost up 220 c vs agreed plan |
 | 152 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 152 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 49 c vs agreed plan |
 | 152 | port_c | EARLY_DEPARTURE | departs 3 h early | needs driver approval; energy cost up 55 c vs agreed plan; delivers less than static |
 | 153 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 153 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -760,6 +811,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 154 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 154 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 154 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 23 c vs agreed plan |
+| 154 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 4 c vs agreed plan |
 | 155 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 54 c vs agreed plan |
 | 155 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 236 c vs agreed plan |
 | 156 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 41 c vs agreed plan |
@@ -789,6 +841,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 161 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 161 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 161 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 161 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 161 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 161 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 16 c vs agreed plan |
 | 161 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
@@ -806,6 +859,8 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 166 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 166 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 166 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 166 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
+| 166 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | needs driver approval; finishes after agreed ready-by; energy cost up 1 c vs agreed plan |
 | 166 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 166 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 166 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
@@ -824,6 +879,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 169 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 169 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 169 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 169 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 169 | port_b | EARLY_DEPARTURE | departs 2 h early | needs driver approval; energy cost up 94 c vs agreed plan |
 | 169 | port_b | EARLY_DEPARTURE | departs 3 h early | needs driver approval; energy cost up 94 c vs agreed plan |
 | 170 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 157 c vs agreed plan |
@@ -845,6 +901,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 173 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 173 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 173 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 173 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 174 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 174 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 66 c vs agreed plan |
 | 174 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 95 c vs agreed plan |
@@ -853,6 +910,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 175 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 175 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 175 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 175 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 175 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 175 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 9 c vs agreed plan |
 | 175 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
@@ -860,6 +918,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 176 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 176 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
 | 176 | port_c | SITE_CAP_REDUCTION | site cap 18 kW | needs driver approval; finishes after agreed ready-by |
+| 176 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 176 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; finishes after agreed ready-by |
 | 176 | port_c | EARLY_DEPARTURE | departs 2 h early | needs driver approval; finishes after agreed ready-by |
 | 176 | port_c | EARLY_DEPARTURE | departs 3 h early | needs driver approval; finishes after agreed ready-by |
@@ -869,10 +928,12 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 177 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 177 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 177 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 177 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 177 | port_b | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 119 c vs agreed plan |
 | 177 | port_b | EARLY_DEPARTURE | departs 2 h early | needs driver approval; energy cost up 119 c vs agreed plan |
 | 178 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 178 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 178 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 178 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 178 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 178 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
@@ -885,6 +946,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 179 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 179 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
 | 179 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
+| 179 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | needs driver approval; finishes after agreed ready-by; energy cost up 1 c vs agreed plan |
 | 180 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 92 c vs agreed plan |
 | 181 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 181 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -897,6 +959,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 182 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 182 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 182 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 182 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 183 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 31 c vs agreed plan |
 | 183 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 138 c vs agreed plan |
 | 183 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 22 c vs agreed plan |
@@ -911,6 +974,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 184 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 184 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 184 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
+| 184 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 184 | port_b | EARLY_DEPARTURE | departs 2 h early | needs driver approval; energy cost up 3 c vs agreed plan |
 | 185 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 39 c vs agreed plan |
 | 185 | port_c | EARLY_DEPARTURE | departs 2 h early | needs driver approval; energy cost up 63 c vs agreed plan |
@@ -935,6 +999,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 190 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 190 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 190 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 1 c vs agreed plan |
+| 190 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 191 | port_c | CHARGER_POWER_REDUCTION | limited to 75% of rated power | energy cost up 34 c vs agreed plan |
 | 191 | port_c | EARLY_DEPARTURE | departs 1 h early | needs driver approval; energy cost up 34 c vs agreed plan |
 | 192 | port_b | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -965,6 +1030,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 199 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
 | 199 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by |
 | 199 | port_a | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
+| 199 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 26 c vs agreed plan |
 | 199 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by |
 | 200 | port_c | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by |
 | 200 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | needs driver approval; finishes after agreed ready-by |
@@ -972,6 +1038,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 200 | port_c | EARLY_DEPARTURE | departs 3 h early | needs driver approval; energy cost up 25 c vs agreed plan |
 | 200 | port_a | CHARGER_POWER_REDUCTION | limited to 75% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 3 c vs agreed plan |
 | 200 | port_a | CHARGER_POWER_REDUCTION | limited to 50% of rated power | needs driver approval; finishes after agreed ready-by; energy cost up 21 c vs agreed plan |
+| 200 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | needs driver approval; finishes after agreed ready-by; energy cost up 41 c vs agreed plan |
 
 ## Infeasible cases (no schedule passes the checks, with the binding constraint)
 
@@ -987,7 +1054,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 1 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 1 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | PORT_POWER | no | yes |
 | 1 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 1 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 1 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 1 | port_b | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
 | 1 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
@@ -1083,7 +1149,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 6 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 6 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 6 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 7 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 7 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 7 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 7 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1149,7 +1214,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 9 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 9 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 10 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 10 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 10 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 10 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 10 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1190,7 +1254,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 11 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 11 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 11 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 12 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 12 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 12 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 12 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1257,7 +1320,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 15 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 15 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 15 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 16 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 16 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 16 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 16 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1280,13 +1342,11 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 16 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 16 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 17 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 17 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 17 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 17 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 17 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 17 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 17 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 17 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 17 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 17 | port_b | EARLY_DEPARTURE | departs 3 h early | PORT_POWER | no | yes |
 | 17 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
@@ -1318,19 +1378,16 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 18 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 18 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 18 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 19 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 19 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 19 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 19 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 19 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 19 | port_a | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 19 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 19 | port_a | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 19 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 19 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 19 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 19 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 19 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 19 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 19 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 19 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1363,7 +1420,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 21 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 21 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 21 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 22 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 22 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 22 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 22 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1396,7 +1452,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 23 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 23 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 23 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 24 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 24 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 24 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 24 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1449,7 +1504,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 26 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 26 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 26 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 26 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 26 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 26 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 26 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1466,7 +1520,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 26 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 26 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 26 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 27 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 27 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 27 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 27 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1484,7 +1537,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 27 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 27 | port_a | CHARGER_POWER_REDUCTION | limited to 50% of rated power | PORT_POWER | no | yes |
 | 27 | port_a | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 27 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 27 | port_a | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 27 | port_a | EARLY_DEPARTURE | departs 2 h early | TIME | no | yes |
 | 27 | port_a | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
@@ -1577,7 +1629,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 32 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 32 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 32 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 33 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 33 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 33 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 33 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1644,7 +1695,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 36 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 36 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 36 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 37 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 37 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 37 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 37 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1747,7 +1797,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 42 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 42 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 42 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 43 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 43 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 43 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 43 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1758,7 +1807,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 43 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 43 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 43 | port_a | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 43 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 43 | port_a | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 43 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 43 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1796,7 +1844,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 45 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 45 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 45 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 46 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 46 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 46 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 46 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1923,7 +1970,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 51 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 51 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 52 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 52 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 52 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 52 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 52 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -1982,7 +2028,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 54 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 54 | port_a | CHARGER_POWER_REDUCTION | limited to 50% of rated power | PORT_POWER | no | yes |
 | 54 | port_a | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 54 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | yes | no |
 | 54 | port_a | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 54 | port_a | EARLY_DEPARTURE | departs 2 h early | TIME | no | yes |
 | 54 | port_a | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
@@ -2024,7 +2069,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 56 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 56 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | PORT_POWER | no | yes |
 | 56 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 56 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 56 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 56 | port_b | EARLY_DEPARTURE | departs 2 h early | TIME | no | yes |
 | 56 | port_b | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
@@ -2037,8 +2081,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 57 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 57 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 57 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 57 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
-| 57 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | VALIDATION | no | yes |
 | 57 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 57 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 57 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
@@ -2066,7 +2108,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 58 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 58 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 58 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 59 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 59 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 59 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 59 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -2159,12 +2200,10 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 64 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 64 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 64 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 64 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 64 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 64 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 64 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 64 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 64 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 64 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 64 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 64 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -2174,7 +2213,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 65 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 65 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 65 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 65 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 65 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 65 | port_b | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
 | 65 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
@@ -2206,7 +2244,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 66 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 66 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 66 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 67 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | VALIDATION | no | yes |
 | 67 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 67 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 67 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
@@ -2363,7 +2400,7 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 75 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | OPERATOR_ECONOMICS | no | yes |
 | 75 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | OPERATOR_ECONOMICS | no | yes |
 | 75 | port_b | SITE_CAP_REDUCTION | site cap 18 kW | OPERATOR_ECONOMICS | yes | no |
-| 75 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
+| 75 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | OPERATOR_ECONOMICS | no | yes |
 | 75 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 75 | port_b | EARLY_DEPARTURE | departs 1 h early | OPERATOR_ECONOMICS | yes | no |
 | 75 | port_b | EARLY_DEPARTURE | departs 2 h early | OPERATOR_ECONOMICS | yes | no |
@@ -2563,7 +2600,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 83 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 83 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 83 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 84 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 84 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 84 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 84 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -2609,7 +2645,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 85 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 85 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 85 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 86 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 86 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 86 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 86 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -2625,7 +2660,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 86 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 86 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 86 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 87 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 87 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 87 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 87 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -2847,7 +2881,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 98 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 98 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 98 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 98 | port_b | SITE_CAP_REDUCTION | site cap 18 kW | PORT_POWER | yes | no |
 | 98 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | SITE_CAPACITY | no | yes |
 | 98 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 98 | port_b | EARLY_DEPARTURE | departs 1 h early | PORT_POWER | no | yes |
@@ -2883,7 +2916,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 100 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 100 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 100 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 100 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 100 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 100 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 100 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -2952,7 +2984,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 103 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 103 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 103 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 103 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 103 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 103 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 103 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3013,13 +3044,11 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 105 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 105 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 105 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 106 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 106 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 106 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 106 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 106 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 106 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 106 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 106 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 106 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 106 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3186,7 +3215,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 114 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 114 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 114 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 114 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 114 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 114 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 114 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3211,7 +3239,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 115 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 115 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 115 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 116 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 116 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 116 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 116 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3323,7 +3350,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 120 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 120 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 121 | port_c | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 121 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 121 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 121 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 121 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3374,7 +3400,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 123 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 123 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 123 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 124 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 124 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 124 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 124 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3453,7 +3478,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 127 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 127 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 127 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 128 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 128 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 128 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 128 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3501,7 +3525,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 130 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 130 | port_b | CHARGER_POWER_REDUCTION | limited to 50% of rated power | OPERATOR_ECONOMICS | no | yes |
 | 130 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 130 | port_b | SITE_CAP_REDUCTION | site cap 18 kW | PORT_POWER | yes | no |
 | 130 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | SITE_CAPACITY | no | yes |
 | 130 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 130 | port_b | EARLY_DEPARTURE | departs 1 h early | OPERATOR_ECONOMICS | no | yes |
@@ -3519,7 +3542,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 131 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 131 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 131 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 131 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 131 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 131 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 131 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3596,7 +3618,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 135 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 135 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 135 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 135 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 135 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 135 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 135 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3616,7 +3637,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 137 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 137 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 137 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 137 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 137 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 137 | port_b | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
 | 137 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
@@ -3685,11 +3705,9 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 139 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 139 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 139 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 140 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | VALIDATION | no | yes |
 | 140 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 140 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 140 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 140 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | PORT_POWER | no | yes |
 | 140 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 140 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 140 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
@@ -3757,7 +3775,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 143 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 143 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 143 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 144 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 144 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 144 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 144 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3816,7 +3833,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 146 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 146 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 146 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 146 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 146 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 146 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 146 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3842,8 +3858,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 148 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 148 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 148 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 148 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
-| 148 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | VALIDATION | no | yes |
 | 148 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 148 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 148 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
@@ -3938,7 +3952,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 152 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 152 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 152 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 152 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 152 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 152 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 152 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -3952,7 +3965,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 153 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 153 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 153 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 154 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 154 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 154 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 154 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -4108,7 +4120,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 160 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 160 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 160 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 161 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 161 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 161 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 161 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -4195,8 +4206,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 165 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 165 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 165 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 166 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
-| 166 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | VALIDATION | no | yes |
 | 166 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 166 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 166 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
@@ -4247,7 +4256,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 169 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 169 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 169 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 169 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 169 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 169 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 169 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -4317,7 +4325,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 172 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 172 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 172 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 173 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 173 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 173 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 173 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -4346,7 +4353,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 174 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 174 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 174 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 175 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 175 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 175 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 175 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -4356,7 +4362,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 175 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 175 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 175 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 176 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 176 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 176 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 176 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -4377,14 +4382,12 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 177 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 177 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 177 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 177 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 177 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 177 | port_b | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
 | 177 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 177 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 177 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 178 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 178 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 178 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 178 | port_b | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
 | 178 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
@@ -4399,7 +4402,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 179 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 179 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 179 | port_b | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 179 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | PORT_POWER | no | yes |
 | 179 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 179 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 179 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
@@ -4457,7 +4459,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 182 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 182 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 182 | port_a | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 182 | port_c | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 182 | port_c | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 182 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 182 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -4498,7 +4499,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 184 | port_c | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 184 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 184 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
-| 184 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 184 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 184 | port_b | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
 | 184 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
@@ -4612,7 +4612,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 190 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 190 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 190 | port_b | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 190 | port_b | SITE_CAP_REDUCTION | site cap 12 kW | VALIDATION | no | yes |
 | 190 | port_b | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 190 | port_b | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 190 | port_b | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -4821,7 +4820,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 199 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 199 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 199 | port_a | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 199 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 199 | port_a | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 199 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
 | 199 | port_a | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
@@ -4853,7 +4851,6 @@ Scenarios not applicable (disturbance rejected by validation, excluded from coun
 | 200 | port_c | CHARGER_FAILURE | fails at 50% of the charging window | PORT_FAILED | no | yes |
 | 200 | port_c | CHARGER_FAILURE | fails at 75% of the charging window | PORT_FAILED | no | yes |
 | 200 | port_a | CHARGER_POWER_REDUCTION | limited to 25% of rated power | PORT_POWER | no | yes |
-| 200 | port_a | SITE_CAP_REDUCTION | site cap 12 kW | PORT_POWER | no | yes |
 | 200 | port_a | SITE_CAP_REDUCTION | site cap 6 kW | SITE_CAPACITY | no | yes |
 | 200 | port_a | EARLY_DEPARTURE | departs 3 h early | TIME | no | yes |
 | 200 | port_a | CHARGER_FAILURE | fails at 25% of the charging window | PORT_FAILED | no | yes |
