@@ -76,12 +76,16 @@ test.describe("guided demo Scenario C: disturbance and recovery", () => {
     await expect(checklist.getByText(/(MODEL_DECISION|DETERMINISTIC_FALLBACK) · .*\(\d+ trace entries\)/)).toBeVisible({ timeout: 15_000 });
     await expect(checklist.getByText("Deterministic validation")).toBeVisible();
     await expect(checklist.getByText("MOCK provider (simulated, not PayPal)", { exact: false })).toBeVisible();
+    // An authorization is context, not a settlement: the financial step waits.
+    const financial = checklist.locator("li", { hasText: "Financial outcome" });
+    await expect(financial).toContainText("· Waiting");
+    await expect(financial).toContainText("AUTHORIZED · MOCK provider (simulated, not PayPal) · funds held, not captured · not settled yet");
 
     // Each branch asserts only what the persisted run status means.
     const reservation = await reservationFor(request, id);
     const status = reservation.recovery?.runs.find((r) => r.status !== "RUNNING")?.status ?? "RUNNING";
     if (status === "INFEASIBLE") {
-      await expect(checklist.getByText("Infeasible or failed: no version written")).toBeVisible();
+      await expect(checklist.getByText("Infeasible: no version written")).toBeVisible();
       await page.goto(`/reservations/${id}`);
       await expect(page.getByRole("region", { name: "Charging change outcome" }).getByText("No feasible recovery")).toBeVisible();
       await expect(page.getByRole("heading", { name: "FlexReceipt" })).toBeHidden();
@@ -106,5 +110,8 @@ test.describe("guided demo Scenario C: disturbance and recovery", () => {
     const settled = await reservationFor(request, id);
     const updated = await openOperatorChecklist(page, night);
     await expect(updated.getByText(`${settled.paymentState} · MOCK provider (simulated, not PayPal)`, { exact: false })).toBeVisible({ timeout: 15_000 });
+    // Done only for a provider-confirmed capture or void; anything else still waits.
+    const settledRow = updated.locator("li", { hasText: "Financial outcome" });
+    await expect(settledRow).toContainText(["CAPTURED", "VOIDED"].includes(settled.paymentState) ? "· Done" : "· Waiting");
   });
 });

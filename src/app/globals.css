@@ -3951,6 +3951,13 @@ h1[tabindex="-1"]:focus-visible {
 .step-row.is-none {
   border-style: dashed;
 }
+.step-row.is-stopped {
+  border-color: var(--red-line);
+  background: color-mix(in oklab, var(--red-soft) 45%, transparent);
+}
+.step-row.is-stopped::before {
+  border-color: var(--red);
+}
 .trace-row::before {
   border-radius: 4px;
   border-color: var(--info-dot);

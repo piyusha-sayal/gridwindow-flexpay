@@ -7,11 +7,12 @@ import { Alert, Badge, PaymentBadge } from "@/components/ui";
 import type { FaultAttribution } from "@/domain/faultAttribution";
 import { formatUsd } from "@/domain/units";
 import { runProvenance } from "@/server/services/recoveryProvenance";
+import type { RecoveryReceiptRun } from "@/server/services/recoveryReceipt";
 import type { RecoveryRunView } from "@/server/services/recoveryRuns";
 import type { ReservationView } from "@/server/services/viewService";
 import { buildScenarioSteps, type ScenarioStep } from "./recoveryDemoSteps";
 
-const STEP_STATUS_LABEL: Record<ScenarioStep["status"], string> = { done: "Done", pending: "Waiting", none: "Not applicable" };
+const STEP_STATUS_LABEL: Record<ScenarioStep["status"], string> = { done: "Done", pending: "Waiting", stopped: "Stopped", none: "Not applicable" };
 
 /** Scenario C checklist: each step is read from the persisted run, reservation and provider mode. */
 function ScenarioChecklist({ steps }: { steps: ScenarioStep[] }) {
@@ -35,9 +36,11 @@ function ScenarioChecklist({ steps }: { steps: ScenarioStep[] }) {
 
 interface Loaded {
   payment: ReservationView["paymentState"];
+  proofTypes: string[];
   providerMode: string;
   eventProvenance: string | null;
   run: RecoveryRunView | null;
+  consent: RecoveryReceiptRun["consent"];
 }
 
 /** Operator view of one disturbance: its run status, reasoning summary, tool trace, proposal and payment state. */
@@ -54,7 +57,14 @@ export function RecoveryRunDetail({ eventId, reservationId, attribution }: { eve
         const run = entry ? (await api<{ run: RecoveryRunView }>(`/api/recovery/runs/${encodeURIComponent(entry.runId)}`)).run : null;
         if (alive) {
           const eventProvenance = reservation.recovery?.disturbances.find((d) => d.eventId === eventId)?.provenance ?? null;
-          setData({ payment: reservation.paymentState, providerMode: reservation.providerMode, eventProvenance, run });
+          setData({
+            payment: reservation.paymentState,
+            proofTypes: reservation.proofs.map((p) => p.type),
+            providerMode: reservation.providerMode,
+            eventProvenance,
+            run,
+            consent: entry?.consent ?? null,
+          });
           setError(null);
         }
       } catch (e) {
@@ -71,7 +81,15 @@ export function RecoveryRunDetail({ eventId, reservationId, attribution }: { eve
 
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!data) return <p aria-live="polite" className="working text-muted">Loading recovery run…</p>;
-  const steps = buildScenarioSteps({ eventId, eventProvenance: data.eventProvenance, run: data.run, paymentState: data.payment, providerMode: data.providerMode });
+  const steps = buildScenarioSteps({
+    eventId,
+    eventProvenance: data.eventProvenance,
+    run: data.run,
+    consent: data.consent,
+    paymentState: data.payment,
+    proofTypes: data.proofTypes,
+    providerMode: data.providerMode,
+  });
   const checklist = <ScenarioChecklist steps={steps} />;
   const attributionLine = <p className="text-[14px] font-semibold">{attributionStatusText(attribution)}</p>;
   if (!data.run) {

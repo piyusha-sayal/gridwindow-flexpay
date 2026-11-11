@@ -40,14 +40,20 @@ function maxVersion(view: ScheduleView): number {
   return Math.max(1, ...view.sessions.map((s) => s.currentVersion));
 }
 
+/** A loaded schedule or a load error, tagged with the night it was requested for (null: the server's default night). */
+interface ForNight<T> {
+  night: string | null;
+  value: T;
+}
+
 /**
  * Loads the operator schedule and polls every few seconds while the tab is visible. A new revision raises a notice;
  * the view is replaced only when the revision actually changes, so an unchanged poll never disturbs the chart.
+ * Data and errors are returned only for the night they were loaded for, so a night change never shows another night.
  */
 export function useScheduleView(nightOf: string | null): ScheduleState {
-  const [view, setView] = useState<ScheduleView | null>(null);
-  const [model, setModel] = useState<ScheduleModel | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState<ForNight<{ view: ScheduleView; model: ScheduleModel }> | null>(null);
+  const [failure, setFailure] = useState<ForNight<string> | null>(null);
   const [notice, setNotice] = useState<ScheduleVersionNotice | null>(null);
   const [tick, setTick] = useState(0);
   const revisionRef = useRef<string | null>(null);
@@ -69,23 +75,24 @@ export function useScheduleView(nightOf: string | null): ScheduleState {
   useEffect(() => {
     let alive = true;
     async function load() {
+      const night = nightRef.current;
       try {
-        const next = await fetchView(nightRef.current);
+        const next = await fetchView(night);
+        // A response for a night the board has already left is dropped.
+        if (!alive || night !== nightRef.current) return;
         const proposals = proposalsFor(next);
-        if (!alive) return;
         const nextModel = buildScheduleModel(next, proposals);
         const recoveryRevision = recoveryRevisionKey(next, proposals);
         const changed = recoveryRevisionRef.current !== null && recoveryRevisionRef.current !== recoveryRevision;
         if (revisionRef.current === nextModel.revision) return;
         revisionRef.current = nextModel.revision;
         recoveryRevisionRef.current = recoveryRevision;
-        setView(next);
-        setModel(nextModel);
-        setError(null);
+        setLoaded({ night, value: { view: next, model: nextModel } });
+        setFailure(null);
         if (changed) setNotice({ version: maxVersion(next), at: new Date() });
       } catch (e) {
-        if (!alive) return;
-        setError(e instanceof ApiError ? e.message : "Could not load the schedule.");
+        if (!alive || night !== nightRef.current) return;
+        setFailure({ night, value: e instanceof ApiError ? e.message : "Could not load the schedule." });
       }
     }
     void load();
@@ -98,5 +105,13 @@ export function useScheduleView(nightOf: string | null): ScheduleState {
     };
   }, [tick, nightOf]);
 
-  return { view, model, error, notice, dismissNotice, retry };
+  const current = loaded?.night === nightOf ? loaded.value : null;
+  return {
+    view: current?.view ?? null,
+    model: current?.model ?? null,
+    error: failure?.night === nightOf ? failure.value : null,
+    notice: current ? notice : null,
+    dismissNotice,
+    retry,
+  };
 }
