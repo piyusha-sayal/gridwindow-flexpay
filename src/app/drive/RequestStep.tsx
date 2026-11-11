@@ -2,12 +2,15 @@
 
 import type { ReactNode } from "react";
 import type { AiSource } from "@/components/ui";
-import type { ParsedRequest } from "@/domain/nlRequest";
+import { OUT_OF_SCOPE_NOTE, type ParsedRequest } from "@/domain/nlRequest";
 import { AxisTicks, FIXED_NIGHT_AXIS, pctOf } from "./NightAxis";
 import { GuidedDemo } from "./GuidedDemo";
 import { ChoiceGroup } from "./ChoiceGroup";
 import { PORT_GUIDE, PREFERENCES, PREFERENCE_GUIDE, type DriverConfig, type FieldErrors, type FormState } from "./driverTypes";
 import { AXIS_MINUTES, formatDuration, summarizeRequest } from "./requestSummary";
+
+/** Setup guide for connecting an AI agent over MCP (it can compare offers and prepare checkout, never pay). */
+const MCP_GUIDE_URL = "https://github.com/piyusha-sayal/gridwindow-flexpay/blob/main/docs/MCP.md";
 
 export type ParseResult = { parsed: ParsedRequest } & AiSource;
 
@@ -80,6 +83,15 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
                 <li key={n}>{n}</li>
               ))}
             </ul>
+            {parseResult.parsed.notes.some((n) => n.startsWith(OUT_OF_SCOPE_NOTE)) && (
+              <p className="text-[14px]">
+                An AI agent connected through MCP can compare offers on every port, show you the exact terms and prepare the PayPal checkout. You still
+                approve the payment yourself.{" "}
+                <a href={MCP_GUIDE_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+                  Set up MCP<span className="sr-only"> (opens in a new tab)</span>
+                </a>
+              </p>
+            )}
             {parseResult.parsed.clarifications && (
               <div role="status" className="text-[14px]">
                 <p className="font-semibold">Needs your input before requesting offers</p>

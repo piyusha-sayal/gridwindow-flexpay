@@ -9,7 +9,7 @@ import { z } from "zod";
 import { explainOffer } from "@/domain/explain";
 import { SYNTHETIC_TARIFF } from "@/domain/forecast";
 import { PAYMENT_STATES } from "@/domain/paymentState";
-import { AMBIGUITY_CODES, CLARIFY, parseChargeRequestText, type ClarifyCode, type LocalTime, type ParsedRequest } from "@/domain/nlRequest";
+import { AMBIGUITY_CODES, CLARIFY, OUT_OF_SCOPE_NOTE, parseChargeRequestText, type ClarifyCode, type LocalTime, type ParsedRequest } from "@/domain/nlRequest";
 import type { PricedOffer, QuoteSet } from "@/domain/quotes";
 import type { StationConfig } from "@/domain/station";
 import { formatLocalTime } from "@/domain/time";
@@ -124,7 +124,7 @@ export function boundInterpretation(raw: z.infer<typeof interpretSchema>, statio
   }
   if (raw.preference) out.preference = raw.preference;
   applyAmbiguities(out, raw.ambiguities ?? []);
-  for (const ignored of raw.ignoredRequests.slice(0, 3)) notes.push(`Not something the assistant can do: "${ignored.slice(0, 80)}". Prices and payments are set only by the backend.`);
+  for (const ignored of raw.ignoredRequests.slice(0, 3)) notes.push(`${OUT_OF_SCOPE_NOTE}: "${ignored.slice(0, 80)}". Prices and payments are set only by the backend.`);
   return out;
 }
 
