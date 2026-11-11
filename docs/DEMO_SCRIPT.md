@@ -1,108 +1,47 @@
-# Demo script (under three minutes, MOCK mode)
+# Demo script (about three minutes, live site)
 
-Goal: show a driver's flexible charging plan being disturbed, re-planned without touching the agreed price or the energy already delivered, and the operator's schedule updating. The payment step is MOCK unless the owner has authorized a PayPal Sandbox run.
+We record the hosted app at https://gridwindow-flexpay.onrender.com. Payments there are PayPal Sandbox, so it is test money. Charging, site load and disturbances are simulated, and the app labels them SYNTHETIC. Say "synthetic" out loud at least once.
 
-## Labels to say on screen
+## Before recording
 
-| Label | Meaning | When to use |
-|---|---|---|
-| MOCK PAYMENT PROVIDER | Built-in provider, not PayPal | Default. Say it at the approval step. |
-| SIMULATED_EVENT | Disturbance injected by the operator, not a real charger fault | Every disturbance. |
-| MODEL_DECISION | A live model really chose among the candidates | Only if the persisted run record says so. |
-| DETERMINISTIC_FALLBACK | No model decision; the deterministic path decided | Default in MOCK mode (no Gemini key) and after any model failure. |
+- Open the site a minute early. It runs on Render's free plan and sleeps when idle, so the first page can take up to a minute.
+- Sign in to the operator console in a second tab (`/operator`, passphrase from the Devpost testing instructions).
+- Have a PayPal Sandbox personal (buyer) login ready. You can create one at developer.paypal.com under Testing Tools, Sandbox Accounts.
+- Optional: an MCP client (Claude Desktop, Cursor) set up as in [MCP.md](MCP.md), with `GRIDWINDOW_URL` set to the live URL.
+- Don't rehearse the AI steps many times on the day. Gemini runs on the free tier (20 requests per model per day). When the quota runs out, the app answers with deterministic text instead. The flow keeps working; the wording is just plainer.
 
-Do not say "AI chose this" unless the run record says MODEL_DECISION. Do not say "PayPal captured" or "PayPal voided" in MOCK mode.
+## Timeline
 
-## Pre-demo checklist
+| Time | Screen | What to do | What to say |
+|---|---|---|---|
+| 0:00-0:12 | Home | Drag the ready-by slider, then press **Plan My Charge** | "A shared charging site has a hard power cap. Most drivers only care that the car is ready in the morning. We move their charging into cheaper windows, and they pay only for energy that was delivered." |
+| 0:12-0:30 | Smart Charge (`/drive`) | Type "Find me 30 kWh before 7 AM and save at least $4", press **Fill form**, then **See offers** | "Gemini turns the sentence into form fields. It never sets a price. The server prices every offer under the station's power cap." |
+| 0:30-0:45 | Offers | Show the recommended offer and its explanation | "The deal agent checks the offers against the driver's goal and explains its pick using numbers the server already verified." |
+| 0:45-1:05 | Terms, then PayPal Sandbox | **Review and approve**, tick consent, press **Approve $X with PayPal Sandbox**, log in as the Sandbox buyer, approve. Back on the reservation it reads "Authorized, not captured" | "The driver approves one exact offer in PayPal. That's an authorization hold. Nothing is captured until energy is delivered." |
+| 1:05-1:25 | MCP client (optional) | Ask: "Book me 25 kWh tonight, ready by 7, under $20, cheapest." Show the offers, the pick and the PayPal approval link | "An AI agent can book through our MCP server. It finds and prepares the deal, then stops at a PayPal link only the human can approve." If you skip this, give the time to the recovery step. |
+| 1:25-1:40 | Operator console | Load tonight's night. In the AG Grid table, sort by payment, tick **Needs attention only**, press **Export CSV** | "Operators see every reservation in one grid. Each row says whether it is PayPal Sandbox or MOCK." |
+| 1:40-2:10 | Recovery engine, then **Schedule view** | On your reservation, inject a **Charger power reduction** with **Inject SYNTHETIC disturbance**. Open it under **Recorded disturbances** and read the seven steps. Press **Schedule view** and toggle **Original plan** / **Current (recovered)** | "A charger slows down. The recovery run proposes fixes, a deterministic validator checks each one, and if the terms change, the driver has to approve first. The Bryntum timeline shows the plan that was actually stored." |
+| 2:10-2:30 | Reservation page | If the run asks for approval, press **Approve change**. Then **Run the synthetic overnight charge** and open the FlexReceipt | "Delivery is simulated. The capture happens only after the delivered energy is recorded, and PayPal confirms it. If the operator's charger fails, the hold is voided instead." |
+| 2:30-2:42 | Rewards, then the developer portal | Show the **Spend your savings** gear cards, then the APIMatic portal's **Accept offer** page | "Channel3 finds real EV gear from real merchants. Developers get an API portal and a typed SDK generated from the same contract the agent uses." |
+| 2:42-2:50 | Closing card | Live URL, repository, the tools used | "GridWindow FlexPay: flexible charging that settles honestly with PayPal." |
 
-- [ ] `npm ci` and `npm run build` done on the machine (build needs network for fonts once).
-- [ ] Start with MOCK settings, no `DATABASE_URL` set, and no PayPal secrets in the shell. `DEMO_TOOLS=true` only works in MOCK mode without `DATABASE_URL`.
-- [ ] Use a fresh `.data/` folder, or "Reset demo data..." in the operator console, so the demo night is empty.
-- [ ] Decide whether a Gemini key is configured. If it is, the run may still show DETERMINISTIC_FALLBACK. Read the label on screen; do not pre-judge it.
-- [ ] Rehearse once end to end. The recovery outcome (COMMITTED, NEEDS_APPROVAL or INFEASIBLE) depends on the run. Do not promise one. The e2e test `tests/e2e/scenarioC.spec.ts` checks whichever status the run reports.
-- [ ] Open three tabs: `http://localhost:3000/drive`, `http://localhost:3000/operator` (signed in with the operator passphrase), `http://localhost:3000/operator/schedule`.
-- [ ] Use one browser window for the driver and one for the operator. The reservation page is opened as the driver.
-- [ ] Check every label against the running build before recording. Labels below are taken from the code, not from a browser run of this script.
+## Saying it accurately
 
-## Click path
+| On screen | What it means |
+|---|---|
+| PayPal Sandbox (test money) | A real PayPal Sandbox call. Real API, test funds. |
+| MOCK provider (simulated, not PayPal) | The built-in mock provider, used locally and in automated tests. The live database also keeps four old test rows made with it, and each one is labeled MOCK. |
+| SIMULATED_EVENT, SYNTHETIC | The operator injected the disturbance. It is not a real charger fault. |
+| MODEL_DECISION | A live model chose among the validated candidates. Say "the AI chose" only when the run shows this. |
+| DETERMINISTIC_FALLBACK | The deterministic path decided, either with no model or after a model error. |
+| Financial outcome: Waiting | The money is only held (AUTHORIZED) or still settling. |
+| Financial outcome: Done | PayPal confirmed the capture or the void. |
 
-Routes: `/drive` (driver wizard), `/reservations/<id>` (reservation, payment state, FlexReceipt), `/operator` (console, passphrase), `/operator/schedule` (Bryntum timeline plus accessible table).
+The recovery result depends on the run: it may commit on its own, ask the driver to approve, or report that no fix fits. Don't promise one before you see it.
 
-### 0:00-0:20 The problem
+Avoid saying "PayPal certified", "real chargers", "measured savings", or anything suggesting the AI moves money.
 
-Open `/` or go straight to `/drive`.
+## If you need a backup
 
-Say: "An EV needs a set amount of energy by a departure time. The site has a hard power cap. Most people do not care when it charges, as long as it is ready in the morning."
-
-### 0:20-0:45 The driver picks a valid flexible plan
-
-1. On `/drive`, open **Guided demo scenarios** and press **Scenario C: Disturbance and recovery** (Port B, 7.2 kW, 30 kWh, 19:00 to 07:00). The button only fills the form; nothing is submitted. Then set **Night of** to a future night and note that date for the operator.
-2. Press **See offers**.
-3. Compare **Charge now** with the flexible window. Point out the modeled price and the assumptions.
-
-Say: "A flexible offer is shown only if the driver pays less and the operator's modeled contribution improves. Otherwise there is only immediate charging. Savings are modeled from synthetic tariffs."
-
-### 0:45-1:00 Approval and authorization
-
-1. Tick the consent box, then press **Approve $X with mock provider**.
-2. On the reservation page, read the status. It should say the amount is authorized, not captured.
-
-Say: "I approved this exact amount, merchant and window. The server recomputed the amount from the stored offer. This is the MOCK provider, not PayPal. An authorization is a hold, not a charge."
-
-### 1:00-1:20 Simulated charger disruption
-
-1. Open `/operator`, sign in, set **Night of** to the same night, press **Load**.
-2. Select the session. In **Synthetic disturbance**, choose **Charger power reduction**, set **Maximum port power (W)** to 3600 and **Effective slot** to 0. Under **Fault attribution**, choose **Operator** only if you want to show the operator attribution (the choice is never preselected). Press **Inject SYNTHETIC disturbance**.
-
-Say: "The charger is limited from this slot onward. This is a SIMULATED_EVENT. The operator records who is responsible for the fault, and the system never assumes it."
-
-### 1:20-1:55 Recovery run and deterministic validation
-
-1. In **Recorded disturbances**, select the new event. Read **Scenario C: recovery steps**. The seven steps are: Disturbance detected, Agent run, Deterministic validation, Schedule, Consent state, Financial outcome, FlexReceipt.
-2. Read step 2. It shows MODEL_DECISION or DETERMINISTIC_FALLBACK, as the persisted run says.
-3. Read step 3, the deterministic validation result.
-
-Say: "The agent, if a model is configured, can only pick among candidates the server already validated, by id. It has no payment tool and no price input. Here the run reports [MODEL_DECISION / DETERMINISTIC_FALLBACK]. Every candidate was checked by the deterministic validators before anything was written."
-
-If the run needs driver approval, go to step 4 below. If it is INFEASIBLE, say that the physical constraint blocks every schedule and the schedule is unchanged.
-
-### 1:55-2:20 Bryntum timeline before and after
-
-1. Open `/operator/schedule`. Use the **Original plan** / **Current (recovered)** toggle.
-2. Point at the table beside the chart: agreed and current kWh, plan version and departure.
-
-Say: "The timeline draws the persisted schedule. Changes that are only proposals appear in a separate lane and are labeled as proposals. The chart is read-only. Dragging on it saves nothing. The table is the accessible reference view."
-
-If the driver must approve a change: open `/reservations/<id>` as the driver, read the **Needs your approval** card and press **Approve change**. Say: "Approval applies only this exact proposal version. A stale or expired proposal is refused."
-
-### 2:20-2:40 Charging outcome and payment state
-
-1. On `/reservations/<id>`, press **Run the synthetic overnight charge**.
-2. Read the delivered energy from the synthetic ledger against the target, and the payment state.
-
-Say: "Capture or void is decided from the synthetic delivered-energy ledger, not the forecast. A forecast that meets the target is labeled planned. Any shortfall is shown in Wh. In MOCK mode the payment state comes from the MOCK provider."
-
-### 2:40-2:55 FlexReceipt and differentiation
-
-1. Open the **FlexReceipt** on the reservation page.
-2. Point at the SIMULATED_EVENT line, the run and the consent method.
-
-Closing: "Money follows delivered energy. The AI proposes only among options the server has validated and cannot touch payments. Everything here is synthetic, and PayPal Sandbox recovery settlement has not been run."
-
-## Optional: Scenario A and Scenario B
-
-- Scenario A (Port C, 30 kWh) is the plain successful-charge path. Use it if the audience asks about the non-recovery path.
-- Scenario B (Port A, 3.6 kW, 40 kWh, 20:00 to 02:00) shows an infeasible request. No offer is shown and nothing is authorized. Use it for a 20-second aside.
-
-## Known gaps to disclose if asked
-
-- **Inject outage** in the operator's reservation table uses the older simulator outage, which voids the MOCK authorization. It is not the recovery path.
-- **Manual drag or resize** on the Bryntum chart is disabled. There is no server endpoint for it.
-- **Bryntum accessibility**: axe reports violations inside Bryntum's own grid DOM. The table is the accessible path. Full timeline accessibility is not claimed.
-- **Time labels**: the axis labels are station time. Tick boundaries still follow the browser's local hours, so a Kolkata browser shows half-hour ticks.
-- **DST fall-back** night has not been browser-tested in UTC or Kolkata browsers.
-- **Operator energy cost**: an auto-commit can raise the operator's energy cost against the agreed plan. The driver's price does not change, and the operator's 1 c minimum margin still holds (`docs/RECOVERY_BENCHMARK_FINDINGS.md`).
-- **Settlement sweep** runs every 5 minutes in the background. The UI has no trigger, so do not show a settlement sweep as a live step.
-- **Live model**: a real Gemini recovery call returned HTTP 504 (DEADLINE_EXCEEDED) once, and the deterministic fallback ran. A successful live MODEL_DECISION is not demonstrated.
-- **Costs**: the remedy cost (200 cents by default, `FAILED_SERVICE_REMEDY_CENTS`) is a modeled operator cost, not a PayPal fee or a customer fee.
-- **Recorded video**: none exists. Do not describe this script as a recording.
+- **Recovery that needs approval, or a void:** the live night 2026-11-12 already has both, recorded with PayPal Sandbox. One recovery was approved by the driver and later captured. The other found no feasible fix, was attributed to the operator, and was voided. Open them in the operator console under **Recorded disturbances**.
+- **No internet or a sleeping site:** run the app locally in MOCK mode, as described in [JUDGES.md](JUDGES.md#4-run-it-locally). Say "mock provider" instead of "PayPal Sandbox" at the payment step.

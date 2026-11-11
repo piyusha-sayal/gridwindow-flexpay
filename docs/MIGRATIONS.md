@@ -1,6 +1,6 @@
 # Database migrations
 
-Scope: how the schema in `src/server/db/migrations.ts` reaches a database. Neon procedure: `docs/EXTERNAL_PREFLIGHT.md` section C.
+Scope: how the schema in `src/server/db/migrations.ts` reaches a database. The procedure for the production database (Neon) is at the end.
 
 ## Behaviour by database
 
@@ -47,16 +47,16 @@ npm run db:migrate -- --apply --confirm-database <fingerprint>
 
 ## Neon procedure (ordered)
 
-Status: documented, not run. Migrating the real Neon database needs separate authorization from the owner. The agent must not run `--apply` against Neon.
+Neon already held migrations 001 to 005 when we checked it read-only on 2026-11-10, so the submitted build needed no migration there. Use this procedure for any future change.
 
-1. Backup. In the Neon console, create a branch from the branch the app uses, or confirm the point-in-time restore window covers the moment before the change. Record the branch name in `plans/PROGRESS.md`. Do not record the URL.
+1. Backup. In the Neon console, create a branch from the branch the app uses, or confirm the point-in-time restore window covers the moment before the change. Write down the branch name, but not the URL.
 2. Put `MIGRATION_DATABASE_URL` (direct URL, `sslmode=verify-full`) in `.env.local` in your own session. Keep `DATABASE_URL` for the app. Do not echo either value.
 3. `npm run db:migrate -- --status`. Note the `target fingerprint`, the applied list and the pending list. Stop if any id is listed as unknown or as a checksum change. Unverified rows are expected on an older ledger.
-4. `npm run db:migrate -- --plan`. Review the objects that will be created or added. Confirm 005 is in scope (`C.1` in `docs/EXTERNAL_PREFLIGHT.md`).
+4. `npm run db:migrate -- --plan`. Review the objects that will be created or added, and confirm the expected migrations are the ones pending.
 5. `npm run db:migrate -- --apply --confirm-database <fingerprint from step 3>`. Exit 0 expected.
 6. `npm run db:migrate -- --status`. Expect `schema ready for this build: yes` and exit 0.
 7. App smoke check, without any payment step: `npm run build`, then `npm start`. Load the home page and the operator console. Confirm the server log has no `SchemaNotReadyError`. Use `npm run db:migrate -- --status` again if the app refuses to start.
-8. Record the outcome, the branch name and the exit codes in `plans/PROGRESS.md`.
+8. Record the outcome, the branch name and the exit codes with the release notes.
 
 ### Optional rehearsal on an isolated Neon branch (before step 2)
 
@@ -71,5 +71,5 @@ Status: prepared 2026-11-10, not run. Needs the same owner approval as the proce
 ## Recovery
 
 - `--apply` exits 1. Read the printed error class and code. The failing migration is rolled back and not recorded; the earlier ones are recorded. Do not edit the SQL, the ledger or the schema by hand. Run `--status` to see the state. Fix the cause (for example a lock timeout: retry off-peak; an object that already exists: find out how it got there before anything else). Then run `--status` and `--apply` again with the same fingerprint.
-- Verification fails or the app misbehaves after a successful apply. Restore the Neon branch or the point-in-time restore point taken in step 1, and point `DATABASE_URL` at the restored branch. Manual SQL rollback is described as untested in `docs/EXTERNAL_PREFLIGHT.md` section C.8. It destroys recorded data, so use it only after a data check.
+- Verification fails or the app misbehaves after a successful apply. Restore the Neon branch or the point-in-time restore point taken in step 1, and point `DATABASE_URL` at the restored branch. A manual SQL rollback is possible but untested, and it destroys recorded data, so use it only after a data check.
 - Never set `GW_AUTO_MIGRATE=true` to work around a refusal. A refusal means the schema and the code disagree; resolve that first.

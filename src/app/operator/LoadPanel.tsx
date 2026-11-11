@@ -108,7 +108,7 @@ function TariffTable({ d }: { d: OperatorDashboard }) {
           .map((b) => (
             <li key={b.fromHour} className="flex justify-between gap-3 rounded bg-surface-2 px-2 py-1">
               <span>
-                {hour(b.fromHour)}–{hour(b.toHour)}
+                {hour(b.fromHour)}-{hour(b.toHour)}
               </span>
               <span>{usd(b.mcPerKWh)}</span>
             </li>

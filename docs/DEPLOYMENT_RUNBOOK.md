@@ -33,7 +33,7 @@ Render applies a changed variable only on the next deploy. After saving variable
 ## Database
 - The app never migrates an external PostgreSQL at startup. If the schema does not match, the app fails closed with the exact command to run.
 - Order: back up or branch the database, `npm run db:migrate -- --status` (note the fingerprint of host + port + database name), `--plan`, test on an isolated branch/copy, then `--apply --confirm-database <fingerprint>` on the intended database. Re-read the fingerprint for every target.
-- Neon holds migrations 001-005 (read-only inspection 2026-11-10: 0 pending, ledger in legacy format without checksums; replay and app startup against Neon NOT TESTED). See `docs/MIGRATIONS.md` and `docs/EXTERNAL_PREFLIGHT.md`.
+- Neon holds migrations 001-005 (read-only inspection 2026-11-10: 0 pending, ledger in legacy format without checksums; replay and app startup against Neon NOT TESTED). See `docs/MIGRATIONS.md`.
 
 ## Build and start
 `npm ci && npm run build && npm start` (Node 22+). Health check: `GET /` returns 200; `/operator` shows the sign-in form when `OPERATOR_PASSPHRASE` is set.

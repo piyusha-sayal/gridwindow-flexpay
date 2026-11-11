@@ -39,7 +39,7 @@ export class Checkout {
    *
    * @returns Reservation created, waiting for buyer approval
    *
-   * @throws {@link Checkout.AcceptOfferError} when the API answers with an error status — narrow on
+   * @throws {@link Checkout.AcceptOfferError} when the API answers with an error status - narrow on
    * `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection
@@ -74,7 +74,7 @@ export class Checkout {
    * @remarks
    * PayPal cancel URL. Cancels the pending order, then redirects to the reservation.
    *
-   * @throws {@link Checkout.CheckoutCancelError} when the API answers with an error status — narrow
+   * @throws {@link Checkout.CheckoutCancelError} when the API answers with an error status - narrow
    * on `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection
@@ -112,7 +112,7 @@ export class Checkout {
    * @remarks
    * PayPal return URL. Authorizes the approved order, then redirects to the reservation.
    *
-   * @throws {@link Checkout.CheckoutReturnError} when the API answers with an error status — narrow
+   * @throws {@link Checkout.CheckoutReturnError} when the API answers with an error status - narrow
    * on `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection

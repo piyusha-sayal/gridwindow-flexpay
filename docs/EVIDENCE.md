@@ -1,6 +1,6 @@
 # Verified integration evidence (sanitized)
 
-This page summarizes what was actually run against the genuine PayPal Sandbox and a genuine Gemini model, and what was not. Provider identifiers are intentionally omitted. All payments are PayPal **Sandbox** transactions; no live money moved. Charging is a **synthetic simulation**: no vehicle was charged, and no real-world energy, grid or cost-saving benefit is claimed.
+This page summarizes what was actually run against the genuine PayPal Sandbox and a genuine Gemini model, and what was not. PayPal identifiers are left out; reservations are named by the last eight characters of their app ID. All payments are PayPal **Sandbox** transactions; no live money moved. Charging is a **synthetic simulation**: no vehicle was charged, and no real-world energy, grid or cost-saving benefit is claimed.
 
 Method: after each run, the team read the application database inside a read-only transaction and queried PayPal with `GET` requests only (authorization, capture, order, webhook registration and webhook event log), then compared the two. Redacted raw artifacts are kept by the team and can be provided on request.
 
@@ -13,6 +13,19 @@ Method: after each run, the team read the application database inside a read-onl
 | Standalone smoke test (historical, not linked to the recovery work) | 2026-10-30 | One authorize → capture and one authorize → void of USD 1.23 each, two separate orders | Passed. Artifacts: `artifacts/paypal-smoke-capture-only-smoke_1793370835421.json` (capture COMPLETED, authorization CREATED before capture) and `artifacts/paypal-smoke-void-only-smoke_1793372411617.json` (authorization VOIDED after void). Sandbox host and USD 1.23 confirmed in both. Approval identity and request-ID values are not recorded. Details: `docs/PAYPAL_CERTIFICATION.md` section 0. |
 
 The orders were approved on PayPal's Sandbox page with a Sandbox personal (buyer) account; for scenario A the approving account was confirmed to differ from the Sandbox business (merchant) account. Before every authorization the application compares the order's payee to the configured merchant, and the amount, currency and custom ID to the stored terms; mismatches stop before authorization.
+
+On the deployed build, the team also ran one capture (`…H62XfQtp`) and one void (`…C2afKCrn`) of USD 15.56 each. Both were read back from the PayPal Sandbox API after the 2026-11-11 deploy, with signature-verified webhooks. See [the release verification](FINAL_RELEASE_VERIFICATION_2026-11-11.md).
+
+## Recovery followed by PayPal Sandbox settlement (2026-11-11)
+
+Two bookings on the deployed site went through a recorded disturbance and then settled in PayPal Sandbox. We read them back through the operator API (GET requests only) the same day. Times are UTC, and both bookings are on the night of 2026-11-12.
+
+| Reservation | What happened | Result |
+|---|---|---|
+| `…n-qKqgUM` | Order, buyer approval and authorization in PayPal Sandbox at 19:09. At 19:09:57 the operator recorded a SYNTHETIC charger disturbance, with fault attribution left as UNKNOWN. The recovery run needed the driver's consent; the driver approved, and schedule version 2 was committed at 19:10:41. Synthetic delivery then recorded 30.015 kWh against a 30 kWh target. | Capture COMPLETED at 19:10:59, read from the PayPal Sandbox API. Webhook verified at 19:11:17. Run COMMITTED, consent DRIVER_APPROVED. |
+| `…kfgzxjBp` | Order, approval and authorization at 19:05 to 19:06. At 19:07:23 the operator recorded a SYNTHETIC disturbance and marked the operator as responsible. The recovery run found no feasible schedule (INFEASIBLE). Because the operator was responsible and nothing could fix it, the app marked the service failed and decided to void. | Void at 19:07:32, read from the PayPal Sandbox API. Webhook verified at 19:09:21. Nothing captured. |
+
+Judges with operator access can open both under **Recorded disturbances** on that night and read the seven recovery steps from the stored run.
 
 ## Signed webhooks
 
@@ -28,9 +41,11 @@ One live run on 2026-11-05 with a free-tier key and synthetic fixtures only: mod
 
 The model has no tools. It never sets a price, consent, authorization, capture or void, and any answer containing a number or payment claim the backend cannot confirm is replaced by deterministic text.
 
-## Automated tests (final run of this release candidate)
+On 2026-11-11 the deployed build answered request parsing, the deal agent and the offer explanation from Gemini (3 of 3 calls in the production smoke test), with Gemini 3.5 Flash-Lite and a free OpenRouter model as backups.
 
-Earlier release-candidate run, before the recovery work (superseded by the combined-release figures in `README.md` and `docs/AWARD_EVIDENCE.md`): TypeScript strict check, ESLint, 344 Vitest tests (physics, economics, payment state machine, adversarial lifecycle cases on an embedded PostgreSQL, 10 skipped), the real-PostgreSQL suite on a disposable local server (9 passed, 1 skipped because it needs a restartable server), Playwright end-to-end checks on desktop, tablet and mobile with axe accessibility and keyboard tests, a production build, and a secret scan of the browser bundle. `npm audit --omit=dev` reports 0 vulnerabilities.
+## Automated tests
+
+On the submitted code: TypeScript strict check and ESLint clean; Vitest 1,023 passed and 12 skipped (the skipped suite needs a disposable PostgreSQL server, see [SKIPPED_TESTS.md](SKIPPED_TESTS.md)); Playwright 114 passed on desktop, 14 on mobile and 3 on tablet, with 6 desktop-only keyboard journeys skipped on the smaller devices; production build and secret scan pass; `npm audit --omit=dev` reports 0 vulnerabilities. All of these run with the MOCK provider and a throwaway database, so they never call PayPal or a model.
 
 ## Known limits
 

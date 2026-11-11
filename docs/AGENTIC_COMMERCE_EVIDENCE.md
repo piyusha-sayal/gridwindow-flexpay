@@ -1,10 +1,10 @@
-# Agentic Commerce evidence (independent QA)
+# Agentic Commerce evidence
 
-All data SYNTHETIC. Payments MOCK. Every run below names its decision source; the three sources are never mixed.
+All data SYNTHETIC. Payments MOCK. Every run below names its decision source, and the three sources are never mixed.
 
 | Source label | Meaning | Evidence in this repository | Status |
 |---|---|---|---|
-| `REAL_GEMINI` | A live Gemini model chose the tool calls | none produced by this QA; the previous live attempt returned HTTP 504 and is not evidence of a model decision | NOT TESTED / NEEDS USER APPROVAL |
+| `REAL_GEMINI` | A live Gemini model made the final recovery decision | Live runs on 2026-11-11 (below): Gemini drove the tool steps, then the provider returned a capacity error and the deterministic path decided. No final model decision has been recorded. | PARTIAL |
 | `MOCK_GEMINI` | A scripted stand-in drives the real orchestrator, tools and validators | `tests/integration/independent-agent-evidence.test.ts`, `tests/integration/recoveryOrchestrator.test.ts`, `evidence/agent-paths.json` | PASS |
 | `DETERMINISTIC_FALLBACK` | No model (or the model failed); the deterministic path decides | browser runs `evidence/recovery-trace.json`, `evidence/recovery-trace-power-cut.json` (`aiUsed: false`) and the timeout case in `agent-paths.json` | PASS |
 
@@ -40,17 +40,16 @@ A deterministic-fallback run is a valid, validated recovery. It is not presented
 | Another driver tries to decide | `routes.test.ts`, `recoveryDriver.spec.ts` | PASS: 404 |
 | Unauthorized financial tool access | tool allowlist has no payment tool; gateway call count asserted 0 | PASS |
 
-## Controlled REAL_GEMINI certification procedure (do not run without approval)
+## How a live recovery run is made
 
-Cost and risk: one recovery, at most 6 model requests, fixed budget, no retries, payments MOCK, in-memory database.
-Run only by Satyam, after approving the live call.
+Each run is one recovery with at most 6 model requests, a fixed budget, no retries, MOCK payments and an in-memory database.
 
-1. Confirm the previous 504 cause is addressed (try a model id that is available to the key; `GEMINI_MODEL` in the local env file; do not commit it).
-2. Dry run first (no model call): `npx tsx scripts/recovery-live.ts`. It must report at least two usable candidates.
+1. Put a model ID your key can use in `GEMINI_MODEL` in the local env file (never committed).
+2. Dry run first, with no model call: `npx tsx scripts/recovery-live.ts`. It must report at least two usable candidates.
 3. Live run: `npx tsx scripts/recovery-live.ts --approve-gemini-calls`. It writes a sanitized `artifacts/recovery-live-<ISO>.json` (git-ignored; no keys, prompts or model text).
-4. Pass criteria (all required): provider responses received; at least one model step names a server tool; every model tool is in the allowlist; payment-gateway calls = 0; the validator accepts the chosen candidate; the run commits or requests consent correctly.
-5. Label the outcome `REAL_GEMINI` only if step 4 passes with a genuine model decision. A 504, a quota error or a deterministic completion is `DETERMINISTIC_FALLBACK` and must be reported as such.
-6. Record: request count, token counts, cost computed from the provider's own pricing page at the time (not assumed), model id and date.
+4. Pass criteria: provider responses arrive, at least one model step names a server tool, every model tool is in the allowlist, the payment gateway is called 0 times, the validator accepts the chosen candidate, and the run commits or asks for consent correctly.
+5. The outcome is labeled `REAL_GEMINI` only when step 4 passes with a genuine model decision. A timeout, a quota error or a deterministic finish is `DETERMINISTIC_FALLBACK`.
+6. Record the request count, token counts, model ID, date, and the cost from the provider's pricing page at the time.
 
 ## Live runs, 2026-11-11 (`gemini-3.6-flash`, Gemini Developer API)
 
@@ -77,10 +76,11 @@ The backup chain is Gemini 3.6 Flash, then Gemini 3.5 Flash-Lite, then OpenRoute
 | Requests sent / successful responses | 1 / 0 | 2 / 1 |
 | What the model did | nothing: HTTP 429 from the free endpoint | answered the first tool step (`inspectDisruption`, served by `baidu/ernie-5.5-flash-preview:free`, 4.4 s, 319 in / 534 out tokens); the next step got HTTP 429 |
 | Outcome | `COMMITTED` by the deterministic path, version 2, `aiUsed: false` | `COMMITTED` by the deterministic path, version 2, `aiUsed: true`, decision `DETERMINISTIC_FALLBACK` |
-| Verdicts | noPaymentToolCalls PASS (0 gateway calls), chosenCandidatePassedValidation PASS, consentRespected PASS, requestCapEnforced PASS, modelFailureFallsBack PASS, provenanceMatchesServingProvider PASS | same |
+| Verdicts | noPaymentToolCalls PASS (0 gateway calls), chosenCandidatePassedValidation PASS, consentRespected PASS, requestCapEnforced PASS, modelFailureFallsBack PASS, provenanceMatchesServingProvider PASS, modelOnlyAllowedTools **BLOCKED** (the model never got to a tool step), invalidOrInjectedOutputFallsBack NOT TESTED live | modelOnlyAllowedTools PASS, noPaymentToolCalls PASS (0 gateway calls), chosenCandidatePassedValidation PASS, consentRespected PASS, requestCapEnforced PASS, modelFailureFallsBack PASS, provenanceMatchesServingProvider **FAIL** (the model answered one tool step, but the deterministic path made the final decision, so the run is correctly labeled DETERMINISTIC_FALLBACK rather than an OpenRouter decision), invalidOrInjectedOutputFallsBack NOT TESTED live |
 
 Outside the recovery agent, the request-parsing feature returned a schema-valid `MODEL` answer from the same free model through the production adapter (4.7 s). What this shows: the backup provider is wired, answers within the allowlist, has no payment access, and a throttled answer ends in the labelled deterministic path. What it does not show: a live model *final* recovery decision. The free endpoint throttles often (3 of the 7 calls made to it on 2026-11-11 got HTTP 429), so no further runs were made. The chain's provenance labelling is covered by `tests/integration/providerFailover.test.ts` ("three-provider chain"), mutation-checked.
 
 ## Limits of this evidence
-- No live model decision exists in this QA. The sentence "an AI agent recovered the schedule" is true of the orchestration and tools and of the scripted model, not of a verified Gemini decision.
-- The existing Devpost text cites an earlier live Gemini certification (2026-11-05). This QA did not re-run or verify it.
+
+- No live model has made a final recovery decision in these runs. "An AI agent recovered the schedule" is true of the orchestration, the tools and the scripted model, but not of a verified live decision.
+- The earlier live Gemini run on 2026-11-05 covered request parsing, explanations and Q&A, not recovery. It is described in [EVIDENCE.md](EVIDENCE.md#gemini).

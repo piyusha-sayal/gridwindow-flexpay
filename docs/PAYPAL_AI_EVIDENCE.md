@@ -1,68 +1,49 @@
-# PayPal + AI evidence (independent QA)
+# PayPal + AI evidence
 
-Scope of this document: what was independently re-verified locally (MOCK provider, in-memory database), and the exact procedure for the provider-backed evidence that only the owner may run. No PayPal order, checkout, buyer approval or webhook was created or sent by this QA.
+What we verified locally with the MOCK provider, and what we verified live with PayPal Sandbox on the deployed app. Identifiers are shortened to their last characters.
 
-## Independently verified locally
+## Verified locally (MOCK provider, in-memory database)
 
 | Property | Evidence | Result |
 |---|---|---|
-| Accepted offer integrity: the amount is recomputed from the stored offer, terms are immutable after acceptance (DB trigger) | `independent-security.test.ts` (price update rejected), `paymentSafety.test.ts`, `termsHashStability.test.ts` | PASS |
-| Authorization semantics: capacity is committed only after provider-confirmed authorization; late authorization is voided | `paymentSafety.test.ts` | PASS |
-| Capture/void state machine: no capture after void, no exit from terminal states, capture requires delivery | `payments.test.ts`, `independent-security.test.ts` (0 provider capture calls after void or before delivery) | PASS |
-| No duplicate financial operation: repeated and concurrent settle = exactly 1 provider capture, 1 CAPTURE operation, 0 VOID | `independent-security.test.ts` | PASS |
-| Webhook integrity: unverified = 401 and no write; oversized = 413; verified duplicate processed once; a hostile "capture completed" event cannot create CAPTURED | `independent-security.test.ts` | PASS |
-| Provider reconciliation after timeout / ambiguous result | `reconciliationSweep.test.ts`, `paymentSafety.test.ts` | PASS |
+| Accepted offer integrity: the amount is recomputed from the stored offer, and terms can't change after acceptance (database trigger) | `independent-security.test.ts` (price update rejected), `paymentSafety.test.ts`, `termsHashStability.test.ts` | PASS |
+| Authorization semantics: capacity is committed only after a provider-confirmed authorization; a late authorization is voided | `paymentSafety.test.ts` | PASS |
+| Capture and void state machine: no capture after a void, no exit from final states, capture needs delivery | `payments.test.ts`, `independent-security.test.ts` (0 provider capture calls after a void or before delivery) | PASS |
+| No duplicate financial operation: repeated and concurrent settlement gives exactly 1 provider capture, 1 CAPTURE operation, 0 VOID | `independent-security.test.ts` | PASS |
+| Webhook integrity: unverified gives 401 and no write; oversized gives 413; a verified duplicate is processed once; a hostile "capture completed" event cannot create CAPTURED | `independent-security.test.ts` | PASS |
+| Provider reconciliation after a timeout or an ambiguous result | `reconciliationSweep.test.ts`, `paymentSafety.test.ts` | PASS |
 | No AI payment tool: the recovery tool allowlist has none; a model asking for one is refused and the gateway is not called | `recoveryTools.test.ts`, `independent-agent-evidence.test.ts` | PASS |
-| Actual-energy settlement: capture or void follows the delivered-energy ledger, not the forecast | `recoveryShortfall.test.ts` | PASS |
-| Fault attribution: only an operator-injected outage voids automatically; any other shortfall is escalated to the operator with a stored deadline and moves no money; agreements from before the policy keep the earlier rule | `settlementPolicy.test.ts`, `outdatedSettlement.test.ts` | PASS |
-| Recovery never raises the price | benchmark: price unchanged in every applied recovery; `routes` and terms-hash tests | PASS |
-| FlexReceipt accuracy: receipt amount, delivered energy and payment state match the reservation view; MOCK is labelled | screenshot `evidence/14-flexreceipt.png` (MOCK payment, SYNTHETIC charging badges; $13.03 paid, 30.02 kWh) | PASS |
+| Settlement follows actual energy: capture or void follows the delivered-energy ledger, not the forecast | `recoveryShortfall.test.ts` | PASS |
+| Fault attribution: only an operator-caused failure voids automatically; any other shortfall goes to the operator with a stored deadline and moves no money; agreements from before the policy keep the earlier rule | `settlementPolicy.test.ts`, `outdatedSettlement.test.ts` | PASS |
+| Recovery never raises the price | benchmark (price unchanged in every applied recovery); `routes` and terms-hash tests | PASS |
+| FlexReceipt matches the reservation (amount, delivered energy, payment state) and labels MOCK | screenshot [evidence/14-flexreceipt.png](evidence/14-flexreceipt.png) (MOCK payment, SYNTHETIC charging; $13.03 paid, 30.02 kWh) | PASS |
 
-Not verified by this QA (documented by earlier work, no independent evidence): live PayPal Sandbox capture and void, live signed webhooks, live Gemini output. Status: NOT TESTED here; NEEDS USER APPROVAL to certify. **Superseded for capture, void and webhooks on 2026-11-11: see "Live PayPal Sandbox capture and void on the deployed build" below.**
+## Verified live on the deployed build (2026-11-11)
 
-## Findings relevant to this track
-
-- QA-4 (Low, copy accuracy): the reservation page labels a run whose consent was given by the driver as "Recovered automatically" (`src/components/recoveryCopy.ts`, `COMMITTED: "Recovered automatically"`) while the same card says "so it needs your approval. Nothing changes until you approve it." After approval the sentence is stale and the label misdescribes the consent method. The FlexReceipt detail does record "Approved by you". Recommended: label by consent method (auto within pre-approved bounds vs approved by driver) and use past tense after approval. Visible in `evidence/14-flexreceipt.png`.
-- QA-1 relevance: the app now refuses to start against an external database that lacks migrations 003-005. The existing Neon database already holds 001-005 (read-only inspection, 2026-11-10); for any other database run `npm run db:migrate` (dry run, then `--apply`) on a branch first.
-
-## Controlled sandbox certification (owner only; NEEDS USER APPROVAL)
-
-Goal: one provider-verified capture and one provider-verified void, with real Sandbox money only. Only provider read-backs count as evidence.
-
-Prerequisites
-1. A Neon branch (not the production branch) migrated deliberately: `npm run db:migrate -- --confirm-target=<host/db> --expect-latest=005_sweep_checked_at` (dry run), then add `--apply` after reading the pending list.
-2. Sandbox merchant and a Sandbox personal buyer account. `PAYMENT_MODE=paypal_sandbox`, `PAYPAL_ENV=sandbox`, `PAYPAL_EXPECTED_MERCHANT_ID` set. No `DEMO_TOOLS`.
-3. HTTPS tunnel, `APP_BASE_URL` set to it, `TRUST_PROXY=true`, a registered webhook with `PAYPAL_WEBHOOK_ID` (event list in `docs/PAYPAL_CERTIFICATION.md` section 3). Use `npm run build && npm start`, never `npm run dev`.
-4. `npm run payment:preflight -- --night-a <future night> --night-b <future night>` prints READY.
-
-Transaction A: authorization -> capture
-1. Driver wizard on the tunnel URL: Port A, 30 kWh, spend cap $20, accept the flexible offer, tick consent, approve in the PayPal Sandbox window with the buyer account (manual; never automated).
-2. Confirm the reservation shows "Authorized, not captured".
-3. Operator console: run the synthetic delivery. Expect one capture.
-4. Evidence: `npm run paypal:order -- <ORDER_ID>` (read-only provider read-back) shows capture COMPLETED and amount equal to the accepted amount; `WEBHOOK_VERIFIED` events for approved, authorized, capture completed; FlexReceipt shows provider-confirmed capture.
-
-Transaction B: authorization -> void
-1. Same flow on Port B. After authorization, operator console: Inject outage.
-2. Expect delivery 0 kWh, one void, no capture, $0 collected.
-3. Evidence: provider read-back authorization status VOIDED; verified `PAYMENT.AUTHORIZATION.VOIDED` webhook; receipt shows no charge.
-
-Stop conditions: any amount mismatch, any second provider operation for one reservation, any CAPTURED label without a provider read-back. Teardown: delete the webhook, stop the tunnel, clear `PAYPAL_WEBHOOK_ID`, restore `APP_BASE_URL`, unset `TRUST_PROXY`. Redact IDs before sharing.
-
-Claim rule: write "PayPal Sandbox capture/void verified" in the submission only after both read-backs exist. Until then the honest statement is "MOCK provider and signed-webhook logic verified locally; Sandbox certification pending".
-
-## Live PayPal Sandbox capture and void on the deployed build (2026-11-11)
-
-Both certification transactions above were run by the owner on the public Render deployment (`PAYMENT_MODE=paypal_sandbox`, Neon database), with buyer approval done by hand in the PayPal Sandbox window. The agent did not create, approve, capture or void anything; it read the results back on 2026-11-11 through the operator API (read-only) and recorded them here. Identifiers are shortened to their last characters.
+The team ran these on the public Render deployment (`PAYMENT_MODE=paypal_sandbox`, Neon database), approving each payment by hand in the PayPal Sandbox window. We then read the results back through the operator API, using GET requests only.
 
 | | Transaction A: authorize, deliver, capture | Transaction B: authorize, outage, void |
 |---|---|---|
-| Reservation | `…2XfQtp`, Port A, 30 kWh target, night of 2026-11-10 | `…afKCrn`, Port A, 30 kWh target, night of 2026-11-12 |
+| Reservation | `…H62XfQtp`, Port A, 30 kWh target, night of 2026-11-10 | `…C2afKCrn`, Port A, 30 kWh target, night of 2026-11-12 |
 | Agreed price | $15.56 | $15.56 |
 | Provider proofs (all `evidenceSource: PAYPAL_SANDBOX_API`) | ORDER_CREATED (PAYER_ACTION_REQUIRED), BUYER_APPROVED (APPROVED), AUTHORIZED (CREATED, 00:18:40Z), CAPTURED (COMPLETED, 1556 c, 08:21:40Z) | ORDER_CREATED 08:55:21Z, BUYER_APPROVED 08:56:07Z, AUTHORIZED (CREATED, 08:56:09Z), VOIDED (VOIDED, 1556 c, 08:56:54Z) |
 | Synthetic delivery | DELIVERED, 30.015 kWh of 30.000 kWh, no outage | FAILED, 0 Wh of 30.000 kWh, `outageInjected: true`, every slot `limitedBy: OUTAGE`, triggered by the operator |
-| Settlement rule applied | delivered energy meets the target: one capture of the agreed amount | zero energy delivered: one full void, $0 collected |
+| Settlement rule applied | Delivered energy meets the target: one capture of the agreed amount | Nothing delivered: one full void, $0 collected |
 | Signed webhooks verified | 2 `WEBHOOK_VERIFIED` events | 3 `WEBHOOK_VERIFIED` events, the last 4 s after the void |
-| Deployed commit at the time | `e2ddf08` (runtime code identical to `19fa76e`) | `19fa76e` |
+| Deployed commit at the time | `e2ddf08` (same runtime code as `19fa76e`) | `19fa76e` |
 | Screenshots | `evidence/final-release-2026-11-11/02-paypal/05-successful-capture.png`, `06-flexreceipt.png` | `07-operator-failure-void.png`, `08-zero-charge-receipt.png` |
 
-Status: **PASS** for one provider-confirmed capture and one provider-confirmed void through the app UI on the deployed build, each with signature-verified webhooks. Not covered live: a void decided by the fault-attribution policy after a *recovery run* (Transaction B used the operator outage, the zero-delivery rule), duplicate-webhook delivery, and provider timeouts. Those stay covered by the automated tests listed above (`attributionSettlement.test.ts`, `paymentSafety.test.ts`, `outdatedSettlement.test.ts`) on the MOCK provider and the offline provider fake.
+The same day, two more Sandbox bookings went through a recorded disturbance before they settled. One had a driver-approved recovery and was then captured (`…n-qKqgUM`). The other was voided under the fault-attribution policy after the recovery found no feasible fix (`…kfgzxjBp`). The timeline for both is in [EVIDENCE.md](EVIDENCE.md#recovery-followed-by-paypal-sandbox-settlement-2026-11-11).
+
+Status: **PASS** for provider-confirmed capture and void through the app on the deployed build, including settlement after a recovery run, all with signature-verified webhooks. Not covered live: duplicate webhook delivery and provider timeouts. The automated tests above cover those on the MOCK provider and the offline provider fake.
+
+## How the live Sandbox runs were done
+
+To repeat them with your own Sandbox credentials:
+
+1. Use a database that already has migrations 001 to 005 ([MIGRATIONS.md](MIGRATIONS.md)), a Sandbox merchant app and a Sandbox personal (buyer) account. Set `PAYMENT_MODE=paypal_sandbox`, `PAYPAL_ENV=sandbox` and `PAYPAL_EXPECTED_MERCHANT_ID`, and leave `DEMO_TOOLS` unset.
+2. Serve the app over HTTPS with `APP_BASE_URL` set to that address, and register a webhook with `PAYPAL_WEBHOOK_ID` (event list in [PAYPAL_CERTIFICATION.md](PAYPAL_CERTIFICATION.md) section 3). `npm run payment:preflight -- --night-a <future night> --night-b <future night>` should print READY.
+3. **Capture:** book Port A for 30 kWh, approve the exact terms, and approve the payment by hand in the PayPal Sandbox window. The reservation shows "Authorized, not captured". Run the synthetic delivery, and you get one capture. Check it with `npm run paypal:order -- <ORDER_ID>`, which reads the order back from PayPal.
+4. **Void:** book again, and after the authorization press **Inject outage** in the operator console. Delivery is 0 kWh, there is one void and no capture, and $0 is collected.
+
+Stop if an amount doesn't match, if a reservation gets a second provider operation, or if anything shows CAPTURED without a provider read-back.

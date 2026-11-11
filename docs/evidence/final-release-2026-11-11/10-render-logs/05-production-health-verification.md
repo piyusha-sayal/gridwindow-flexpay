@@ -2,11 +2,11 @@
 
 All checks ran against the live services after deployment. They were bounded and non-destructive: no PayPal order, reservation, disturbance or payment was created or changed; the only writes were quote records (as any visitor makes). Model calls: 3 per smoke run.
 
-## Smoke test on the release (`6265654`), 17:14–17:16 UTC: 19 of 20
+## Smoke test on the release (`6265654`), 17:14-17:16 UTC: 19 of 20
 
 Everything passed except the AI: all three model calls (request parsing, deal agent, explanation) came back as the labelled deterministic fallback with `REQUEST_REJECTED`, and the operator AI status read "AI unavailable". The logs in `02-app-startup-runtime.log` show HTTP 400 `INVALID_ARGUMENT` from Gemini. Root cause (reproduced locally with the same key): the Google SDK sent the adapter's 8 s timeout as `X-Server-Timeout: 8`, which Gemini rejects; 20 s is accepted. Fixed in PR #10 (`ed68391`, merged as `7959a1b`), with a regression test that drives the real SDK.
 
-## Smoke test on the hotfix (`7959a1b`), 17:31:51–17:32:41 UTC: 21 of 21
+## Smoke test on the hotfix (`7959a1b`), 17:31:51-17:32:41 UTC: 21 of 21
 
 | Area | Result |
 |---|---|
@@ -32,6 +32,6 @@ Everything passed except the AI: all three model calls (request parsing, deal ag
 
 - APIMatic SDK contract: 17 of 17 calls pass, 13 distinct operations, 6 of them against the live API (site config, gear search, request offers, operator sign-in, session, dashboard); the rest on an isolated server built from the same source (`09-verification/sdk-contract-2026-11-11.txt`).
 - MCP (live, read-only, 17:36 UTC): 7 tools, none moves money or accepts a price; live gear search returns 6 products (`09-verification/mcp-live-readonly-2026-11-11.txt`).
-- Live screenshots re-captured on `7959a1b` (17:33–17:35 UTC), 0 console errors, 0 overflow.
+- Live screenshots re-captured on `7959a1b` (17:33-17:35 UTC), 0 console errors, 0 overflow.
 
 The two high-severity booking and recovery fixes run on the deployed code (`7959a1b` contains them); reproducing them live would need a disturbance on a shared production reservation and a new PayPal order, both outside the release authorization, so they are proven by their regression tests (run in CI on the deployed commit) and by the isolated browser run on the same code (`04-bryntum-recovery/`).

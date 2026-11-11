@@ -7,7 +7,7 @@ describe("landing hero scheduler", () => {
     expect(HERO_EFFICIENCY_BP).toBe(ASSUMED_EFFICIENCY_BP);
   });
 
-  it("reproduces the recorded demo for a 07:00 ready-by: $16.80 list, $12.43 offer, charging 00:00–03:00", () => {
+  it("reproduces the recorded demo for a 07:00 ready-by: $16.80 list, $12.43 offer, charging 00:00-03:00", () => {
     const r = heroSchedule(HERO_DEFAULT_READY_SLOT);
     expect(r.kind).toBe("OFFER");
     if (r.kind !== "OFFER") return;

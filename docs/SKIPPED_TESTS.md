@@ -1,19 +1,19 @@
 # Skipped tests inventory
 
-- Date: 2026-11-09
-- Scope: combined tree on branch `feature/combined-release` (previously recorded at commit 5544038 on `feature/recovery-engine`)
+- Date: 2026-11-09, counts rechecked on the submitted code on 2026-11-11 (Vitest 12 skipped, Playwright 6 skipped)
+- Scope: the submitted code on `main`
 - Method: static inspection of `tests/`, `vitest.config.ts`, `playwright.config.ts`, plus the final combined-tree runs reported in the last section. No test was un-skipped or modified for this inventory.
 
 ## Summary
 
 | Runner | Skipped (static count, no env vars) | Documented figure | Match | Mechanism |
 |---|---|---|---|---|
-| Vitest | 12 | 12 (README.md, Testing section; docs/AWARD_EVIDENCE.md) | Yes | 11 tests under `describe.skipIf(!TEST_DATABASE_URL)` plus 1 `it.skipIf(!TEST_PG_RESTART_CMD)` nested in it |
-| Playwright | 6 | 6 (README.md, Testing section) | Yes | `test.beforeEach` calling `test.skip` for non-desktop projects, in `tests/e2e/qa.spec.ts` only |
+| Vitest | 12 | 12 (docs/JUDGES.md; docs/AWARD_EVIDENCE.md; docs/EVIDENCE.md) | Yes | 11 tests under `describe.skipIf(!TEST_DATABASE_URL)` plus 1 `it.skipIf(!TEST_PG_RESTART_CMD)` nested in it |
+| Playwright | 6 | 6 (docs/JUDGES.md; docs/AWARD_EVIDENCE.md) | Yes | `test.beforeEach` calling `test.skip` for non-desktop projects, in `tests/e2e/qa.spec.ts` only |
 
 Notes on the counts:
 - All 12 Vitest skips are in one file, `tests/integration/postgres.test.ts`, and are gated on `TEST_DATABASE_URL` or `TEST_PG_RESTART_CMD`. With no env vars set, all 12 are skipped. With `TEST_DATABASE_URL` set and `TEST_PG_RESTART_CMD` unset, 1 is skipped (the restart test).
-- The count was 10 before the two migration guard tests were added (tests 3 and 4 in the table below). The tracker (`plans/SUBMISSION_TRACKER.md`) still records the older "10 skipped" figure and the "1 skipped" figure from a run with the database variable set. Those are historical.
+- The count was 10 before the two migration guard tests were added (tests 3 and 4 in the table below).
 - The Playwright 6 are 3 tests in the `keyboard-only journeys` describe, run on the `mobile` and `tablet` projects (both `testMatch` include `qa.spec.ts`), 3 x 2 = 6. The `desktop` project runs them.
 - No `.todo`, `.fixme`, `.only`, `xit`, `xdescribe` or unconditional `.skip` exists anywhere in the repository outside `node_modules`.
 

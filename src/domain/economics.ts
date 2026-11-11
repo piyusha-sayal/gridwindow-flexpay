@@ -1,6 +1,6 @@
 /**
  * Win-win pricing. All money in integer USD cents. Every input here is a labeled
- * SYNTHETIC ASSUMPTION — not a real tariff, real PayPal fee schedule, or measured cost.
+ * SYNTHETIC ASSUMPTION: not a real tariff, real PayPal fee schedule, or measured cost.
  */
 
 export interface EconomicsConfig {

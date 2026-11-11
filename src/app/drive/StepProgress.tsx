@@ -11,7 +11,7 @@ interface StepProgressProps {
   onGo: (s: WizardStep) => void;
 }
 
-/** Five-step progress: steps 4–5 live on the reservation page and are shown for orientation only. */
+/** Five-step progress: steps 4-5 live on the reservation page and are shown for orientation only. */
 export function StepProgress({ step, reachable, onGo }: StepProgressProps) {
   return (
     <nav aria-label="Charging steps" className="stepper">

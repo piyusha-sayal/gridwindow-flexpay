@@ -1,5 +1,5 @@
 /**
- * Deterministic natural-language request parser — the labeled fallback when the model is
+ * Deterministic natural-language request parser: the labeled fallback when the model is
  * unavailable. It extracts ONLY request fields (energy, plug-in/departure time, spend cap,
  * port, preference). It cannot set prices, approve payments, or change any rule; every value
  * is re-validated by the request schema afterwards.
@@ -81,7 +81,7 @@ function moneyCents(m: RegExpMatchArray, offset: number): number | null {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** Departure deadline; an hour without am/pm is a morning departure (1–11) or ambiguous (12+ is left unset). */
+/** Departure deadline; an hour without am/pm is a morning departure (1-11) or ambiguous (12+ is left unset). */
 function parseDeparture(input: string, notes: string[]): LocalTime | undefined {
   const depart = new RegExp(String.raw`(?:ready by|by|before|until|leave at|leaving at|depart(?:ing)? at)\s*${TIME}(?![\d:]|\s*(?:kwh|hours?|minutes?|dollars?|bucks?))`).exec(input);
   if (!depart) return undefined;

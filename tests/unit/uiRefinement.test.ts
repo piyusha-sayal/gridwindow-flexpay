@@ -43,7 +43,7 @@ describe("planFitPoints", () => {
   it("never claims a saving or battery health, and uses no em dash", () => {
     for (const o of quote.offers) {
       const text = planFitPoints(o, quote, o.kind, TZ).join(" ");
-      expect(text).not.toMatch(/sav(e|ing)|health|cheaper|—/i);
+      expect(text).not.toMatch(/sav(e|ing)|health|cheaper|\u2014/i);
     }
   });
 
@@ -62,7 +62,7 @@ describe("port and preference copy", () => {
     expect(Object.keys(PORT_GUIDE).sort()).toEqual(["port_a", "port_b", "port_c"]);
     expect(PREFERENCES.map((p) => p.value).sort()).toEqual(Object.keys(PREFERENCE_GUIDE).sort());
     const text = JSON.stringify([PORT_GUIDE, PREFERENCE_GUIDE]);
-    expect(text).not.toMatch(/—/);
+    expect(text).not.toMatch(/\u2014/);
     expect(text).not.toMatch(/cheaper|saves|savings/i);
   });
 

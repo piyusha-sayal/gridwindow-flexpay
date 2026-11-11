@@ -29,11 +29,11 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
   const mock = config.providerMode !== "PAYPAL_SANDBOX";
   const providerName = mock ? "the MOCK provider (not PayPal)" : "PayPal Sandbox";
   const expired = secondsLeft === 0;
-  const chargeWindow = `${formatLocalTime(offer.chargeStartMs, tz)}–${formatLocalTime(offer.chargeEndMs, tz)}`;
+  const chargeWindow = `${formatLocalTime(offer.chargeStartMs, tz)}-${formatLocalTime(offer.chargeEndMs, tz)}`;
   const terms: [string, string][] = [
     ["Energy to battery", `At least ${formatKWh(quote.request.targetBatteryWh)}`],
     ["Charging schedule", `${chargeWindow}, done before ${formatLocalTime(quote.request.departMs, tz)}`],
-    ["Port", `Port ${port} (parked ${formatLocalTime(quote.request.plugInMs, tz)}–${formatLocalTime(quote.request.departMs, tz)})`],
+    ["Port", `Port ${port} (parked ${formatLocalTime(quote.request.plugInMs, tz)}-${formatLocalTime(quote.request.departMs, tz)})`],
     ["Merchant", config.station.name],
   ];
   const flow: { when: string; what: string; rule: string }[] = [

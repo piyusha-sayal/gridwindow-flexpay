@@ -86,7 +86,7 @@ export function DetailPanel({ id, version, onClose }: { id: string; version: num
             <span className="badge tone-neutral">{r.slotsCommitted ? "Capacity committed" : "Capacity not held"}</span>
           </div>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-[14px] tabular">
-            <Item k="Parked" v={`Port ${r.portLabel} · ${formatLocalTime(r.plugInMs, r.timeZone)}–${formatLocalTime(r.departMs, r.timeZone)}`} />
+            <Item k="Parked" v={`Port ${r.portLabel} · ${formatLocalTime(r.plugInMs, r.timeZone)}-${formatLocalTime(r.departMs, r.timeZone)}`} />
             <Item k="Energy target" v={formatKWh(r.targetBatteryWh)} />
             <Item k="Delivered" v={r.simulation ? `${formatKWh(Math.floor(r.simulation.deliveredBatteryMilliWh / 1000))} (${r.simulation.outcome})` : "not run"} />
             <Item k="Authorization expires" v={r.authorizationExpiresAt ? new Date(r.authorizationExpiresAt).toISOString().slice(0, 16).replace("T", " ") + " UTC" : "n/a"} />

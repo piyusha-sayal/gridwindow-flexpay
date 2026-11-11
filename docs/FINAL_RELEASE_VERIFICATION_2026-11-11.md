@@ -22,7 +22,7 @@ Evidence: [screenshots and manifest](evidence/final-release-2026-11-11/EVIDENCE_
 |---|---|---|
 | TypeScript, ESLint | 0 errors, 0 problems on `7959a1b` | PASS |
 | Vitest | **1,004 passed, 12 skipped** (1,016 tests, 96 files) on `7959a1b`, locally and in CI. The 12 skips are the real-PostgreSQL suite, which needs a disposable `TEST_DATABASE_URL` | PASS |
-| Playwright (desktop, tablet, mobile; axe, keyboard, payment states) | 132 collected: **126 passed, 6 skipped, 0 failed** on build `11cf209` (16:35–16:47 UTC). 2 known Bryntum time-zone residuals (QA-3) are marked expected-to-fail and failed as expected; the 6 skips are desktop-only keyboard journeys. Later changes are not exercised by these tests: the spec, portal and SDK regeneration and the docs do not touch the app, and the Gemini client change only applies with a model key, which e2e blanks | PASS |
+| Playwright (desktop, tablet, mobile; axe, keyboard, payment states) | 132 collected: **126 passed, 6 skipped, 0 failed** on build `11cf209` (16:35-16:47 UTC). 2 known Bryntum time-zone residuals (QA-3) are marked expected-to-fail and failed as expected; the 6 skips are desktop-only keyboard journeys. Later changes are not exercised by these tests: the spec, portal and SDK regeneration and the docs do not touch the app, and the Gemini client change only applies with a model key, which e2e blanks | PASS |
 | Production build | exit 0 locally and on Render for `7959a1b` | PASS |
 | Release scan | `.next/static` 46 files clean; `.env.example` placeholders only | PASS |
 | Dependency audit | `npm audit --omit=dev`: 0 vulnerabilities (the full audit Render prints at build time reports 7 moderate, all dev-only) | PASS |
@@ -95,9 +95,9 @@ Synthetic benchmark effect of fix 2 (site-cap scenarios only): reached the energ
 
 ## H. Release decision
 
-**GO.** The release code `7959a1b` is merged, deployed on both Render services and verified on the live site: 21 of 21 production smoke checks, live AI answering from Gemini with working failover, Channel3, PayPal Sandbox evidence, AG Grid, Bryntum, MCP, the regenerated portal and the SDK contract (17 of 17), with CI green and the full test suite passing (1,004 unit and integration tests; 126 browser tests on the same app code). The five defects found during this closure are fixed and deployed, each with a regression test that fails on the old code. What remains in section G are documented limitations, none release-critical: notably, a live model *final* recovery decision is not claimed.
+**GO.** The release code `7959a1b` is merged, deployed on both Render services and verified on the live site: 21 of 21 production smoke checks, live AI answering from Gemini with working failover, Channel3, PayPal Sandbox evidence, AG Grid, Bryntum, MCP, the regenerated portal and the SDK contract (17 of 17), with CI green and the full test suite passing (1,004 unit and integration tests; 126 browser tests on the same app code). The five defects found during this closure are fixed and deployed, each with a regression test that fails on the old code. What remains in section G are documented limitations, none release-critical. The main one: a live model *final* recovery decision is not claimed.
 
-## I. Facts to reflect in Devpost (not written here)
+## I. Summary figures for this release
 
 - Synthetic impact (after fix 2): 736 of 4,672 disturbed scenarios reached the energy target (16 %, was 704 / 15 %); 624 of them only by finishing later with consent (was 592); 3,765 with no feasible recovery (was 3,832); delivered energy with approval +2.9 % (was +2.6 %). Source: `docs/IMPACT_SUMMARY.md`.
 - Tests: 1,004 unit and integration (12 skipped), 126 browser (6 skipped), 0 failures.
@@ -110,3 +110,11 @@ Synthetic benchmark effect of fix 2 (site-cap scenarios only): reached the energ
 
 - Release window (deploys of `6265654` and `7959a1b`, both smoke tests, live checks): [`evidence/final-release-2026-11-11/10-render-logs/`](evidence/final-release-2026-11-11/10-render-logs/README.md), retrieved through the official Render API, sanitized, with the [deployment summary](evidence/final-release-2026-11-11/10-render-logs/06-render-deployment-summary.md).
 - The documentation-only deploy triggered by merging this report: logs and deploy records attached to the GitHub Release [`release-2026-11-11`](https://github.com/piyusha-sayal/gridwindow-flexpay/releases/tag/release-2026-11-11), so archiving them does not trigger another deploy.
+
+## K. Addendum: the final submitted build (later on 2026-11-11)
+
+**Two operator fixes (PR #12, merged as `3edf59d`).** The console's "Schedule view" link now opens the night the dashboard has loaded, and a "Night of" picker above the Bryntum timeline changes the night through the URL, so it survives refresh and Back/Forward. Switching nights no longer shows the previous night's sessions. The recovery checklist's financial step is Done only after PayPal confirms a capture or void, and the other steps follow the stored run. Results on that commit: Vitest 1,023 passed and 12 skipped; Playwright 114 passed on desktop, 14 on mobile and 3 on tablet (6 skipped), 0 failed; CI passed on the pull request and on `main`; Render deploy `dep-dbqcp3g473hc73fpmaf0` went live at 20:16 UTC; a read-only live check passed 25 of 25.
+
+**Settlement after a recovery run, live in PayPal Sandbox.** Between 19:05 and 19:11 UTC the team ran two Sandbox bookings through a recorded disturbance on the deployed site. `…n-qKqgUM` had a driver-approved recovery (schedule version 2) and was then captured. `…kfgzxjBp` had an operator-attributed disturbance with no feasible fix and was voided under the fault-attribution policy. Both have verified webhooks. This settles the "void decided by fault attribution after a recovery run" row in section G for the live provider; duplicate webhooks and provider timeouts are still covered by fakes only. Details: [EVIDENCE.md](EVIDENCE.md#recovery-followed-by-paypal-sandbox-settlement-2026-11-11).
+
+**Documentation pass.** The judge guide and demo script now start from the hosted app, internal handoff and planning files were removed, the evidence documents were brought up to date, and the repository text uses plain hyphens instead of em and en dashes.

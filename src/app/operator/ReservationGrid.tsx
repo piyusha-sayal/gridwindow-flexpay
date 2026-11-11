@@ -62,7 +62,7 @@ export function ReservationGrid({ d, selectedId, onSelect }: { d: OperatorDashbo
       paymentState: s.paymentState,
       serviceState: s.serviceState,
       provider: s.providerMode === "PAYPAL_SANDBOX" ? "PayPal Sandbox" : "MOCK",
-      lastEvent: s.lastEvent ? `${s.lastEvent.source} · ${s.lastEvent.type}` : "—",
+      lastEvent: s.lastEvent ? `${s.lastEvent.source} · ${s.lastEvent.type}` : "None",
       attention: needsAttention(s, ATTENTION_STATES),
       slotsCommitted: s.slotsCommitted,
     }));

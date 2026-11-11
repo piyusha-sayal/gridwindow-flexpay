@@ -25,7 +25,7 @@
 [![MIT](https://img.shields.io/badge/License-MIT-16A34A)](LICENSE)
 [![CI](https://github.com/piyusha-sayal/gridwindow-flexpay/actions/workflows/ci.yml/badge.svg)](https://github.com/piyusha-sayal/gridwindow-flexpay/actions/workflows/ci.yml)
 
-**[▶ Explore the live demo](https://gridwindow-flexpay.onrender.com)** · **[Open the API developer portal](https://gridwindow-flexpay-developers.onrender.com)** · **[Connect an AI agent through MCP](docs/MCP.md)**
+**[Explore the live demo](https://gridwindow-flexpay.onrender.com)** · **[Judge guide](docs/JUDGES.md)** · **[Open the API developer portal](https://gridwindow-flexpay-developers.onrender.com)** · **[Connect an AI agent through MCP](docs/MCP.md)**
 
 <sub>Live on Render · PayPal Sandbox test funds · Synthetic charging · Latest release evidence: November 11, 2026</sub>
 
@@ -43,12 +43,12 @@
 
 GridWindow FlexPay uses that flexibility to coordinate charging at a shared site. Drivers choose their energy target, departure time, and budget. The scheduler finds feasible windows, checks the economics for both sides, and lets the driver approve one exact offer. The exact approved amount is authorized first. Capture follows only when the synthetic delivery ledger and settlement rules allow it. If an eligible operator failure prevents delivery, the authorization is voided instead.
 
-| | The promise | How we approach it |
-| :---: | :--- | :--- |
-| 🔌 | **Ready when you leave** | Schedule in 15-minute slots around energy needs, port limits, occupancy, and departure times. |
-| 📉 | **Savings with real constraints** | Show a flexible offer only when it improves the modeled outcome for both driver and operator. |
-| 💳 | **No automatic pay-now capture** | Authorize an agreed amount, then capture after qualifying delivery or void after an eligible failure. |
-| 🛡️ | **AI without payment authority** | Let AI explain or select prevalidated recovery options, never change prices, grant consent, or move money. |
+| The promise | How we approach it |
+| :--- | :--- |
+| **Ready when you leave** | Schedule in 15-minute slots around energy needs, port limits, occupancy, and departure times. |
+| **Savings with real constraints** | Show a flexible offer only when it improves the modeled outcome for both driver and operator. |
+| **No automatic pay-now capture** | Authorize an agreed amount, then capture after qualifying delivery or void after an eligible failure. |
+| **AI without payment authority** | Let AI explain or select prevalidated recovery options, never change prices, grant consent, or move money. |
 
 > [!IMPORTANT]
 > **Prototype, not a live charging network.** Vehicles, building load, energy delivery, forecasts, tariffs, disturbances, and savings are simulated. Payments use MOCK mode or PayPal Sandbox funds. No real vehicle is charged and no real customer money moves. [Read the limits](#an-honest-look-at-the-boundaries).
@@ -60,22 +60,22 @@ GridWindow FlexPay uses that flexibility to coordinate charging at a shared site
 <table>
 <tr>
 <td width="33%" align="center">
-<h3>🚗 I'm a driver</h3>
+<h3>I'm a driver</h3>
 <p>See what a flexible charging offer looks like and follow a session through settlement.</p>
 <a href="docs/evidence/final-release-2026-11-11/01-product/05-validated-charging-offers.png"><strong>See Smart Charge</strong></a><br />
 <a href="#what-the-app-actually-gives-you">Explore the driver flow</a>
 </td>
 <td width="33%" align="center">
-<h3>🧑‍💻 I'm an operator</h3>
+<h3>I'm an operator</h3>
 <p>Inspect site power, schedule versions, synthetic faults, and payment outcomes.</p>
 <a href="docs/evidence/final-release-2026-11-11/03-operator-ag-grid/01-operator-dashboard.png"><strong>See the console</strong></a><br />
 <a href="#what-the-app-actually-gives-you">Explore operator controls</a>
 </td>
 <td width="33%" align="center">
-<h3>🏆 I'm a judge</h3>
-<p>Find the three-minute demo, evidence, tests, and known limitations in one place.</p>
+<h3>I'm a judge</h3>
+<p>Start with the hosted app: what to try without access, and which evidence is real PayPal Sandbox.</p>
 <a href="docs/JUDGES.md"><strong>Open judge guide</strong></a><br />
-<a href="docs/FINAL_DEMO_SCRIPT.md">Follow the demo script</a>
+<a href="docs/DEMO_SCRIPT.md">Follow the demo script</a>
 </td>
 </tr>
 </table>
@@ -206,7 +206,7 @@ If the requested energy cannot physically be delivered, the system does not crea
 <table>
 <tr>
 <td width="50%" valign="top">
-<h3 id="driver-experience">🚗 Driver experience</h3>
+<h3 id="driver-experience">Driver experience</h3>
 <ul>
 <li>Enter energy, arrival, departure, and budget by form or plain language.</li>
 <li>Compare immediate charging against qualifying flexible windows.</li>
@@ -219,7 +219,7 @@ If the requested energy cannot physically be delivered, the system does not crea
 <a href="docs/evidence/final-release-2026-11-11/01-product/05-validated-charging-offers.png">View driver screenshot</a>
 </td>
 <td width="50%" valign="top">
-<h3 id="operator-experience">🖥️ Operator experience</h3>
+<h3 id="operator-experience">Operator experience</h3>
 <ul>
 <li>Open a passphrase-protected control center.</li>
 <li>Use AG Grid-powered operator tables to inspect reservations, site load and charging status.</li>
@@ -326,13 +326,13 @@ sequenceDiagram
 <table>
 <tr>
 <td width="50%" valign="top">
-<h3>✅ Delivery succeeds</h3>
+<h3>Delivery succeeds</h3>
 <strong>November 6, 2026</strong>
 <p>Authorized <strong>$14.82</strong> for a 30 kWh target. The simulator recorded <strong>30.015 kWh</strong>, followed by one capture. The provider reported completed capture and verified webhooks were processed.</p>
 <a href="docs/EVIDENCE.md">Inspect successful scenario</a>
 </td>
 <td width="50%" valign="top">
-<h3>🛑 Charging fails</h3>
+<h3>Charging fails</h3>
 <strong>November 7, 2026</strong>
 <p>Authorized <strong>$14.19</strong>, then injected an outage with <strong>0 kWh</strong> delivered. The provider reported a void, no capture, and <strong>$0.00 collected</strong>.</p>
 <a href="docs/EVIDENCE.md">Inspect failure scenario</a>
@@ -383,7 +383,9 @@ flowchart LR
 | **No duplicate commit** | Lease and fencing checks protect schedule commits and traces. |
 | **Model cannot improvise** | It can select only server-validated candidate IDs, with deterministic fallback. |
 
-**Important current limits:** recovery uses forecast base load while replay uses realized base load, so replanning does not guarantee that all remaining energy will ultimately be delivered. A recovery may raise the operator's modeled energy cost while preserving its 1-cent minimum contribution margin. One earlier Gemini recovery attempt returned HTTP 504 and used deterministic fallback. The release checks cover Gemini and OpenRouter integration, but do not establish that every recovery in the live service is model-selected. The supplied verification report confirms live Sandbox capture and void, but does not separately establish a full recovery-triggered Sandbox settlement. The dedicated recovery workflow traces its steps in sequence and supports a version-specific approval gate. Its synthetic fault path is distinct from the older single-click outage simulator.
+**Recovery and settlement on the live site:** on 2026-11-11, two PayPal Sandbox bookings went through a recorded disturbance before settling. One recovery was approved by the driver, wrote schedule version 2 and was then captured. The other had no feasible fix, was attributed to the operator and was voided. Both were read back from the PayPal API with verified webhooks ([evidence](docs/EVIDENCE.md#recovery-followed-by-paypal-sandbox-settlement-2026-11-11)).
+
+**Important current limits:** recovery uses forecast base load while replay uses realized base load, so replanning does not guarantee that all remaining energy will ultimately be delivered. A recovery may raise the operator's modeled energy cost while preserving its 1-cent minimum contribution margin. Gemini has driven recovery tool steps live, but in those runs the provider hit capacity errors and the deterministic path made the final decision, so a live model's final recovery decision is not claimed. The dedicated recovery workflow traces its steps in sequence and supports a version-specific approval gate. Its synthetic fault path is distinct from the older single-click outage simulator.
 
 [Recovery benchmark](docs/RECOVERY_BENCHMARK.md) · [Detailed findings](docs/RECOVERY_BENCHMARK_FINDINGS.md) · [Operator timeline notes](docs/BRYNTUM_NOTES.md)
 
@@ -391,7 +393,7 @@ flowchart LR
 
 ## Connected tools that make the product work
 
-These integrations are part of the application, not a list of logos. Each has a specific job in the charging, payment, operator, or developer experience.
+Each integration has a specific job in the charging, payment, operator, or developer experience.
 
 | Integration | Where it shows up | Why it matters |
 | :--- | :--- | :--- |
@@ -400,7 +402,7 @@ These integrations are part of the application, not a list of logos. Each has a 
 | [Bryntum Scheduler](https://bryntum.com/products/scheduler/) | [Operator schedule](https://gridwindow-flexpay.onrender.com/operator/schedule) | Date-driven timeline with persisted schedule versions and separately shown pending proposals. |
 | [AG Grid](https://www.ag-grid.com/) | [Operator console](https://gridwindow-flexpay.onrender.com/operator) | Structured operational tables and faster inspection of reservation and session data. |
 | [Channel3](https://trychannel3.com/) | [Rewards & Payments](https://gridwindow-flexpay.onrender.com/rewards) and MCP `find_ev_gear` | Live EV accessory discovery and merchant links, distinct from modeled energy savings. |
-| [APIMatic](https://www.apimatic.io/) | [Developer portal](https://gridwindow-flexpay-developers.onrender.com), [OpenAPI spec](docs/openapi.yaml), generated TypeScript SDK | A documented and typed surface for external developers rather than undocumented endpoints. |
+| [APIMatic](https://www.apimatic.io/) | [Developer portal](https://gridwindow-flexpay-developers.onrender.com), [OpenAPI spec](docs/openapi.yaml), generated TypeScript SDK | A documented, typed API surface for outside developers. |
 | [Model Context Protocol](https://modelcontextprotocol.io/) | [MCP server guide](docs/MCP.md) | Allows compatible AI clients to search and compare charging options while preserving the driver's checkout approval. |
 | [Render](https://render.com/) | [Hosted application](https://gridwindow-flexpay.onrender.com) and [developer portal](https://gridwindow-flexpay-developers.onrender.com) | Publicly accessible deployments for demonstrations and developer exploration. |
 
@@ -438,7 +440,7 @@ Run `npm run mcp:smoke` for the dedicated integration check. [MCP setup and cons
 
 ## AI helps explain. The server makes the decisions.
 
-GridWindow can use [Google Gemini](https://ai.google.dev/gemini-api/docs) through the [Google Gen AI SDK](https://github.com/googleapis/js-genai), with OpenRouter available as a backup model route. When no supported model key is configured or a provider fails, the app uses a **labeled deterministic parser and explainer**. The main workflow still works.
+GridWindow can use [Google Gemini](https://ai.google.dev/gemini-api/docs) through the [Google Gen AI SDK](https://github.com/googleapis/js-genai), with OpenRouter available as a backup model route. When no supported model key is configured or a provider fails, the app uses a **deterministic parser and explainer**. The main workflow still works, and the operator's recovery view always says whether a model or the deterministic path made each decision.
 
 | AI may do | AI may not do |
 | :--- | :--- |
@@ -492,14 +494,14 @@ AG Grid adds operator data tables, the MCP server exposes bounded charging workf
 
 ## Watch the workflow, or reproduce it yourself
 
-A full demo recording is **not yet included in the repository or GitHub release assets**. The repository does include a recording-ready walkthrough, scripts, test inputs and the final screenshot evidence set. These let reviewers follow the actual interface without an invented video link.
+The demo video is linked from our Devpost submission. The repository also has the walkthrough script, the test inputs and the final screenshot evidence set, so you can follow the real interface yourself.
 
 | Demo resource | What you get |
 | :--- | :--- |
-| [Live product](https://gridwindow-flexpay.onrender.com) | Driver journey and public pages; operator controls require a passphrase |
-| [Final demo script](docs/FINAL_DEMO_SCRIPT.md) | Screen-by-screen live-site story, including PayPal, MCP, AG Grid, recovery and the integrations |
-| [Recording package](docs/DEMO_RECORDING_PACKAGE.md) | Suggested setup, camera plan, exact interactions and truth labels for a recorded demo |
-| [Repeatable demo runbook](docs/DEMO_RUNBOOK.md) | Reproduce charging and recovery scenarios with an isolated MOCK database |
+| [Live product](https://gridwindow-flexpay.onrender.com) | Driver journey and public pages; operator controls require a passphrase (judges get it in the Devpost testing instructions) |
+| [Judge guide](docs/JUDGES.md) | What to try without access, which live nights hold real Sandbox records, and Sandbox evidence versus MOCK tests |
+| [Demo script](docs/DEMO_SCRIPT.md) | Screen-by-screen live-site story, including PayPal, MCP, AG Grid, recovery and the integrations, with the labels to read aloud |
+| [Run it locally](docs/JUDGES.md#4-run-it-locally) | Reproduce charging and recovery scenarios with an isolated MOCK database |
 | [Release screenshot index](docs/evidence/final-release-2026-11-11/SCREENSHOT_INDEX.md) | Captures of the product, payment outcomes, recovery, integrations and mobile layouts |
 | [Final release verification](docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md) | What was exercised against the deployed release and what remains limited |
 
@@ -527,7 +529,7 @@ The final deployment report for application revision **`3edf59d`** records **1,2
 
 ![Passed checks](https://img.shields.io/badge/Verified%20passes-1%2C247-15803D?style=for-the-badge)
 ![Automated failures](https://img.shields.io/badge/Automated%20failures-0-0F766E?style=for-the-badge)
-![Release](https://img.shields.io/badge/Deployed%20revision-3edf59d-2563EB?style=for-the-badge)
+![Release](https://img.shields.io/badge/Verified%20revision-3edf59d-2563EB?style=for-the-badge)
 ![Sandbox](https://img.shields.io/badge/PayPal%20Sandbox-capture%20%2B%20void-003087?style=for-the-badge&logo=paypal&logoColor=white)
 
 </div>
@@ -538,7 +540,7 @@ The final deployment report for application revision **`3edf59d`** records **1,2
 | :--- | ---: | :--- |
 | **PayPal payment lifecycle** | **229** | Checkout, authorizations, capture and void, webhooks, reconciliation and settlement. |
 | **AI assistance and deal agent** | **238** | Gemini, OpenRouter backup, assistant and deal-agent behavior. Four additional live or contract checks were not recorded as passed. |
-| **Autonomous recovery** | **282** | Safe replanning, consent requirements, schedule versions and recovery step-order fix. |
+| **Autonomous recovery** | **282** | Safe replanning, consent requirements, schedule versions and the recovery checklist fix. |
 | **Bryntum scheduler** | **130** | Persisted schedules, timeline behavior and selected-date navigation fix. |
 | **AG Grid operator console** | **4** | Browser and integration checks for operator data presentation. |
 | **Channel3 gear discovery** | **7** | EV gear search and integration behavior. |
@@ -550,7 +552,7 @@ The final deployment report for application revision **`3edf59d`** records **1,2
 | **Render deployment and health** | **6** | Hosted service and health checks. |
 | **Total successful** | **1,247** | **Successful checks recorded against the release.** |
 
-<sub>The full release inventory contains 1,269 recorded checks: 1,247 passed, 18 were intentionally skipped, and 4 AI live/contract checks were not recorded as passed. The table above focuses on successful coverage rather than counting skipped checks as executed tests. No automated test failed. These figures come from the supplied release record, not a new independent test execution.</sub>
+<sub>The full release inventory contains 1,269 recorded checks: 1,247 passed, 18 were intentionally skipped, and 4 AI live/contract checks were not recorded as passed. The table above focuses on successful coverage rather than counting skipped checks as executed tests. No automated test failed. The same automated suites passed again, with the same counts, on the final documentation commit.</sub>
 
 ### Live outcomes worth demonstrating
 
@@ -562,7 +564,7 @@ The final deployment report for application revision **`3edf59d`** records **1,2
 </tr>
 </table>
 
-The two important operator fixes, **date-specific scheduler navigation** and **correct recovery step ordering**, are part of the recorded final checks. For a demo, use the [final demo script](docs/FINAL_DEMO_SCRIPT.md), [release screenshot index](docs/evidence/final-release-2026-11-11/SCREENSHOT_INDEX.md), and [integration evidence](docs/EVIDENCE.md).
+The two final operator fixes, **date-specific scheduler navigation** and **an accurate recovery checklist** (the financial step shows Done only after PayPal confirms the capture or void), are part of the recorded final checks. For a demo, use the [demo script](docs/DEMO_SCRIPT.md), [release screenshot index](docs/evidence/final-release-2026-11-11/SCREENSHOT_INDEX.md), and [integration evidence](docs/EVIDENCE.md).
 
 <details>
 <summary><strong>Re-run the automated checks locally</strong></summary>
@@ -707,7 +709,7 @@ Never enable `GW_AUTO_MIGRATE=true` for a persistent database. Read [docs/MIGRAT
 | Webhooks do not arrive | Verify HTTPS endpoint `/api/webhooks/paypal`, webhook ID, and trusted-proxy settings |
 | Tests refuse to start | Remove hosted services, model keys, and non-MOCK payment settings from isolated test configuration |
 
-See [External preflight](docs/EXTERNAL_PREFLIGHT.md).
+See the [external integration guide](docs/EXTERNAL_INTEGRATION.md).
 
 </details>
 
@@ -719,12 +721,12 @@ See [External preflight](docs/EXTERNAL_PREFLIGHT.md).
 | :--- | :--- |
 | Deterministic scheduling with independent validation in synthetic benchmarks | Performance against real vehicles, chargers, meter readings, and utility tariffs |
 | Exact-offer consent and payment state controls | Production customer authentication and live commercial payment processing |
-| PayPal Sandbox authorization/capture and authorization/void scenarios | A complete live Sandbox settlement triggered specifically by the newer recovery path |
+| PayPal Sandbox authorization/capture and authorization/void, including settlement after a recovery run | Duplicate webhook delivery and provider timeouts against the live provider (tested with fakes only) |
 | Fault recovery with server-validated candidate selection and deterministic fallback | Guaranteed model-selected recovery under all provider conditions |
 | Bryntum schedule with operator-selected date and an accessible table | Fully accessible third-party Bryntum grid; vendor DOM has known axe findings |
 | Repeatable synthetic benchmarks and documented negative cases | Proven real-world savings, grid impact, or general economic superiority |
 
-The recovery benchmark may show unfavorable or infeasible results. The settlement sweep runs periodically in the background and is not a manual UI action. The demo uses pseudonymous sessions instead of production-grade identity management. Bryntum licensing and vendor accessibility findings are documented in the third-party notes. These are meaningful limitations, not things a README should gloss over.
+The recovery benchmark may show unfavorable or infeasible results. The settlement sweep runs periodically in the background and is not a manual UI action. The demo uses pseudonymous sessions instead of production-grade identity management. Bryntum licensing and vendor accessibility findings are documented in the third-party notes.
 
 [Detailed limitations](docs/AWARD_EVIDENCE.md) · [Bryntum notes](docs/BRYNTUM_NOTES.md) · [Third-party license notes](docs/THIRD_PARTY.md) · [Secrets checklist](docs/LICENSE_AND_SECRETS_CHECKLIST.md)
 
@@ -733,20 +735,19 @@ The recovery benchmark may show unfavorable or infeasible results. The settlemen
 ## Documentation you can actually navigate
 
 <details open>
-<summary><strong>🏆 Demo and judging</strong></summary>
+<summary><strong>Demo and judging</strong></summary>
 
 | Document | Best for |
 | :--- | :--- |
-| [Judge walkthrough](docs/JUDGES.md) | Where to click, what works without credentials, and what requires setup |
-| [Final demo script](docs/FINAL_DEMO_SCRIPT.md) | A short, reproducible presentation path |
-| [Project description](docs/DEVPOST_FINAL.md) | Detailed product narrative and implementation context |
+| [Judge walkthrough](docs/JUDGES.md) | Where to click on the hosted app, what works without credentials, and real Sandbox evidence versus MOCK tests |
+| [Demo script](docs/DEMO_SCRIPT.md) | A short, reproducible presentation path on the live site |
 | [Live application](https://gridwindow-flexpay.onrender.com) | Browser-based product walkthrough |
-| [Award evidence](docs/AWARD_EVIDENCE.md) | Claimed results and PASS / FAIL / BLOCKED / NOT TESTED distinctions |
+| [Award evidence](docs/AWARD_EVIDENCE.md) | Every claim marked PASS, PARTIAL, FAIL, NOT TESTED or NOT CLAIMED |
 
 </details>
 
 <details>
-<summary><strong>🧠 Engineering and scheduling</strong></summary>
+<summary><strong>Engineering and scheduling</strong></summary>
 
 | Document | Best for |
 | :--- | :--- |
@@ -762,14 +763,15 @@ The recovery benchmark may show unfavorable or infeasible results. The settlemen
 </details>
 
 <details>
-<summary><strong>💳 Integrations, safety, and operations</strong></summary>
+<summary><strong>Integrations, safety, and operations</strong></summary>
 
 | Document | Best for |
 | :--- | :--- |
 | [Integration evidence](docs/EVIDENCE.md) | Sanitized PayPal Sandbox and Gemini run records |
 | [PayPal certification](docs/PAYPAL_CERTIFICATION.md) | Payment and webhook certification steps |
 | [External integration](docs/EXTERNAL_INTEGRATION.md) | Sandbox, webhook, and model smoke-test runbooks |
-| [External preflight](docs/EXTERNAL_PREFLIGHT.md) | Required approvals before live integration exercises |
+| [PayPal + AI evidence](docs/PAYPAL_AI_EVIDENCE.md) | What was verified locally and what was verified live |
+| [Agentic Commerce evidence](docs/AGENTIC_COMMERCE_EVIDENCE.md) | Recovery agent runs, decision labels and live model runs |
 | [Migration guide](docs/MIGRATIONS.md) | Database schema safety and migration confirmation |
 | [Skipped tests](docs/SKIPPED_TESTS.md) | What was deliberately gated and why |
 | [Third-party packages](docs/THIRD_PARTY.md) | Dependency licensing |
@@ -785,9 +787,7 @@ The recovery benchmark may show unfavorable or infeasible results. The settlemen
 | [Final release report](docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md) | Deployment facts, checks and integration limits |
 | [Screenshot gallery](docs/evidence/final-release-2026-11-11/SCREENSHOT_INDEX.md) | All final screen captures, with provenance labels |
 | [Screenshot manifest](docs/evidence/final-release-2026-11-11/EVIDENCE_MANIFEST.md) | Which images show live, local, Sandbox or fallback results |
-| [Recording package](docs/DEMO_RECORDING_PACKAGE.md) | End-to-end demo preparation and narration |
-| [Final demo script](docs/FINAL_DEMO_SCRIPT.md) | Current browser walkthrough and verbal script |
-| [Project description](docs/DEVPOST_FINAL.md) | Feature narrative and implementation context |
+| [Demo script](docs/DEMO_SCRIPT.md) | Current browser walkthrough and verbal script |
 
 </details>
 
@@ -828,7 +828,7 @@ The application uses the Geist font family under the SIL Open Font License, load
 
 ### Flexible charging. Verified delivery. Accountable payment.
 
-**[Back to top](#gridwindow-flexpay)** · **[Demo walkthrough](docs/FINAL_DEMO_SCRIPT.md)** · **[Release evidence](docs/evidence/final-release-2026-11-11/SCREENSHOT_INDEX.md)**
+**[Back to top](#gridwindow-flexpay)** · **[Judge guide](docs/JUDGES.md)** · **[Demo walkthrough](docs/DEMO_SCRIPT.md)** · **[Release evidence](docs/evidence/final-release-2026-11-11/SCREENSHOT_INDEX.md)**
 
 <sub>Built as a working hackathon prototype, with simulations and external integrations labeled for what they actually prove.</sub>
 

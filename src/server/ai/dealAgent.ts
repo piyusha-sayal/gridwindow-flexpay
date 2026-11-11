@@ -100,7 +100,7 @@ export function deterministicDealText(quote: QuoteSet, e: DealEvaluation): { sum
       return {
         summary: `${rec!.label} meets your requirements: ${formatUsd(rec!.priceCents)} instead of ${formatUsd(rec!.listPriceCents)} for immediate charging, a validated saving of ${formatUsd(rec!.discountCents)}.`,
         points: [
-          `Charging runs ${formatLocalTime(rec!.chargeStartMs, tz)}–${formatLocalTime(rec!.chargeEndMs, tz)}, ready before ${readyBy}, adding ${formatKWh(quote.request.targetBatteryWh)} to the battery.`,
+          `Charging runs ${formatLocalTime(rec!.chargeStartMs, tz)}-${formatLocalTime(rec!.chargeEndMs, tz)}, ready before ${readyBy}, adding ${formatKWh(quote.request.targetBatteryWh)} to the battery.`,
           `Ranking: ${e.rankingPolicy}`,
           ...rejected,
           PAYMENT_RULE,

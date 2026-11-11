@@ -29,7 +29,7 @@ Provider status progression, from the `.progress.json` steps (`at` is the time t
 | Capture or void | capture `COMPLETED` at 14:34:27.196Z (evidence: `authorizationMatches` true) | authorization `VOIDED` at 15:00:31.816Z (read back with GET after the void) |
 
 - The operations lists in the evidence files match the script's order: create order, poll order, authorize, then capture and read the capture (capture run) or void and read the authorization (void run).
-- Order status `CREATED` is not what the artifacts record. The B.7 table in `docs/EXTERNAL_PREFLIGHT.md` has been corrected to match.
+- Order status `CREATED` is not what the artifacts record.
 
 Request IDs: no artifact records a `PayPal-Request-Id`. The script derives IDs as `<ref>:CREATE_ORDER`, `:AUTHORIZE`, `:CAPTURE`, `:VOID` (`scripts/paypalSmokeFlow.ts`), and the header is set only when an ID is passed (`src/payments/paypalSandbox.ts:155`). The header values actually sent are NOT VERIFIED by these files.
 

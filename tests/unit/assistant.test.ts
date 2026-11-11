@@ -102,7 +102,7 @@ describe("reservation questions", () => {
   } as unknown as ReservationView;
 
   it("refuses payment-action claims from the model", async () => {
-    const llm = new ScriptedLlm(() => ok({ answer: "Done — I have refunded your payment.", inScope: true, statedPaymentState: "NONE" }));
+    const llm = new ScriptedLlm(() => ok({ answer: "Done, I have refunded your payment.", inScope: true, statedPaymentState: "NONE" }));
     const res = await answerReservationQuestion(llm, view, "Refund me now");
     expect(res).toMatchObject({ source: "DETERMINISTIC_FALLBACK", reason: "UNGROUNDED_OUTPUT" });
     expect(res.answer).toContain("AUTHORIZED");
@@ -138,7 +138,7 @@ describe("reservation questions", () => {
 
 describe("grounding check", () => {
   it("flags money not present in facts but allows exact figures, times and small counts", () => {
-    const allowed = allowedNumbers({ price: "$14.20", window: "01:00–05:30", energy: "30.00 kWh" });
+    const allowed = allowedNumbers({ price: "$14.20", window: "01:00-05:30", energy: "30.00 kWh" });
     expect(checkGrounding("Pay $14.20 for 30 kWh between 1:00 and 05:30 across 2 windows.", allowed)).toEqual([]);
     expect(checkGrounding("Pay $14.00.", allowed)).toEqual([{ kind: "UNGROUNDED_NUMBER", token: "$14.00" }]);
     expect(checkGrounding("The price is now free.", allowed)).toEqual([{ kind: "ACTION_CLAIM" }]);

@@ -36,7 +36,7 @@ export class Reservations {
    *
    * @returns The reservation
    *
-   * @throws {@link Reservations.GetReservationError} when the API answers with an error status —
+   * @throws {@link Reservations.GetReservationError} when the API answers with an error status - 
    * narrow on `err.payload.kind`
    *
    * @throws {@link GridWindowFlexPayApiError} when no usable response was produced: a connection

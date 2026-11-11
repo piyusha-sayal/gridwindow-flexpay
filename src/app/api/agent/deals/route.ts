@@ -6,7 +6,7 @@ import { getRuntime } from "@/server/runtime";
 
 /**
  * Read-only Flex Deal Agent: evaluates the caller's own stored quote against their goals and explains
- * the result. It writes nothing — no acceptance, terms, prices, payments or capacity change.
+ * the result. It writes nothing: no acceptance, terms, prices, payments or capacity change.
  */
 export const POST = handler(async (req: Request) => {
   await assertSameOrigin(req);

@@ -95,7 +95,7 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
       </section>
 
       <form onSubmit={onSubmit} noValidate aria-label="Your charging need" className="request-form">
-        <Row label={<label htmlFor="kwh">Energy<span className="sr-only"> into battery (kWh)</span></label>} hintId="targetBatteryKWh-hint" hint="Added to your battery, 0.01–120 kWh.">
+        <Row label={<label htmlFor="kwh">Energy<span className="sr-only"> into battery (kWh)</span></label>} hintId="targetBatteryKWh-hint" hint="Added to your battery, 0.01-120 kWh.">
           <div className="flex items-baseline gap-2">
             <input
               id="kwh"
