@@ -16,6 +16,7 @@ The agent can **find, compare and prepare** a deal. It can never **pay**.
 | Approve the payment in PayPal | **Driver only** (opens the returned `approveUrl`) | — |
 | Capture for delivered energy, or void | Server, from the energy ledger | — |
 | Check payment and charging state | Agent | `get_reservation_status` |
+| Find in-stock EV accessories (adapters, cables, organizers) across merchants, optionally under a budget | Agent (read-only, powered by [Channel3](https://trychannel3.com)) | `find_ev_gear` |
 
 Every server-side safeguard still applies, because the tools call the app's normal endpoints: same-origin checks, rate limits, offer expiry, terms-hash tamper checks, and provider read-back before anything is labelled paid or voided.
 

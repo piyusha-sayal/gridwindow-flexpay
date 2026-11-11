@@ -4996,3 +4996,46 @@ body::after {
     display: none;
   }
 }
+
+/* Channel3 gear cards (rewards page) */
+.gear-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-card-sm);
+  background: var(--surface);
+  transition: transform var(--dur-2) var(--ease-out-expo), box-shadow var(--dur-2);
+}
+.gear-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elev-1);
+}
+.gear-link {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 12px;
+  color: var(--ink);
+}
+.gear-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #fff;
+  border-radius: var(--r-sm);
+}
+.gear-title {
+  font-size: 14px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.gear-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 13px;
+  margin-top: auto;
+}

@@ -1,0 +1,230 @@
+# SDKs (/sdks)
+
+- [TypeScript](/sdks/typescript): [Download SDK](/__downloads/sdk/typescript.zip)
+- [Python](/sdks/python): [Download SDK](/__downloads/sdk/python.zip)
+
+# Python SDK (/sdks/python)
+
+[Download SDK](/__downloads/sdk/python.zip)
+
+## Intro [#intro]
+
+The GridWindow FlexPay API SDK provides access to the GridWindow FlexPay API REST APIs.
+
+The public driver API behind GridWindow FlexPay, plus the operator endpoints.
+
+**Flow.** A driver (or an AI agent acting for one, see `docs/MCP.md`) reads the site, requests priced offers,
+optionally asks the deal agent for a pick, then accepts one exact offer. Accepting creates a PayPal Orders v2
+**AUTHORIZE** order and returns an `approveUrl`; only the human buyer can approve it in PayPal. The server then
+authorizes, commits the charging slots, and later captures for delivered energy or voids. The client never sets a price
+and never moves money.
+
+**Sessions.** Driver identity is a signed `gw_drv` cookie created on the first quote. Operator endpoints need the
+`gw_op` cookie from `POST /api/operator/session`. Mutating requests must come from an allowed origin (`Origin` header).
+
+**Money.** All amounts are integer US cents. Payments are PayPal **Sandbox** (test money) or a labelled MOCK provider.
+
+## Installation [#installation]
+
+Add the SDK to your project from its folder, with whichever package manager your project uses. Give each tool a path containing a slash, such as `../grid-window-flex-pay-api` — a bare folder name is looked up on PyPI instead, and resolves to whatever project holds that name there:
+
+```bash
+pip install <path-to-sdk>
+```
+
+```bash
+uv add <path-to-sdk>
+```
+
+```bash
+poetry add <path-to-sdk>
+```
+
+## Quick Start [#quick-start]
+
+### Synchronous client [#synchronous-client]
+
+Construct `GridWindowFlexPayApiClient` with keyword arguments, and call `close()` when you are done. Every argument is optional.
+
+```python
+from grid_window_flex_pay_api import GridWindowFlexPayApiClient
+
+client = GridWindowFlexPayApiClient(operator_cookie="YOUR_API_KEY", environment="production")
+
+client.close()
+```
+
+Alternatively, scope it — `with GridWindowFlexPayApiClient(...) as client:` closes the pool on exit.
+
+### Asynchronous client [#asynchronous-client]
+
+`AsyncGridWindowFlexPayApiClient` mirrors `GridWindowFlexPayApiClient` with **identical method names**, and every endpoint method is a coroutine. It takes the same arguments, with some differences — for example, the transport argument is `custom_async_http_client`.
+
+```python
+from asyncio import run
+
+from grid_window_flex_pay_api import AsyncGridWindowFlexPayApiClient
+
+async def main() -> None:
+    client = AsyncGridWindowFlexPayApiClient(operator_cookie="YOUR_API_KEY", environment="production")
+    await client.aclose()
+
+run(main())
+```
+
+Alternatively, scope it — `async with AsyncGridWindowFlexPayApiClient(...) as client:` closes the pool on exit.
+
+# TypeScript SDK (/sdks/typescript)
+
+[Download SDK](/__downloads/sdk/typescript.zip)
+
+## Intro [#intro]
+
+The GridWindow FlexPay API SDK provides access to the GridWindow FlexPay API REST APIs.
+
+The public driver API behind GridWindow FlexPay, plus the operator endpoints.
+
+**Flow.** A driver (or an AI agent acting for one, see `docs/MCP.md`) reads the site, requests priced offers,
+optionally asks the deal agent for a pick, then accepts one exact offer. Accepting creates a PayPal Orders v2
+**AUTHORIZE** order and returns an `approveUrl`; only the human buyer can approve it in PayPal. The server then
+authorizes, commits the charging slots, and later captures for delivered energy or voids. The client never sets a price
+and never moves money.
+
+**Sessions.** Driver identity is a signed `gw_drv` cookie created on the first quote. Operator endpoints need the
+`gw_op` cookie from `POST /api/operator/session`. Mutating requests must come from an allowed origin (`Origin` header).
+
+**Money.** All amounts are integer US cents. Payments are PayPal **Sandbox** (test money) or a labelled MOCK provider.
+
+## Installation [#installation]
+
+The SDK compiles to `dist/` before it can be referenced — run its `build` script once in the SDK folder, then add it to your project by path:
+
+```bash
+npm install <path-to-sdk>
+```
+
+## Quick Start [#quick-start]
+
+Create one client and reuse it. Configure its behaviour through `ClientOptions`.
+
+```ts
+import { GridWindowFlexPayApiClient, ServerEnvironment } from "grid-window-flex-pay-api";
+
+const client = new GridWindowFlexPayApiClient({
+  serverEnvironment: ServerEnvironment.Production,
+  operatorCookie: "YOUR_API_KEY",
+});
+```
+
+Nothing in `ClientOptions` is required — `new GridWindowFlexPayApiClient()` compiles — and each option left out falls back to its default. `serverEnvironment` is spelled out above so the environment a call reaches is visible where the client is built rather than inherited silently.
+
+### From CommonJS [#from-commonjs]
+
+The package ships both dialects from a single entry, so `require` works with full types. In a TypeScript CommonJS file use the `import ... = require(...)` form — a plain destructuring `require` runs fine but gives you `any`.
+
+```ts
+import sdk = require("grid-window-flex-pay-api");
+
+const client = new sdk.GridWindowFlexPayApiClient({
+  serverEnvironment: sdk.ServerEnvironment.Production,
+  operatorCookie: "YOUR_API_KEY",
+});
+```
+
+# Station, ports, payment mode, AI status and the default charging window (/api/openapi/site/getSiteConfig)
+
+`GET /api/config`
+
+Station, ports, payment mode, AI status and the default charging window.
+
+# Turn a plain-language request into form fields (/api/openapi/ai/parseChargingRequest)
+
+`POST /api/quotes/parse`
+
+Fills a form only. It sets no price and approves nothing. Falls back to a labelled deterministic parser when no AI provider is available.
+
+# Ask the deal agent to pick one of the caller's offers for a goal (/api/openapi/ai/recommendOffer)
+
+`POST /api/agent/deals`
+
+Read-only. It evaluates only offers the backend already priced and never accepts or pays.
+
+# Explain one of the caller's offers in plain language (/api/openapi/ai/explainOffer)
+
+`POST /api/assist/explain`
+
+Numbers come from the stored quote; model text is checked against them before it is shown.
+
+# Ask a question about one of the caller's reservations (/api/openapi/ai/askAboutReservation)
+
+`POST /api/assist/ask`
+
+Ask a question about one of the caller's reservations.
+
+# Request priced charging offers for one port and night (/api/openapi/offers/requestOffers)
+
+`POST /api/quotes`
+
+Creates the driver session cookie if absent. Each offer carries exact terms and their SHA-256 `termsHash`, which accept must echo.
+
+# Accept one exact, unexpired offer and create the PayPal authorize order (/api/openapi/checkout/acceptOffer)
+
+`POST /api/offers/accept`
+
+Requires the driver's explicit consent (`consent: true`) and the `termsHash` the driver saw; tampered or expired
+terms are refused. Returns the PayPal approval link. Nothing is authorized or charged until the buyer approves in PayPal.
+
+
+# PayPal return URL. Authorizes the approved order, then redirects to the reservation (/api/openapi/checkout/checkoutReturn)
+
+`GET /api/checkout/return`
+
+PayPal return URL. Authorizes the approved order, then redirects to the reservation.
+
+# PayPal cancel URL. Cancels the pending order, then redirects to the reservation (/api/openapi/checkout/checkoutCancel)
+
+`GET /api/checkout/cancel`
+
+PayPal cancel URL. Cancels the pending order, then redirects to the reservation.
+
+# Reservations made in the caller's driver session (/api/openapi/reservations/listMyReservations)
+
+`GET /api/reservations`
+
+Reservations made in the caller's driver session.
+
+# One reservation with payment state, provider proofs and receipt data (/api/openapi/reservations/getReservation)
+
+`GET /api/reservations/{id}`
+
+One reservation with payment state, provider proofs and receipt data.
+
+# Whether the caller holds an operator session (/api/openapi/operator/getOperatorSession)
+
+`GET /api/operator/session`
+
+Whether the caller holds an operator session.
+
+# Sign in with the operator passphrase (/api/openapi/operator/operatorSignIn)
+
+`POST /api/operator/session`
+
+Sign in with the operator passphrase.
+
+# Sign out (/api/openapi/operator/operatorSignOut)
+
+`DELETE /api/operator/session`
+
+Sign out.
+
+# Every reservation of a night with load, ports and payment states (/api/openapi/operator/getOperatorDashboard)
+
+`GET /api/operator/dashboard`
+
+Every reservation of a night with load, ports and payment states.
+
+# PayPal Sandbox webhook receiver (/api/openapi/webhooks/paypalWebhook)
+
+`POST /api/webhooks/paypal`
+
+Verifies the PayPal signature against the unaltered body, then re-reads provider state. A webhook alone never marks a payment captured or voided.

@@ -158,4 +158,29 @@ server.registerTool(
   },
 );
 
+server.registerTool(
+  "find_ev_gear",
+  {
+    title: "Find EV charging accessories",
+    description:
+      "Searches in-stock EV accessories (adapters, cables, organizers, home chargers) across merchants through Channel3, optionally under a price cap. Read-only: returns merchant links; nothing is bought.",
+    inputSchema: {
+      query: z.string().max(200).optional(),
+      maxPriceCents: z.number().int().min(100).max(500_000).optional(),
+      limit: z.number().int().min(1).max(12).optional(),
+    },
+  },
+  async ({ query, maxPriceCents, limit }) => {
+    try {
+      const qs = new URLSearchParams();
+      if (query) qs.set("q", query);
+      if (maxPriceCents) qs.set("maxPriceCents", String(maxPriceCents));
+      if (limit) qs.set("limit", String(limit));
+      return text(await call(`/api/gear?${qs.toString()}`));
+    } catch (e) {
+      return fail(e);
+    }
+  },
+);
+
 await server.connect(new StdioServerTransport());
