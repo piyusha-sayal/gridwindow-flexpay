@@ -5,15 +5,18 @@ export type ApiOffersAcceptRequest = {
   quoteSetId: string;
   offerId: string;
   termsHash: string;
-  /** @default "True" */
-  consent?: "True";
+  /**
+   * Must be `true` (the driver's explicit consent to these exact terms); any other value is
+   * refused.
+   */
+  consent: boolean;
 };
 
 const apiOffersAcceptRequestProperties: s.Shape<ApiOffersAcceptRequest> = {
   quoteSetId: s.string(),
   offerId: s.string(),
   termsHash: s.string(),
-  consent: s.defaulted(s.literal("True"), "True"),
+  consent: s.boolean(),
 };
 
 export const apiOffersAcceptRequestInternalSchema: Schema<ApiOffersAcceptRequest> =

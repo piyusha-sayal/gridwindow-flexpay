@@ -43,7 +43,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: "#/components/schemas/AskResult"
         "404":
           $ref: "#/components/responses/NotFound"
       description: Ask a question about one of the caller's reservations.
@@ -59,7 +59,7 @@ paths:
                           question="some example string",
                       ),
                   )
-                  # TODO: Handle 'response' of type Any
+                  # TODO: Handle 'response' of type AskResult
               except ApiError as e:
                   # TODO: Handle 'e.error' of type
                   # AskAboutReservationErrorBody
@@ -75,7 +75,7 @@ paths:
                     question: "some example string",
                   },
                 });
-                // TODO: Handle 'response' of type Record<string, unknown>
+                // TODO: Handle 'response' of type AskResult
               } catch (err) {
                 // TODO: Handle 'err' of type AiApi.AskAboutReservationError, discriminated with 'err.payload.kind'
               }
@@ -86,14 +86,25 @@ components:
       in: cookie
       name: gw_op
       description: Signed operator session cookie set by POST /api/operator/session.
-  responses:
-    NotFound:
-      description: Not found (or not the caller's)
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
   schemas:
+    AskResult:
+      type: object
+      required:
+        - answer
+        - inScope
+        - source
+      properties:
+        answer:
+          type: string
+        inScope:
+          type: boolean
+          description: False when the question is outside what the assistant may answer
+        source:
+          $ref: "#/components/schemas/AiSourceKind"
+        model:
+          type: string
+        reason:
+          type: string
     Error:
       type: object
       required:
@@ -118,6 +129,20 @@ components:
               type: array
               items:
                 type: string
+    AiSourceKind:
+      type: string
+      description: Which produced the text. A deterministic fallback is never
+        presented as a model answer.
+      enum:
+        - MODEL
+        - DETERMINISTIC_FALLBACK
+  responses:
+    NotFound:
+      description: Not found (or not the caller's)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
 info:
   title: GridWindow FlexPay API
   version: 1.0.0

@@ -8,12 +8,12 @@ Accessor: `client.aiApi` · Source: `src/resources/ai-api.ts` · 4 operations ·
 
 ### askAboutReservation
 
-- **Signature**: `askAboutReservation(request: AiApi.AskAboutReservationRequest, options?: RequestOptions): ApiPromise<Record<string, unknown>, AiApi.AskAboutReservationError>`
+- **Signature**: `askAboutReservation(request: AiApi.AskAboutReservationRequest, options?: RequestOptions): ApiPromise<AskResult, AiApi.AskAboutReservationError>`
 - **Wire**: `POST /api/assist/ask`
 - **Auth**: none — public; no credential is sent
 - **Request body**: `application/json` — the `body` field
 - **SDK-sent**: `header Idempotency-Key` (minted per call)
-- **Returns**: `Record<string, unknown>` — a bare `application/json` map; the success type *is* the map
+- **Returns**: `AskResult`
 - **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.AskAboutReservationError` — **typed arms**, narrowed on `err.payload.kind`
 - **Error arms**: `"error"` [404] `Error` · `"undeclared"` [any other] `rawBody: ArrayBuffer`
 
@@ -26,16 +26,17 @@ Accessor: `client.aiApi` · Source: `src/resources/ai-api.ts` · 4 operations ·
 | Type | Schema value | Source |
 | --- | --- | --- |
 | `ApiAssistAskRequest` | `apiAssistAskRequestSchema` | `src/models/api-assist-ask-request.ts` |
+| `AskResult` | `askResultSchema` | `src/models/ask-result.ts` |
 | `Error` | `errorSchema` | `src/models/error.ts` |
 
 ### explainOffer
 
-- **Signature**: `explainOffer(request: AiApi.ExplainOfferRequest, options?: RequestOptions): ApiPromise<Record<string, unknown>, AiApi.ExplainOfferError>`
+- **Signature**: `explainOffer(request: AiApi.ExplainOfferRequest, options?: RequestOptions): ApiPromise<ExplainResult, AiApi.ExplainOfferError>`
 - **Wire**: `POST /api/assist/explain`
 - **Auth**: none — public; no credential is sent
 - **Request body**: `application/json` — the `body` field
 - **SDK-sent**: `header Idempotency-Key` (minted per call)
-- **Returns**: `Record<string, unknown>` — a bare `application/json` map; the success type *is* the map
+- **Returns**: `ExplainResult`
 - **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `AiApi.ExplainOfferError` — **typed arms**, narrowed on `err.payload.kind`
 - **Error arms**: `"error"` [404] `Error` · `"undeclared"` [any other] `rawBody: ArrayBuffer`
 
@@ -48,6 +49,7 @@ Accessor: `client.aiApi` · Source: `src/resources/ai-api.ts` · 4 operations ·
 | Type | Schema value | Source |
 | --- | --- | --- |
 | `ApiAssistExplainRequest` | `apiAssistExplainRequestSchema` | `src/models/api-assist-explain-request.ts` |
+| `ExplainResult` | `explainResultSchema` | `src/models/explain-result.ts` |
 | `Error` | `errorSchema` | `src/models/error.ts` |
 
 ### parseChargingRequest

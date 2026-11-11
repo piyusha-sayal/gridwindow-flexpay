@@ -199,7 +199,7 @@ if (result.ok) {
 > Source: [AiApi](src/resources/ai-api.ts)
 
 <details>
-<summary><code>askAboutReservation(request: AiApi.AskAboutReservationRequest, options?: RequestOptions): ApiPromise&lt;Record&lt;string, unknown&gt;, AiApi.AskAboutReservationError&gt;</code></summary>
+<summary><code>askAboutReservation(request: AiApi.AskAboutReservationRequest, options?: RequestOptions): ApiPromise&lt;AskResult, AiApi.AskAboutReservationError&gt;</code></summary>
 
 <dl>
 <dd>
@@ -224,7 +224,7 @@ try {
   const response = await client.aiApi.askAboutReservation({
     body: { reservationId: "some example string", question: "some example string" },
   });
-  // TODO: Handle 'response' of type Record<string, unknown>
+  // TODO: Handle 'response' of type AskResult
 } catch (err) {
   // TODO: Handle 'err' of type AiApi.AskAboutReservationError, discriminated with 'err.payload.kind'
 }
@@ -244,7 +244,7 @@ const result = await client.aiApi
   .asApiResult();
 // TODO: Use 'result.status' and 'result.headers' to read the raw response status and headers
 if (result.ok) {
-  // TODO: Use 'result.value' of type Record<string, unknown>
+  // TODO: Use 'result.value' of type AskResult
 } else {
   // TODO: Handle 'result', discriminated with 'result.payload.kind'
 }
@@ -272,12 +272,12 @@ if (result.ok) {
 
 **Direct**: `await client.aiApi.askAboutReservation(request)`
 
-- **OnSuccess**: <code>Record&lt;string, unknown&gt;</code>
+- **OnSuccess**: <code>[AskResult](src/models/ask-result.ts)</code>
 - **OnError**: throws <code>[AiApi.AskAboutReservationError](src/resources/ai-api.ts)</code>, with `err.payload` discriminated on `kind`
 
 **As ApiResult**: `await client.aiApi.askAboutReservation(request).asApiResult()`
 
-- **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;Record&lt;string, unknown&gt;, AiApi.AskAboutReservationError&gt;</code>, with `result.value` of type <code>Record&lt;string, unknown&gt;</code>
+- **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;AskResult, AiApi.AskAboutReservationError&gt;</code>, with `result.value` of type <code>[AskResult](src/models/ask-result.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
 **Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
@@ -291,7 +291,7 @@ if (result.ok) {
 </details>
 
 <details>
-<summary><code>explainOffer(request: AiApi.ExplainOfferRequest, options?: RequestOptions): ApiPromise&lt;Record&lt;string, unknown&gt;, AiApi.ExplainOfferError&gt;</code></summary>
+<summary><code>explainOffer(request: AiApi.ExplainOfferRequest, options?: RequestOptions): ApiPromise&lt;ExplainResult, AiApi.ExplainOfferError&gt;</code></summary>
 
 <dl>
 <dd>
@@ -316,7 +316,7 @@ try {
   const response = await client.aiApi.explainOffer({
     body: { quoteSetId: "some example string", offerId: "some example string" },
   });
-  // TODO: Handle 'response' of type Record<string, unknown>
+  // TODO: Handle 'response' of type ExplainResult
 } catch (err) {
   // TODO: Handle 'err' of type AiApi.ExplainOfferError, discriminated with 'err.payload.kind'
 }
@@ -336,7 +336,7 @@ const result = await client.aiApi
   .asApiResult();
 // TODO: Use 'result.status' and 'result.headers' to read the raw response status and headers
 if (result.ok) {
-  // TODO: Use 'result.value' of type Record<string, unknown>
+  // TODO: Use 'result.value' of type ExplainResult
 } else {
   // TODO: Handle 'result', discriminated with 'result.payload.kind'
 }
@@ -364,12 +364,12 @@ if (result.ok) {
 
 **Direct**: `await client.aiApi.explainOffer(request)`
 
-- **OnSuccess**: <code>Record&lt;string, unknown&gt;</code>
+- **OnSuccess**: <code>[ExplainResult](src/models/explain-result.ts)</code>
 - **OnError**: throws <code>[AiApi.ExplainOfferError](src/resources/ai-api.ts)</code>, with `err.payload` discriminated on `kind`
 
 **As ApiResult**: `await client.aiApi.explainOffer(request).asApiResult()`
 
-- **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;Record&lt;string, unknown&gt;, AiApi.ExplainOfferError&gt;</code>, with `result.value` of type <code>Record&lt;string, unknown&gt;</code>
+- **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ExplainResult, AiApi.ExplainOfferError&gt;</code>, with `result.value` of type <code>[ExplainResult](src/models/explain-result.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
 **Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
@@ -600,6 +600,7 @@ try {
       quoteSetId: "some example string",
       offerId: "some example string",
       termsHash: "some example string",
+      consent: true,
     },
   });
   // TODO: Handle 'response' of type ApiOffersAcceptResponse
@@ -623,6 +624,7 @@ const result = await client.checkout
       quoteSetId: "some example string",
       offerId: "some example string",
       termsHash: "some example string",
+      consent: true,
     },
   })
   .asApiResult();
@@ -1196,7 +1198,7 @@ if (result.ok) {
 </details>
 
 <details>
-<summary><code>operatorSignIn(request: Operator.OperatorSignInRequest, options?: RequestOptions): ApiPromise&lt;undefined, Operator.OperatorSignInError&gt;</code></summary>
+<summary><code>operatorSignIn(request: Operator.OperatorSignInRequest, options?: RequestOptions): ApiPromise&lt;OperatorSessionState, Operator.OperatorSignInError&gt;</code></summary>
 
 <dl>
 <dd>
@@ -1218,7 +1220,8 @@ Sign in with the operator passphrase.
 
 ```ts
 try {
-  await client.operator.operatorSignIn({ body: { passphrase: "some example string" } });
+  const response = await client.operator.operatorSignIn({ body: { passphrase: "some example string" } });
+  // TODO: Handle 'response' of type OperatorSessionState
 } catch (err) {
   // TODO: Handle 'err' of type Operator.OperatorSignInError, discriminated with 'err.payload.kind'
 }
@@ -1238,7 +1241,7 @@ const result = await client.operator
   .asApiResult();
 // TODO: Use 'result.status' and 'result.headers' to read the raw response status and headers
 if (result.ok) {
-  // TODO: The call succeeded and resolves to no body
+  // TODO: Use 'result.value' of type OperatorSessionState
 } else {
   // TODO: Handle 'result', discriminated with 'result.payload.kind'
 }
@@ -1266,12 +1269,12 @@ if (result.ok) {
 
 **Direct**: `await client.operator.operatorSignIn(request)`
 
-- **OnSuccess**: <code>undefined</code>
+- **OnSuccess**: <code>[OperatorSessionState](src/models/operator-session-state.ts)</code>
 - **OnError**: throws <code>[Operator.OperatorSignInError](src/resources/operator.ts)</code>, with `err.payload` discriminated on `kind`
 
 **As ApiResult**: `await client.operator.operatorSignIn(request).asApiResult()`
 
-- **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;undefined, Operator.OperatorSignInError&gt;</code>, with `result.value` of type <code>undefined</code>
+- **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;OperatorSessionState, Operator.OperatorSignInError&gt;</code>, with `result.value` of type <code>[OperatorSessionState](src/models/operator-session-state.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
 **Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
@@ -1285,7 +1288,7 @@ if (result.ok) {
 </details>
 
 <details>
-<summary><code>operatorSignOut(options?: RequestOptions): ApiPromise&lt;undefined, ApiError&gt;</code></summary>
+<summary><code>operatorSignOut(options?: RequestOptions): ApiPromise&lt;OperatorSessionState, ApiError&gt;</code></summary>
 
 <dl>
 <dd>
@@ -1307,7 +1310,8 @@ Sign out.
 
 ```ts
 try {
-  await client.operator.operatorSignOut();
+  const response = await client.operator.operatorSignOut();
+  // TODO: Handle 'response' of type OperatorSessionState
 } catch (err) {
   // TODO: Handle 'err' of type ApiError, where 'err.payload' is always the Undeclared arm
 }
@@ -1325,7 +1329,7 @@ try {
 const result = await client.operator.operatorSignOut().asApiResult();
 // TODO: Use 'result.status' and 'result.headers' to read the raw response status and headers
 if (result.ok) {
-  // TODO: The call succeeded and resolves to no body
+  // TODO: Use 'result.value' of type OperatorSessionState
 } else {
   // TODO: Handle 'result', where 'result.payload' is always the Undeclared arm
 }
@@ -1341,12 +1345,12 @@ if (result.ok) {
 
 **Direct**: `await client.operator.operatorSignOut()`
 
-- **OnSuccess**: <code>undefined</code>
+- **OnSuccess**: <code>[OperatorSessionState](src/models/operator-session-state.ts)</code>
 - **OnError**: throws <code>[ApiError](src/core/api-error.ts)</code>, with `err.payload` always the <code>[Undeclared](src/core/api-error.ts)</code> arm
 
 **As ApiResult**: `await client.operator.operatorSignOut().asApiResult()`
 
-- **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;undefined, ApiError&gt;</code>, with `result.value` of type <code>undefined</code>
+- **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;OperatorSessionState, ApiError&gt;</code>, with `result.value` of type <code>[OperatorSessionState](src/models/operator-session-state.ts)</code>
 - **OnError**: `result.payload` always the <code>[Undeclared](src/core/api-error.ts)</code> arm, with `result.message`
 
 **Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw

@@ -15,6 +15,7 @@ export { Webhooks } from "./resources/webhooks.js";
 export { Gear } from "./resources/gear.js";
 
 export { aiSchema, type Ai } from "./models/ai.js";
+export { AiSourceKind, aiSourceKindSchema } from "./models/ai-source-kind.js";
 export { apiAgentDealsRequestSchema, type ApiAgentDealsRequest } from "./models/api-agent-deals-request.js";
 export { apiAssistAskRequestSchema, type ApiAssistAskRequest } from "./models/api-assist-ask-request.js";
 export {
@@ -51,6 +52,7 @@ export {
   apiReservationsResponse1Schema,
   type ApiReservationsResponse1,
 } from "./models/api-reservations-response1.js";
+export { askResultSchema, type AskResult } from "./models/ask-result.js";
 export { Currency, currencySchema } from "./models/currency.js";
 export { dealResultSchema, type DealResult } from "./models/deal-result.js";
 export { economicsSchema, type Economics } from "./models/economics.js";
@@ -58,9 +60,11 @@ export { errorSchema, type Error } from "./models/error.js";
 export { error1Schema, type Error1 } from "./models/error1.js";
 export { errorErrorSchema, type ErrorError } from "./models/error-error.js";
 export { evaluationSchema, type Evaluation } from "./models/evaluation.js";
+export { explainResultSchema, type ExplainResult } from "./models/explain-result.js";
 export { itemSchema, type Item } from "./models/item.js";
 export { Kind, kindSchema } from "./models/kind.js";
 export { offerTermsSchema, type OfferTerms } from "./models/offer-terms.js";
+export { operatorSessionStateSchema, type OperatorSessionState } from "./models/operator-session-state.js";
 export { parseResultSchema, type ParseResult } from "./models/parse-result.js";
 export { PaymentState, paymentStateSchema } from "./models/payment-state.js";
 export { Preference, preferenceSchema } from "./models/preference.js";
