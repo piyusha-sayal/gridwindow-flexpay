@@ -13,6 +13,16 @@ import { classifyHttpStatus, providerStatusWord, type LlmDiagnostic, type LlmFai
  */
 export const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
 const TIMEOUT_MS = 20_000;
+
+/**
+ * Deadline given to the SDK client. The SDK sends it to Google as `X-Server-Timeout` (whole seconds), and the Gemini API
+ * answers a short deadline with HTTP 400 INVALID_ARGUMENT: measured 2026-11-11, `X-Server-Timeout: 8` rejected in 0.3 s,
+ * 20 accepted. This adapter enforces its own (possibly shorter) timeout with the AbortController in `generate`, so the
+ * server deadline only has to be valid; it is never set below TIMEOUT_MS.
+ */
+export function serverDeadlineMs(adapterTimeoutMs: number): number {
+  return Math.max(adapterTimeoutMs, TIMEOUT_MS);
+}
 /** Gemini counts thinking tokens against the output limit; headroom keeps a short answer from being cut off. */
 const THINKING_HEADROOM_TOKENS = 1_024;
 /** Finish reasons meaning the provider declined to answer (anything else except STOP is a truncated or unusable output). */
@@ -40,7 +50,7 @@ export class GeminiLlm implements StructuredLlm {
     if (transport.generate) {
       this.generateContent = transport.generate;
     } else {
-      const client = new GoogleGenAI({ apiKey, httpOptions: { timeout: this.timeoutMs, retryOptions: { attempts: 1 } } });
+      const client = new GoogleGenAI({ apiKey, httpOptions: { timeout: serverDeadlineMs(this.timeoutMs), retryOptions: { attempts: 1 } } });
       this.generateContent = (params) => client.models.generateContent(params);
     }
   }
