@@ -23,6 +23,11 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-PGlite%20%2F%20Server-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![PayPal](https://img.shields.io/badge/PayPal-Sandbox-003087?logo=paypal&logoColor=white)](docs/EVIDENCE.md)
 [![MIT](https://img.shields.io/badge/License-MIT-16A34A)](LICENSE)
+[![CI](https://github.com/piyusha-sayal/gridwindow-flexpay/actions/workflows/ci.yml/badge.svg)](https://github.com/piyusha-sayal/gridwindow-flexpay/actions/workflows/ci.yml)
+
+**[▶ Live demo](https://gridwindow-flexpay.onrender.com)** · **[API portal (APIMatic)](https://gridwindow-flexpay-developers.onrender.com)** · **[Let your AI agent book a charge (MCP)](docs/MCP.md)**
+
+<sub>Free-tier hosting: the first load after a quiet period takes about 30 to 60 seconds. Payments are PayPal Sandbox (test money).</sub>
 
 <br />
 
