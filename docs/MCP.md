@@ -27,21 +27,37 @@ npm run dev                      # the app, on http://localhost:3000
 npm run mcp:smoke                # walks the whole agent flow and prints the PayPal approval link
 ```
 
-### Claude Desktop / Claude Code
+### Connect your AI client (Claude Desktop, Cursor, Claude Code)
+
+You don't need to run the app. Clone the repository, run `npm ci` once, and point the server at the hosted site.
+
+For Claude Desktop (`claude_desktop_config.json`) or Cursor (`mcp.json`), use absolute paths. Some clients ignore a `cwd` setting and start servers from an unrelated folder, so a relative path or a bare `npx tsx` may fail to start:
 
 ```json
 {
   "mcpServers": {
     "gridwindow-flexpay": {
-      "command": "npx",
-      "args": ["tsx", "scripts/mcp-server.ts"],
-      "cwd": "/path/to/gridwindow-flexpay",
-      "env": { "GRIDWINDOW_URL": "http://localhost:3000" }
+      "command": "node",
+      "args": [
+        "/ABSOLUTE/PATH/gridwindow-flexpay/node_modules/tsx/dist/cli.mjs",
+        "/ABSOLUTE/PATH/gridwindow-flexpay/scripts/mcp-server.ts"
+      ],
+      "env": { "GRIDWINDOW_URL": "https://gridwindow-flexpay.onrender.com" }
     }
   }
 }
 ```
 
-Point `GRIDWINDOW_URL` at a deployed instance to shop against it instead. If that instance enforces an origin allow-list, its own URL is what the server sends.
+For Claude Code:
+
+```bash
+claude mcp add gridwindow-flexpay -e GRIDWINDOW_URL=https://gridwindow-flexpay.onrender.com -- node /ABSOLUTE/PATH/gridwindow-flexpay/node_modules/tsx/dist/cli.mjs /ABSOLUTE/PATH/gridwindow-flexpay/scripts/mcp-server.ts
+```
+
+On Windows, write the paths with forward slashes, for example `C:/Users/you/gridwindow-flexpay/scripts/mcp-server.ts`. Restart the client after changing its config.
+
+To shop against your own local copy instead, start the app and set `GRIDWINDOW_URL` to `http://localhost:3000`. If an instance enforces an origin allow-list, its own URL is what the server sends.
+
+On the hosted site, payments are PayPal Sandbox. When you approve a checkout link, log in with a PayPal Sandbox personal (buyer) account.
 
 Then ask the agent, for example: *"Book me 25 kWh at the depot tonight, ready by 7 AM, under $20, cheapest option."* It will return offers, explain its pick and hand you a PayPal link to approve.
