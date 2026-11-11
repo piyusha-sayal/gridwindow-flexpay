@@ -1,0 +1,11 @@
+{
+  "$schema": "https://cdn.jsdelivr.net/npm/@apimatic/cli@2/apimatic.schema.json",
+  "schemaVersion": 1,
+  "portal": {
+    "site": {},
+    "brand": { "colors": {}, "colorMode": "light" },
+    "navigation": { "links": [] },
+    "ai": { "pageActions": true }
+  },
+  "languages": { "typescript": {}, "python": {} }
+}

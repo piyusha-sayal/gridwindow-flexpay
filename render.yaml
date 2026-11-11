@@ -37,10 +37,21 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: AI_PROVIDER
-        sync: false
+        value: gemini
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
+        value: gemini-3.6-flash
+      - key: CHANNEL3_API_KEY
         sync: false
       - key: DEMO_TOOLS
         value: "true"
+
+  # APIMatic-generated developer portal for the GridWindow API (static files, free static site, no secrets).
+  - type: web
+    name: gridwindow-flexpay-developers
+    runtime: static
+    branch: main
+    buildCommand: echo "prebuilt APIMatic portal"
+    staticPublishPath: ./apimatic/portal
+    autoDeploy: true

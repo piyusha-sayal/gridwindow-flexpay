@@ -1,0 +1,873 @@
+openapi: 3.1.0
+info:
+  title: GridWindow FlexPay API
+  version: 1.0.0
+  summary: Consented flexible overnight EV charging, settled with PayPal (authorize, then capture or void from delivered energy).
+  description: |
+    The public driver API behind GridWindow FlexPay, plus the operator endpoints.
+
+    **Flow.** A driver (or an AI agent acting for one, see `docs/MCP.md`) reads the site, requests priced offers,
+    optionally asks the deal agent for a pick, then accepts one exact offer. Accepting creates a PayPal Orders v2
+    **AUTHORIZE** order and returns an `approveUrl`; only the human buyer can approve it in PayPal. The server then
+    authorizes, commits the charging slots, and later captures for delivered energy or voids. The client never sets a price
+    and never moves money.
+
+    **Sessions.** Driver identity is a signed `gw_drv` cookie created on the first quote. Operator endpoints need the
+    `gw_op` cookie from `POST /api/operator/session`. Mutating requests must come from an allowed origin (`Origin` header).
+
+    **Money.** All amounts are integer US cents. Payments are PayPal **Sandbox** (test money) or a labelled MOCK provider.
+  license:
+    name: See LICENSE
+  contact:
+    name: GridWindow FlexPay team
+    url: https://github.com/piyusha-sayal/gridwindow-flexpay
+servers:
+  - url: https://gridwindow-flexpay.onrender.com
+    description: Hosted demo (Render free tier; the first request after idle wakes the service)
+  - url: http://localhost:3000
+    description: Local development
+tags:
+  - name: Site
+    description: Station, ports and payment mode
+  - name: Offers
+    description: Priced charging offers with exact terms
+  - name: AI
+    description: Plain-language parsing, explanations and the deal agent (never sets prices or moves money)
+  - name: Checkout
+    description: Accepting an offer and the PayPal approval round trip
+  - name: Reservations
+    description: Reservation, payment state and provider proofs
+  - name: Operator
+    description: Operator session and night dashboard
+  - name: Webhooks
+    description: PayPal Sandbox webhooks
+paths:
+  /api/config:
+    get:
+      tags:
+        - Site
+      operationId: getSiteConfig
+      summary: Station, ports, payment mode, AI status and the default charging window
+      responses:
+        '200':
+          description: Site configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteConfig'
+      description: Station, ports, payment mode, AI status and the default charging window.
+  /api/quotes/parse:
+    post:
+      tags:
+        - AI
+      operationId: parseChargingRequest
+      summary: Turn a plain-language request into form fields
+      description: >-
+        Fills a form only. It sets no price and approves nothing. Falls back to a labelled deterministic parser when no AI provider is
+        available.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  maxLength: 1000
+                  examples:
+                    - Find me 30 kWh before 7 AM and save at least $4
+      responses:
+        '200':
+          description: Parsed fields and their source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParseResult'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /api/quotes:
+    post:
+      tags:
+        - Offers
+      operationId: requestOffers
+      summary: Request priced charging offers for one port and night
+      description: Creates the driver session cookie if absent. Each offer carries exact terms and their SHA-256 `termsHash`, which accept must echo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequest'
+      responses:
+        '200':
+          description: The quote set
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - quote
+                properties:
+                  quote:
+                    $ref: '#/components/schemas/QuoteSet'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/BadOrigin'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /api/agent/deals:
+    post:
+      tags:
+        - AI
+      operationId: recommendOffer
+      summary: Ask the deal agent to pick one of the caller's offers for a goal
+      description: Read-only. It evaluates only offers the backend already priced and never accepts or pays.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - quoteSetId
+                - minSavingsCents
+                - preference
+              properties:
+                quoteSetId:
+                  type: string
+                  maxLength: 64
+                minSavingsCents:
+                  type:
+                    - integer
+                    - 'null'
+                  minimum: 1
+                  maximum: 50000
+                preference:
+                  type: string
+                  enum:
+                    - lowest_cost
+                    - early_finish
+                    - gentle
+      responses:
+        '200':
+          description: The recommendation and the evaluation behind it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/assist/explain:
+    post:
+      tags:
+        - AI
+      operationId: explainOffer
+      summary: Explain one of the caller's offers in plain language
+      description: Numbers come from the stored quote; model text is checked against them before it is shown.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - quoteSetId
+                - offerId
+              properties:
+                quoteSetId:
+                  type: string
+                  maxLength: 64
+                offerId:
+                  type: string
+                  maxLength: 128
+      responses:
+        '200':
+          description: Explanation and its source
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/assist/ask:
+    post:
+      tags:
+        - AI
+      operationId: askAboutReservation
+      summary: Ask a question about one of the caller's reservations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - reservationId
+                - question
+              properties:
+                reservationId:
+                  type: string
+                  maxLength: 64
+                question:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+      responses:
+        '200':
+          description: Grounded answer and its source
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          $ref: '#/components/responses/NotFound'
+      description: Ask a question about one of the caller's reservations.
+  /api/offers/accept:
+    post:
+      tags:
+        - Checkout
+      operationId: acceptOffer
+      summary: Accept one exact, unexpired offer and create the PayPal authorize order
+      description: |
+        Requires the driver's explicit consent (`consent: true`) and the `termsHash` the driver saw; tampered or expired
+        terms are refused. Returns the PayPal approval link. Nothing is authorized or charged until the buyer approves in PayPal.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - quoteSetId
+                - offerId
+                - termsHash
+                - consent
+              properties:
+                quoteSetId:
+                  type: string
+                  maxLength: 64
+                offerId:
+                  type: string
+                  maxLength: 128
+                termsHash:
+                  type: string
+                  pattern: ^[0-9a-f]{64}$
+                consent:
+                  type: boolean
+                  const: true
+      responses:
+        '200':
+          description: Reservation created, waiting for buyer approval
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - reservationId
+                  - approveUrl
+                  - providerMode
+                properties:
+                  reservationId:
+                    type: string
+                  approveUrl:
+                    type: string
+                    description: PayPal Sandbox checkout URL, or the in-app MOCK approval page
+                  providerMode:
+                    $ref: '#/components/schemas/ProviderMode'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/checkout/return:
+    get:
+      tags:
+        - Checkout
+      operationId: checkoutReturn
+      summary: PayPal return URL. Authorizes the approved order, then redirects to the reservation
+      parameters:
+        - name: rid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Signed anti-forgery state
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: PayPal order id
+      responses:
+        '303':
+          description: Redirect to the reservation page
+      description: PayPal return URL. Authorizes the approved order, then redirects to the reservation.
+  /api/checkout/cancel:
+    get:
+      tags:
+        - Checkout
+      operationId: checkoutCancel
+      summary: PayPal cancel URL. Cancels the pending order, then redirects to the reservation
+      parameters:
+        - name: rid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '303':
+          description: Redirect to the reservation page
+      description: PayPal cancel URL. Cancels the pending order, then redirects to the reservation.
+  /api/reservations:
+    get:
+      tags:
+        - Reservations
+      operationId: listMyReservations
+      summary: Reservations made in the caller's driver session
+      responses:
+        '200':
+          description: The caller's reservations (empty without a session)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservationView'
+      description: Reservations made in the caller's driver session.
+  /api/reservations/{id}:
+    get:
+      tags:
+        - Reservations
+      operationId: getReservation
+      summary: One reservation with payment state, provider proofs and receipt data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The reservation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservation:
+                    $ref: '#/components/schemas/ReservationView'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      description: One reservation with payment state, provider proofs and receipt data.
+  /api/operator/session:
+    get:
+      tags:
+        - Operator
+      operationId: getOperatorSession
+      summary: Whether the caller holds an operator session
+      responses:
+        '200':
+          description: Session state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  operator:
+                    type: boolean
+      description: Whether the caller holds an operator session.
+    post:
+      tags:
+        - Operator
+      operationId: operatorSignIn
+      summary: Sign in with the operator passphrase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - passphrase
+              properties:
+                passphrase:
+                  type: string
+                  minLength: 1
+                  maxLength: 256
+      responses:
+        '200':
+          description: Signed in; sets the operator cookie
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      description: Sign in with the operator passphrase.
+    delete:
+      tags:
+        - Operator
+      operationId: operatorSignOut
+      summary: Sign out
+      responses:
+        '200':
+          description: Signed out
+      description: Sign out.
+  /api/operator/dashboard:
+    get:
+      tags:
+        - Operator
+      operationId: getOperatorDashboard
+      summary: Every reservation of a night with load, ports and payment states
+      security:
+        - operatorCookie: []
+      parameters:
+        - name: nightOf
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d{4}-\d{2}-\d{2}$
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      description: Every reservation of a night with load, ports and payment states.
+  /api/webhooks/paypal:
+    post:
+      tags:
+        - Webhooks
+      operationId: paypalWebhook
+      summary: PayPal Sandbox webhook receiver
+      description: >-
+        Verifies the PayPal signature against the unaltered body, then re-reads provider state. A webhook alone never marks a payment
+        captured or voided.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Accepted
+        '400':
+          description: Signature verification failed
+components:
+  securitySchemes:
+    operatorCookie:
+      type: apiKey
+      in: cookie
+      name: gw_op
+      description: Signed operator session cookie set by POST /api/operator/session.
+  responses:
+    ValidationError:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadOrigin:
+      description: Request origin not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found (or not the caller's)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: The request conflicts with current state (expired offer, terms mismatch, already accepted, ...)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Operator session required or passphrase wrong
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              examples:
+                - QUOTE_EXPIRED
+                - TERMS_MISMATCH
+                - VALIDATION_ERROR
+                - BAD_ORIGIN
+            message:
+              type: string
+            fields:
+              type: array
+              items:
+                type: string
+    ProviderMode:
+      type: string
+      enum:
+        - PAYPAL_SANDBOX
+        - MOCK
+    PaymentState:
+      type: string
+      enum:
+        - QUOTE_ACCEPTED
+        - ORDER_CREATED
+        - BUYER_APPROVED
+        - AUTHORIZED
+        - CAPTURE_PENDING
+        - CAPTURED
+        - CAPTURE_DECLINED
+        - VOIDED
+        - CANCELLED
+        - FAILED
+        - NEEDS_RECONCILIATION
+    ServiceState:
+      type: string
+      enum:
+        - AWAITING_PAYMENT
+        - SCHEDULED
+        - DELIVERED
+        - FAILED
+        - CANCELLED
+    SiteConfig:
+      type: object
+      properties:
+        providerMode:
+          $ref: '#/components/schemas/ProviderMode'
+        station:
+          type: object
+          properties:
+            name:
+              type: string
+            timeZone:
+              type: string
+              examples:
+                - America/Los_Angeles
+            stationCapW:
+              type: integer
+            ports:
+              type: array
+              items:
+                type: object
+        ai:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            model:
+              type:
+                - string
+                - 'null'
+        defaultNightOf:
+          type: string
+          format: date
+        defaultPlugInLocal:
+          type: string
+          pattern: ^\d{2}:\d{2}$
+        defaultDepartLocal:
+          type: string
+          pattern: ^\d{2}:\d{2}$
+    ParseResult:
+      type: object
+      properties:
+        parsed:
+          type: object
+          description: 'Fields to pre-fill: targetBatteryKWh, departLocal, minSavingsCents, preference, notes'
+        source:
+          type: string
+          examples:
+            - MODEL
+            - DETERMINISTIC_FALLBACK
+        reason:
+          type: string
+    QuoteRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - portId
+        - nightOf
+        - plugInLocal
+        - departLocal
+        - targetBatteryKWh
+        - spendCapCents
+      properties:
+        portId:
+          type: string
+          maxLength: 32
+        nightOf:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        plugInLocal:
+          type: string
+          pattern: ^\d{2}:\d{2}$
+          description: Station-local time
+        departLocal:
+          type: string
+          pattern: ^\d{2}:\d{2}$
+          description: Station-local ready-by time (next morning)
+        targetBatteryKWh:
+          type: number
+          maximum: 120
+          description: At most 2 decimals
+          minimum: 0.01
+        spendCapCents:
+          type: integer
+          minimum: 100
+          maximum: 50000
+        requiredMinSavingsCents:
+          type: integer
+          minimum: 1
+          maximum: 50000
+          description: Mandatory minimum saving versus immediate charging; accept refuses offers that save less
+    OfferTerms:
+      type: object
+      description: The exact agreement. `termsHash` is the SHA-256 of its canonical JSON.
+      properties:
+        version:
+          type: string
+        quoteSetId:
+          type: string
+        offerId:
+          type: string
+        stationId:
+          type: string
+        merchantRef:
+          type: string
+        portId:
+          type: string
+        currency:
+          type: string
+          const: USD
+        amountCents:
+          type: integer
+        listPriceCents:
+          type: integer
+        targetBatteryWh:
+          type: integer
+        plugInMs:
+          type: integer
+        departMs:
+          type: integer
+        gridStartMs:
+          type: integer
+        powerW:
+          type: array
+          items:
+            type: integer
+          description: Planned charging power per quarter-hour slot
+        expiresAtMs:
+          type: integer
+    PricedOffer:
+      type: object
+      properties:
+        offerId:
+          type: string
+        kind:
+          type: string
+          enum:
+            - flex_lowest_cost
+            - flex_early_finish
+            - flex_gentle
+        label:
+          type: string
+        chargeStartMs:
+          type: integer
+        chargeEndMs:
+          type: integer
+        listPriceCents:
+          type: integer
+        priceCents:
+          type: integer
+        discountCents:
+          type: integer
+        energyCostCents:
+          type: integer
+        operatorImprovementCents:
+          type: integer
+        powerW:
+          type: array
+          items:
+            type: integer
+        terms:
+          $ref: '#/components/schemas/OfferTerms'
+        termsHash:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+    QuoteSet:
+      type: object
+      properties:
+        quoteSetId:
+          type: string
+        stationId:
+          type: string
+        createdAtMs:
+          type: integer
+        expiresAtMs:
+          type: integer
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricedOffer'
+        rejected:
+          type: array
+          items:
+            type: object
+            properties:
+              kind:
+                type: string
+              reason:
+                type: string
+        baseline:
+          type: object
+          description: Immediate-charging comparison
+        assumptions:
+          type: object
+          description: Tariff, economics and forecast labels; provenance is SYNTHETIC
+        requiredMinSavingsCents:
+          type:
+            - integer
+            - 'null'
+    DealResult:
+      type: object
+      properties:
+        evaluation:
+          type: object
+          properties:
+            status:
+              type: string
+              examples:
+                - RECOMMENDED
+                - NO_OFFERS
+            recommendedOfferId:
+              type:
+                - string
+                - 'null'
+            candidates:
+              type: array
+              items:
+                type: object
+            backendRejected:
+              type: array
+              items:
+                type: object
+        source:
+          type: object
+          description: Which model or the deterministic fallback produced the narrative
+    ProofView:
+      type: object
+      description: Provider evidence read back from PayPal (or MOCK) before any paid or voided label
+      properties:
+        type:
+          type: string
+          examples:
+            - BUYER_APPROVED
+            - AUTHORIZED
+            - CAPTURED
+            - VOIDED
+        ref:
+          type: string
+        status:
+          type: string
+        amountCents:
+          type: integer
+    ReservationView:
+      type: object
+      properties:
+        id:
+          type: string
+        providerMode:
+          $ref: '#/components/schemas/ProviderMode'
+        paymentState:
+          $ref: '#/components/schemas/PaymentState'
+        serviceState:
+          $ref: '#/components/schemas/ServiceState'
+        slotsCommitted:
+          type: boolean
+        portLabel:
+          type: string
+        merchantName:
+          type: string
+        timeZone:
+          type: string
+        plugInMs:
+          type: integer
+        departMs:
+          type: integer
+        targetBatteryWh:
+          type: integer
+        powerW:
+          type: array
+          items:
+            type: integer
+        termsHash:
+          type: string
+        economics:
+          type: object
+          properties:
+            listPriceCents:
+              type: integer
+            priceCents:
+              type: integer
+            discountCents:
+              type: integer
+            energyCostCents:
+              type: integer
+            baselineEnergyCostCents:
+              type:
+                - integer
+                - 'null'
+            operatorImprovementCents:
+              type: integer
+        proofs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProofView'

@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { driverSession } from "@/server/http";
 import { getRuntime } from "@/server/runtime";
 import { listSessionReservations, summarizeSession } from "@/server/services/sessionService";
+import { GearSection } from "./GearSection";
 import { SummaryCards } from "./SummaryCards";
 import { TransactionList } from "./TransactionList";
 
@@ -38,6 +40,10 @@ export default async function RewardsPage() {
       ) : (
         <TransactionList reservations={reservations} />
       )}
+
+      <Suspense fallback={null}>
+        <GearSection savingsCents={summary.modeledSavingCents} />
+      </Suspense>
     </div>
   );
 }

@@ -41,6 +41,8 @@ export default defineConfig({
       // The optional failover provider must also stay off, even if .env.local configures it.
       OPENROUTER_API_KEY: "",
       AI_FALLBACK_PROVIDER: "",
+      // No live product search in e2e: the Channel3 section hides itself without a key.
+      CHANNEL3_API_KEY: "",
       DEMO_TOOLS: "true",
     },
   },

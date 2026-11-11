@@ -48,6 +48,8 @@ const schema = z
       .max(100)
       .optional(),
     AI_FALLBACK_PROVIDER: z.enum(["openrouter"]).optional(),
+    /** Optional Channel3 product-search key for the EV accessory finder; the feature hides itself without it. */
+    CHANNEL3_API_KEY: z.string().optional(),
     /** Set by automated test runners: forbids any hosted database URL (see runtime.openDb). */
     GW_ISOLATED_DB: z.enum(["true"]).optional(),
     DEMO_TOOLS: z.enum(["true", "false"]).optional(),

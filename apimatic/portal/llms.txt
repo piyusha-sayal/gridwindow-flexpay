@@ -1,0 +1,33 @@
+# Docs
+
+- Home
+  - [Home](/)
+- SDKs
+  - [SDKs](/sdks): Client libraries for this API.
+  - [TypeScript SDK](/sdks/typescript): Install and start using the TypeScript SDK.
+  - [Python SDK](/sdks/python): Install and start using the Python SDK.
+- API Reference
+  - Site: Station, ports and payment mode
+    - [Station, ports, payment mode, AI status and the default charging window](/api/openapi/site/getSiteConfig): Station, ports, payment mode, AI status and the default charging window.
+  - A I: Plain-language parsing, explanations and the deal agent (never sets prices or moves money)
+    - [Turn a plain-language request into form fields](/api/openapi/ai/parseChargingRequest): Fills a form only. It sets no price and approves nothing. Falls back to a labelled deterministic parser when no AI provider is available.
+    - [Ask the deal agent to pick one of the caller's offers for a goal](/api/openapi/ai/recommendOffer): Read-only. It evaluates only offers the backend already priced and never accepts or pays.
+    - [Explain one of the caller's offers in plain language](/api/openapi/ai/explainOffer): Numbers come from the stored quote; model text is checked against them before it is shown.
+    - [Ask a question about one of the caller's reservations](/api/openapi/ai/askAboutReservation): Ask a question about one of the caller's reservations.
+  - Offers: Priced charging offers with exact terms
+    - [Request priced charging offers for one port and night](/api/openapi/offers/requestOffers): Creates the driver session cookie if absent. Each offer carries exact terms and their SHA-256 `termsHash`, which accept must echo.
+  - Checkout: Accepting an offer and the PayPal approval round trip
+    - [Accept one exact, unexpired offer and create the PayPal authorize order](/api/openapi/checkout/acceptOffer): Requires the driver's explicit consent (`consent: true`) and the `termsHash` the driver saw; tampered or expired
+terms are refused. Returns the PayPal approval link. Nothing is authorized or charged until the buyer approves in PayPal.
+    - [PayPal return URL. Authorizes the approved order, then redirects to the reservation](/api/openapi/checkout/checkoutReturn): PayPal return URL. Authorizes the approved order, then redirects to the reservation.
+    - [PayPal cancel URL. Cancels the pending order, then redirects to the reservation](/api/openapi/checkout/checkoutCancel): PayPal cancel URL. Cancels the pending order, then redirects to the reservation.
+  - Reservations: Reservation, payment state and provider proofs
+    - [Reservations made in the caller's driver session](/api/openapi/reservations/listMyReservations): Reservations made in the caller's driver session.
+    - [One reservation with payment state, provider proofs and receipt data](/api/openapi/reservations/getReservation): One reservation with payment state, provider proofs and receipt data.
+  - Operator: Operator session and night dashboard
+    - [Whether the caller holds an operator session](/api/openapi/operator/getOperatorSession): Whether the caller holds an operator session.
+    - [Sign in with the operator passphrase](/api/openapi/operator/operatorSignIn): Sign in with the operator passphrase.
+    - [Sign out](/api/openapi/operator/operatorSignOut): Sign out.
+    - [Every reservation of a night with load, ports and payment states](/api/openapi/operator/getOperatorDashboard): Every reservation of a night with load, ports and payment states.
+  - Webhooks: PayPal Sandbox webhooks
+    - [PayPal Sandbox webhook receiver](/api/openapi/webhooks/paypalWebhook): Verifies the PayPal signature against the unaltered body, then re-reads provider state. A webhook alone never marks a payment captured or voided.

@@ -382,6 +382,8 @@ flowchart TD
 
 GridWindow ships an [MCP](https://modelcontextprotocol.io) server, so Claude, Cursor or any MCP-capable agent can shop for a charging window on a driver's behalf: read the site, turn a sentence into a request, compare priced offers, ask the deal agent for a pick, and prepare the PayPal checkout. The agent stops at a PayPal approval link that only the driver can complete; capture or void still follows delivered energy on the server. Setup and the full consent boundary: [docs/MCP.md](docs/MCP.md). Try it with `npm run mcp:smoke`.
 
+The agent can also find in-stock EV accessories across merchants through [Channel3](https://trychannel3.com) (`find_ev_gear`), and the Rewards page shows the same live picks under "Spend your savings" when `CHANNEL3_API_KEY` is set. The PayPal integration was audited against PayPal's official SDK definitions with APIMatic's PayPal Context Plugin, and the API is described in [docs/openapi.yaml](docs/openapi.yaml), from which APIMatic generated a developer portal and a typed TypeScript SDK (`apimatic/`); see [docs/APIMATIC.md](docs/APIMATIC.md).
+
 ## AI helps explain. The server makes the decisions.
 
 GridWindow can use [Google Gemini](https://ai.google.dev/gemini-api/docs) through the [Google Gen AI SDK](https://github.com/googleapis/js-genai), with an Anthropic provider option. When no key is configured or a provider fails, the app uses a **labeled deterministic parser and explainer**. The main workflow still works.
