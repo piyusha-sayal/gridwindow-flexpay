@@ -63,8 +63,10 @@ test.describe("keyboard-only journeys", () => {
     await page.keyboard.type("Need 30 kWh by 7am, at most $20, port A");
     await page.keyboard.press("Tab");
     expect((await focused(page)).name).toBe("Fill form");
+    const parse = page.waitForResponse((r) => r.url().includes("/api/quotes/parse") && r.request().method() === "POST");
     await page.keyboard.press("Enter");
-    await expect(page.getByText(/Deterministic fallback \(no AI\)/)).toBeAttached();
+    expect(((await (await parse).json()) as { source: string }).source).toBe("DETERMINISTIC_FALLBACK");
+    await expect(page.locator(".ai-note")).toBeVisible();
 
     // A future night, so the run never depends on wall-clock time (after midnight the default night's
     // window may already have started and the approval-deadline guard would correctly refuse it).
@@ -90,8 +92,10 @@ test.describe("keyboard-only journeys", () => {
     expect(after).not.toBe(before);
 
     await tabUntil(page, (f) => f.name.startsWith("Why is it cheaper?"));
+    const explain = page.waitForResponse((r) => r.url().includes("/api/assist/explain") && r.request().method() === "POST");
     await page.keyboard.press("Enter");
-    await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeAttached();
+    expect(((await (await explain).json()) as { source: string }).source).toBe("DETERMINISTIC_FALLBACK");
+    await expect(page.locator('[id^="why-"]:not([hidden]) ul li').first()).toBeVisible();
 
     await tabUntil(page, (f) => f.name === "Review and approve");
     await page.keyboard.press("Enter");
@@ -244,7 +248,7 @@ test("layout and full axe report per viewport (all impacts)", async ({ page }, i
   await page.getByRole("button", { name: "See offers" }).click();
   await expect(page.getByRole("heading", { name: /flexible offer|cannot be met/ })).toBeVisible();
   await page.getByRole("button", { name: "Why is it cheaper?" }).first().click();
-  await expect(page.getByText(/Deterministic fallback/).first()).toBeAttached();
+  await expect(page.locator('[id^="why-"]:not([hidden]) ul li').first()).toBeVisible();
   await audit("drive-offers-terms");
   await page.getByRole("button", { name: "Review and approve" }).click();
   await audit("drive-approve-terms");

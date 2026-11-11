@@ -15,8 +15,11 @@ async function fillFromWords(page: Page, words: string) {
   await expect(page.getByRole("heading", { name: "What does your car need tonight?" })).toBeVisible();
   await expect(page.getByLabel("Charging request in words")).toHaveAttribute("placeholder", "Find me 30 kWh before 7 AM and save at least $4.");
   await page.getByLabel("Charging request in words").fill(words);
+  const parse = page.waitForResponse((r) => r.url().includes("/api/quotes/parse") && r.request().method() === "POST");
   await page.getByRole("button", { name: "Fill form" }).click();
-  await expect(page.getByText(/Deterministic fallback|AI ·/).first()).toBeAttached();
+  // No model key in e2e: the answer must be the deterministic parser, and the API says so (driver screens show no label).
+  expect(((await (await parse).json()) as { source: string }).source).toBe("DETERMINISTIC_FALLBACK");
+  await expect(page.locator(".ai-note")).toBeVisible();
 }
 
 /**

@@ -7,7 +7,7 @@ import { z } from "zod";
 import { validateOfferEconomics } from "@/domain/economics";
 import { meetsRequiredSaving } from "@/domain/quotes";
 import { approvalDeadlineMs, settlementPolicyOf, termsHash } from "@/domain/terms";
-import { validateWithEnvelope } from "@/domain/disturbance";
+import { violationsIntroducedBy } from "@/domain/disturbance";
 import { ProviderError } from "@/payments/gateway";
 import { ServiceError, type AppDeps } from "../deps";
 import { assertProviderScope } from "../providerScope";
@@ -107,11 +107,12 @@ export async function acceptOffer(deps: AppDeps, driverSession: string, input: A
     throw new ServiceError("QUOTE_STALE", "A disturbance was recorded at this station tonight after these offers were made. No payment was taken; please request new offers.", 409);
   }
 
-  // Capacity may have changed since quoting: re-validate against current commitments.
+  // Capacity may have changed since quoting: re-validate against current commitments. Same rule as quoting: a problem
+  // another session already has (e.g. its charger was cut and no recovery was feasible) is not this offer's conflict.
   const { scenario, envelope } = await nightContext(deps.db, deps.station, nightOf);
   const committed = await committedPlans(deps.db, deps.station.id, nightOf);
   const plan = { sessionId: "candidate", portId: offer.terms.portId, plugInMs: offer.terms.plugInMs, departMs: offer.terms.departMs, powerW: offer.terms.powerW };
-  if (validateWithEnvelope({ station: deps.station, grid: scenario.grid, forecastBaseLoadW: scenario.forecastBaseLoadW, envelope, plans: [...committed, plan] }).length > 0) {
+  if (violationsIntroducedBy({ station: deps.station, grid: scenario.grid, forecastBaseLoadW: scenario.forecastBaseLoadW, envelope, committed, candidate: plan }).length > 0) {
     throw new ServiceError("CAPACITY_CHANGED", "Station capacity changed since this offer was made. Please request new offers.", 409);
   }
 
@@ -294,7 +295,7 @@ export async function commitCapacityOrVoid(deps: AppDeps, rid: string): Promise<
     }
     const { scenario, envelope } = await nightContext(q, deps.station, locked.night_of);
     const others = await committedPlans(q, locked.station_id, locked.night_of, locked.id);
-    const violations = validateWithEnvelope({ station: deps.station, grid: scenario.grid, forecastBaseLoadW: scenario.forecastBaseLoadW, envelope, plans: [...others, planOf(locked)],
+    const violations = violationsIntroducedBy({ station: deps.station, grid: scenario.grid, forecastBaseLoadW: scenario.forecastBaseLoadW, envelope, committed: others, candidate: planOf(locked),
       targets: [{ sessionId: locked.id, targetBatteryWh: locked.terms.targetBatteryWh, efficiencyBp: locked.terms.efficiencyBp }],
     });
     if (violations.length > 0) {
