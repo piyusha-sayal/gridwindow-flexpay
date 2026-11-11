@@ -22,12 +22,15 @@ paths:
       security:
         - operatorCookie: []
       parameters:
-        - name: nightOf
+        - name: night
           in: query
           required: false
           schema:
             type: string
             pattern: ^\d{4}-\d{2}-\d{2}$
+          description: Night to show (YYYY-MM-DD, station-local). Defaults to the current
+            charging night.
+          example: 2026-11-12
       responses:
         "200":
           description: Dashboard data
@@ -44,7 +47,9 @@ paths:
           sources:
             Example: |-
               try:
-                  response = client.operator.get_operator_dashboard()
+                  response = client.operator.get_operator_dashboard(
+                      night="2026-11-12"
+                  )
                   # TODO: Handle 'response' of type Any
               except ApiError as e:
                   # TODO: Handle 'e.error' of type
@@ -56,7 +61,9 @@ paths:
             Example: >-
               try {
                 const response =
-                  await client.operator.getOperatorDashboard();
+                  await client.operator.getOperatorDashboard({
+                    night: "2026-11-12",
+                  });
                 // TODO: Handle 'response' of type Record<string, unknown>
               } catch (err) {
                 // TODO: Handle 'err' of type Operator.GetOperatorDashboardError, discriminated with 'err.payload.kind'
