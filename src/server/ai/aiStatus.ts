@@ -14,7 +14,8 @@ export function aiStatusOf(llm: StructuredLlm | null | undefined): AiStatus {
     case "OK":
       return { state: "OK", label: `AI ok: ${health.primary.model}` };
     case "DEGRADED":
-      return { state: "DEGRADED", label: `AI degraded: fallback ${health.fallback?.model ?? "model"} is answering` };
+      // The model that actually answered last (the fallback may be a chain of several models).
+      return { state: "DEGRADED", label: `AI degraded: fallback ${health.recent[health.recent.length - 1]?.model ?? health.fallback?.model ?? "model"} is answering` };
     case "DOWN":
       return { state: "DOWN", label: "AI unavailable: labelled deterministic explanations" };
     default:

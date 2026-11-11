@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { api, ApiError } from "@/components/api";
-import { AiSourceBadge, type AiSource } from "@/components/ui";
+import type { AiSource } from "@/components/ui";
 
 type Answer = { answer: string; inScope: boolean } & AiSource;
 
@@ -81,7 +81,6 @@ export function AskAssistant({ reservationId }: { reservationId: string }) {
       )}
       {answer && (
         <div className="ai-answer space-y-2 text-[15px]" aria-live="polite">
-          <AiSourceBadge src={answer} />
           <p>{answer.answer}</p>
         </div>
       )}

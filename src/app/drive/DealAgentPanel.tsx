@@ -1,6 +1,5 @@
 "use client";
 
-import { AiSourceBadge } from "@/components/ui";
 import type { DealEvaluation } from "@/domain/dealAgent";
 import { formatLocalTime } from "@/domain/time";
 import { formatUsd } from "@/domain/units";
@@ -34,11 +33,6 @@ export function DealAgentPanel({ deal, tz, expired, onRun, onEdit }: DealAgentPa
           <span aria-hidden="true" className="ico ico-spark" />
           Flex Deal Agent
         </h2>
-        {deal.status === "done" && (
-          <div className="badge-wrap">
-            <AiSourceBadge src={deal.data} />
-          </div>
-        )}
       </div>
       <div aria-live="polite" className="space-y-3">
         {deal.status === "idle" && (

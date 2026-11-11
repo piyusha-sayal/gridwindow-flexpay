@@ -135,6 +135,22 @@ describe("which failures switch to OpenRouter", () => {
     });
   }
 
+  it("three-provider chain: both Gemini models 429, OpenRouter decides, and provenance names OpenRouter (not the wrapper's Gemini)", async () => {
+    const rid = await disturb("evt_pf_0005");
+    const gatewayBefore = app.gateway.calls.length;
+    const first = gemini([], "QUOTA_EXHAUSTED");
+    const second = new Adapter("gemini", "gemini-3.5-flash-lite", [], "QUOTA_EXHAUSTED");
+    const third = openRouter(DECIDING_STEPS);
+    app.deps.llm = new FailoverLlm(first, new FailoverLlm(second, third));
+    const run = await orchestrateRecovery(app.deps, "evt_pf_0005");
+    expect([first.calls, second.calls]).toEqual([1, 1]);
+    expect(third.calls).toBeGreaterThanOrEqual(DECIDING_STEPS.length);
+    expect(run.status).toBe("COMMITTED");
+    expect(provenance(run)).toMatchObject({ decision: "MODEL_DECISION", decisionCode: "OPENROUTER_MODEL_DECISION" });
+    expect(app.gateway.calls.length).toBe(gatewayBefore);
+    expect((await getReservation(app.db, rid))!.payment_state).toBe("AUTHORIZED");
+  });
+
   for (const failure of ["AUTH_FAILED", "REFUSED", "INVALID_OUTPUT", "SCHEMA_MISMATCH", "REQUEST_REJECTED"] as const) {
     it(`Gemini ${failure} is not treated as an outage: OpenRouter is not asked and the deterministic path decides`, async () => {
       await disturb("evt_pf_0003");

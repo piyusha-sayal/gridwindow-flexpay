@@ -3,6 +3,7 @@
  * payment-state and price checks run AFTER the failover wrapper, so a fallback answer is never trusted more.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 import { answerReservationQuestion, explainOfferWithAi, offerFacts, reservationFacts } from "@/server/ai/assistant";
 import { aiStatusOf } from "@/server/ai/aiStatus";
 import { FailoverLlm } from "@/server/ai/failoverLlm";
@@ -181,9 +182,42 @@ describe("second Gemini model on the same key (free-tier quotas are per model)",
     expect(createLlm({ AI_PROVIDER: "anthropic", ANTHROPIC_API_KEY: "a", GEMINI_FALLBACK_MODEL: "gemini-3.5-flash-lite" })?.llm).not.toBeInstanceOf(FailoverLlm);
   });
 
-  it("leaves an explicitly configured OpenRouter fallback in charge", () => {
-    const made = createLlm({ ...g, GEMINI_FALLBACK_MODEL: "gemini-3.5-flash-lite", AI_FALLBACK_PROVIDER: "openrouter", OPENROUTER_API_KEY: "o", OPENROUTER_MODEL: "vendor/model" });
+  it("with OpenRouter also configured, chains primary, then the second Gemini model, then OpenRouter", () => {
+    const made = createLlm({ ...g, GEMINI_FALLBACK_MODEL: "gemini-3.5-flash-lite", AI_FALLBACK_PROVIDER: "openrouter", OPENROUTER_API_KEY: "o", OPENROUTER_MODEL: "vendor/model:free" });
     expect(made?.llm).toBeInstanceOf(FailoverLlm);
-    expect(made?.llm.health?.().fallback?.model).toBe("vendor/model");
+    expect(made?.llm.model).toBe("gemini-3.6-flash");
+    expect(made?.llm.health?.().fallback).toEqual({ provider: "gemini", model: "gemini-3.5-flash-lite, then vendor/model:free" });
+  });
+
+  it("OpenRouter without its key leaves the two-model Gemini failover unchanged", () => {
+    const made = createLlm({ ...g, GEMINI_FALLBACK_MODEL: "gemini-3.5-flash-lite", AI_FALLBACK_PROVIDER: "openrouter" });
+    expect(made?.llm.health?.().fallback).toEqual({ provider: "gemini", model: "gemini-3.5-flash-lite" });
+  });
+});
+
+describe("three-provider chain (nested failover)", () => {
+  const offerExplanationShape = z.object({ summary: z.string(), points: z.array(z.string()) });
+  const f = offerFacts(quote, offer);
+  const grounded = { summary: `Your car stays on the same port; charging runs ${f.flexibleChargingWindow}.`, points: [`You pay ${f.flexiblePrice} instead of ${f.immediateListPrice}, saving ${f.driverDiscount}.`] };
+
+  it("both Gemini models rate-limited: OpenRouter answers, and the answer keeps the provider and model that wrote it", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const first = fake("gemini", "gemini-3.6-flash", down("QUOTA_EXHAUSTED"));
+    const second = fake("gemini", "gemini-3.5-flash-lite", down("QUOTA_EXHAUSTED"));
+    const third = fake("openrouter", "baidu/ernie-5.5-flash-preview:free", answer(grounded));
+    const llm = new FailoverLlm(first, new FailoverLlm(second, third));
+    const direct = await llm.generate({ system: "s", user: "u", schema: offerExplanationShape, maxTokens: 10 });
+    expect(direct).toMatchObject({ ok: true, provider: "openrouter", model: "baidu/ernie-5.5-flash-preview:free" });
+    const res = await explainOfferWithAi(llm, quote, offer);
+    expect(res).toMatchObject({ source: "MODEL", model: "baidu/ernie-5.5-flash-preview:free" });
+    expect([first.users.length, second.users.length]).toEqual([1, 1]); // each skipped for its cooldown after one failure
+    expect(aiStatusOf(llm)).toMatchObject({ state: "DEGRADED", label: "AI degraded: fallback baidu/ernie-5.5-flash-preview:free is answering" });
+  });
+
+  it("the second Gemini model answering is reported as DEGRADED, not OK (same provider, different adapter)", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const llm = new FailoverLlm(fake("gemini", "gemini-3.6-flash", down("QUOTA_EXHAUSTED")), fake("gemini", "gemini-3.5-flash-lite", answer(grounded)));
+    await explainOfferWithAi(llm, quote, offer);
+    expect(llm.health().state).toBe("DEGRADED");
   });
 });

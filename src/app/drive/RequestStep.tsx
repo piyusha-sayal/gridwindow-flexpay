@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { AiSourceBadge, type AiSource } from "@/components/ui";
+import type { AiSource } from "@/components/ui";
 import type { ParsedRequest } from "@/domain/nlRequest";
 import { AxisTicks, FIXED_NIGHT_AXIS, pctOf } from "./NightAxis";
 import { GuidedDemo } from "./GuidedDemo";
@@ -75,7 +75,6 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
         </p>
         {parseResult && (
           <div className="ai-note space-y-2 badge-wrap" aria-live="polite">
-            <AiSourceBadge src={parseResult} />
             <ul className="text-[14px] text-muted list-disc pl-5">
               {(parseResult.parsed.notes.length ? parseResult.parsed.notes : ["Form updated. Review every field before requesting offers."]).map((n) => (
                 <li key={n}>{n}</li>

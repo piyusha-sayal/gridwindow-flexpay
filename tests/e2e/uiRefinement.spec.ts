@@ -104,12 +104,12 @@ test.describe("driver choices", () => {
     expect(await items.count()).toBeLessThanOrEqual(3);
     await expect(items.first()).toContainText("Delivers 30.00 kWh");
 
-    // The AI explanation is not available here, so the fallback is used: no banner, provenance one click away.
+    // No model here, so the deterministic explanation is shown: plain text, with no "how this was generated" label.
     await page.getByRole("button", { name: "Why is it cheaper?" }).first().click();
-    await expect(page.getByText("How this was generated").first()).toBeVisible();
-    await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeHidden();
-    await page.getByText("How this was generated").first().click();
-    await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeVisible();
+    const why = page.locator('[id^="why-"]:not([hidden])').first();
+    await expect(why.locator("ul li").first()).toBeVisible();
+    await expect(page.getByText("How this was generated")).toHaveCount(0);
+    await expect(page.getByText(/Deterministic fallback \(no AI\)/)).toHaveCount(0);
   });
 });
 
