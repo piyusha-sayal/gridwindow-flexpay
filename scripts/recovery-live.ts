@@ -198,6 +198,16 @@ async function liveRecovery(apiKey: string, model: string) {
 
 type LiveResult = Awaited<ReturnType<typeof liveRecovery>>;
 
+const okModelCalls = (live: LiveResult) => live.meter.calls.filter((c) => c.ok).length;
+
+/** A model decision must carry the code of the provider that served it; a run with no usable answer must say DETERMINISTIC_FALLBACK. */
+function provenanceVerdict(run: LiveResult["run"], okCalls: number) {
+  const code = run ? runProvenance(run).decisionCode : null;
+  const expected = run?.aiUsed ? (FALLBACK_MODE ? "OPENROUTER_MODEL_DECISION" : "GEMINI_MODEL_DECISION") : "DETERMINISTIC_FALLBACK";
+  const consistent = run !== null && code === expected && (run.aiUsed ? okCalls > 0 : true);
+  return { verdict: consistent ? "PASS" : "FAIL", note: `decisionCode ${code ?? "none"}, expected ${expected}, ok provider responses ${okCalls}` } as const;
+}
+
 function buildVerdicts(live: LiveResult, rehearsal: { proposed: number }) {
   const run = live.run;
   const trace = run?.trace ?? [];
@@ -214,6 +224,7 @@ function buildVerdicts(live: LiveResult, rehearsal: { proposed: number }) {
     consentRespected: verdict(chosen === null ? "BLOCKED" : consentMatches ? "PASS" : "FAIL", `status ${run?.status ?? "none"}`),
     requestCapEnforced: verdict(live.meter.calls.length <= MAX_REQUESTS ? "PASS" : "FAIL", `requests sent ${live.meter.calls.length}, refused by meter ${live.refusedByMeter}`),
     modelFailureFallsBack: fallbackVerdict({ failedCalls: failedCalls.length, status: run?.status ?? null, trace, decision: runProvenance({ aiUsed: run?.aiUsed ?? false, trace }).decision }),
+    provenanceMatchesServingProvider: provenanceVerdict(run, okModelCalls(live)),
     invalidOrInjectedOutputFallsBack: verdict("NOT TESTED", `live adversarial probe not run; rejected model steps observed: ${trace.filter((e) => e.actor === "GEMINI" && e.outcome === "REJECTED").length}; rehearsal usable candidates: ${rehearsal.proposed}`),
   };
 }
