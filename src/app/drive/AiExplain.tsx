@@ -27,16 +27,17 @@ export function AiExplain({ quoteSetId, offerId }: { quoteSetId: string; offerId
   }
 
   return (
-    <div className="border-t border-line pt-4">
-      <button type="button" className="flex w-full items-center justify-between gap-3 py-1 text-left text-[16px] font-semibold" aria-expanded={open} aria-controls={`why-${offerId}`} onClick={toggle}>
+    <div className="ai-panel">
+      <button type="button" className="ai-toggle flex w-full items-center gap-3 text-left text-[16px] font-semibold" aria-expanded={open} aria-controls={`why-${offerId}`} onClick={toggle}>
+        <span aria-hidden="true" className="ico ico-spark" />
         Why is it cheaper?
-        <span aria-hidden="true" className="font-mono text-muted">
+        <span aria-hidden="true" className="ai-chevron font-mono text-muted">
           {open ? "−" : "+"}
         </span>
       </button>
-      <div id={`why-${offerId}`} hidden={!open} className="pt-3 space-y-3 text-[15px]" aria-live="polite" aria-busy={state.status === "loading"}>
+      <div id={`why-${offerId}`} hidden={!open} className="ai-body pt-3 space-y-3 text-[15px]" aria-live="polite" aria-busy={state.status === "loading"}>
         <p className="meta">Every number checked against the quote</p>
-        {state.status === "loading" && <p className="text-muted">Explaining…</p>}
+        {state.status === "loading" && <p className="working text-muted">Explaining…</p>}
         {state.status === "error" && (
           <p role="alert" className="text-red">
             {state.message}{" "}

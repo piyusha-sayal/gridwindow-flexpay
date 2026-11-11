@@ -55,14 +55,14 @@ export function DetailPanel({ id, version, onClose }: { id: string; version: num
 
   return (
     <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-ink/40" aria-hidden="true" onClick={onClose} />
+      <div className="drawer-scrim absolute inset-0 bg-navy/50" aria-hidden="true" onClick={onClose} />
       <section
         ref={sheetRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="detail-title"
         onKeyDown={onKeyDown}
-        className="absolute inset-y-0 right-0 w-[min(480px,100%)] overflow-y-auto bg-surface p-5 sm:p-6 space-y-5 shadow-[var(--shadow-receipt)]"
+        className="drawer absolute inset-y-0 right-0 w-[min(480px,100%)] overflow-y-auto bg-surface p-5 sm:p-6 space-y-5"
         style={{ paddingTop: "max(1.25rem, env(safe-area-inset-top))", paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
       >
       <div className="flex items-start justify-between gap-3">
@@ -77,7 +77,7 @@ export function DetailPanel({ id, version, onClose }: { id: string; version: num
         </button>
       </div>
       {error && <p role="alert" className="text-danger text-sm">{error}</p>}
-      {!r && !error && <p className="text-muted text-sm">Loading…</p>}
+      {!r && !error && <p className="working text-muted text-sm">Loading…</p>}
       {r && (
         <>
           <div className="flex flex-wrap gap-2 badge-wrap">
@@ -119,7 +119,7 @@ export function DetailPanel({ id, version, onClose }: { id: string; version: num
               </ol>
             </div>
           </div>
-          <Link href={`/reservations/${encodeURIComponent(id)}`} className="text-[14px] underline underline-offset-4">
+          <Link href={`/reservations/${encodeURIComponent(id)}`} className="link-arrow text-[14px]">
             Open the driver view of this reservation
           </Link>
         </>
@@ -144,7 +144,7 @@ export function contributionItem(r: Pick<ReservationView, "paymentState" | "econ
 
 function Item({ k, v }: { k: string; v: string }) {
   return (
-    <div className="min-w-0">
+    <div className="detail-item min-w-0">
       <dt className="meta">{k}</dt>
       <dd className="mt-0.5 [overflow-wrap:anywhere]">{v}</dd>
     </div>

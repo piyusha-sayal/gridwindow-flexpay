@@ -27,10 +27,10 @@ export function LoadPanel({ d }: { d: OperatorDashboard }) {
   ];
 
   return (
-    <section className="card p-5 sm:p-6 space-y-5" aria-labelledby="load-title">
+    <section className="card ops-panel p-5 sm:p-6 space-y-5" aria-labelledby="load-title">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 id="load-title" className="text-[22px] font-semibold tracking-[-0.01em]">
+          <h2 id="load-title" className="panel-title text-[22px] font-semibold">
             Site load
           </h2>
           <p className="meta mt-1">
@@ -68,7 +68,7 @@ export function LoadPanel({ d }: { d: OperatorDashboard }) {
           })),
         ]}
       />
-      <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-label="Baseline versus optimized table (scrolls horizontally)">
+      <div className="table-wrap relative overflow-x-auto" tabIndex={0} role="region" aria-label="Baseline versus optimized table (scrolls horizontally)">
         <table className="data-table text-sm">
           <caption className="sr-only">Baseline versus optimized schedule comparison</caption>
           <thead className="text-left text-muted">
@@ -100,7 +100,7 @@ function TariffTable({ d }: { d: OperatorDashboard }) {
   const usd = (mc: number) => `$${(mc / 100_000).toFixed(3)}/kWh`;
   const hour = (h: number) => `${String(h % 24).padStart(2, "0")}:00`;
   return (
-    <details className="text-sm">
+    <details className="disclosure text-sm">
       <summary className="cursor-pointer font-medium">Modeled tariff periods (synthetic)</summary>
       <ul className="mt-2 grid gap-1 sm:grid-cols-2 tabular">
         {[...d.tariff.bands]

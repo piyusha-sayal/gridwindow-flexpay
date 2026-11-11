@@ -47,11 +47,11 @@ export function tariffBands(tariff: readonly number[]): { from: number; to: numb
 
 export function TariffStrip({ axis, className = "h-6" }: { axis: Axis; className?: string }) {
   return (
-    <div className={`relative rounded-[3px] overflow-hidden ${className}`} aria-hidden="true">
+    <div className={`tariff-strip relative rounded-[6px] overflow-hidden ${className}`} aria-hidden="true">
       {tariffBands(slotTariffMc(axis)).map((b) => (
         <span
           key={b.from}
-          className="absolute inset-y-0 flex items-center justify-center font-mono text-[11px] text-ink"
+          className="tariff-band absolute inset-y-0 flex items-center justify-center font-mono text-[11px] text-ink"
           style={{ left: pctOf(b.from, axis.slotCount), width: pctOf(b.to - b.from, axis.slotCount), background: TOU_FILL[b.mc] }}
         >
           {b.to - b.from >= 6 ? `${b.mc / 1000}¢` : ""}
@@ -64,7 +64,7 @@ export function TariffStrip({ axis, className = "h-6" }: { axis: Axis; className
 export function AxisTicks({ axis, every = 16 }: { axis: Axis; every?: number }) {
   const ticks = Array.from({ length: Math.floor(axis.slotCount / every) + 1 }, (_, k) => k * every);
   return (
-    <div className="flex justify-between meta" aria-hidden="true">
+    <div className="axis-ticks flex justify-between meta" aria-hidden="true">
       {ticks.map((t) => (
         <span key={t}>{axis.label(t)}</span>
       ))}
@@ -84,14 +84,14 @@ interface PowerBarsProps {
 export function PowerBars({ powerW, maxW, color, parked, className = "h-9" }: PowerBarsProps) {
   const n = powerW.length;
   return (
-    <span className={`relative block ${className}`} aria-hidden="true">
-      {parked && <span className="absolute inset-y-0 rounded-[2px] bg-[var(--chart-track)]" style={{ left: pctOf(parked.from, n), width: pctOf(parked.to - parked.from, n) }} />}
+    <span className={`power-bars relative block ${className}`} aria-hidden="true">
+      {parked && <span className="power-track absolute inset-y-0 rounded-[3px] bg-[var(--chart-track)]" style={{ left: pctOf(parked.from, n), width: pctOf(parked.to - parked.from, n) }} />}
       <span className="relative flex h-full items-end gap-px">
         {powerW.map((w, i) => (
-          <span key={i} className="flex-1 rounded-[1px]" style={{ height: `${maxW > 0 ? (w / maxW) * 100 : 0}%`, background: color, transition: "height var(--t-bar) var(--ease)" }} />
+          <span key={i} className="power-bar flex-1 rounded-t-[2px]" style={{ height: `${maxW > 0 ? (w / maxW) * 100 : 0}%`, background: color, transition: "height var(--t-bar) var(--ease)", "--i": i } as React.CSSProperties} />
         ))}
       </span>
-      {parked && <span className="absolute -inset-y-1 border-l border-dashed border-ink" style={{ left: pctOf(parked.to, n) }} />}
+      {parked && <span className="power-depart absolute -inset-y-1 border-l border-dashed border-ink" style={{ left: pctOf(parked.to, n) }} />}
     </span>
   );
 }

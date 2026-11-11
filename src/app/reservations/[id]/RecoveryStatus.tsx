@@ -9,12 +9,12 @@ export function RecoveryStatus({ recovery }: { recovery: RecoveryReceipt }) {
   const settled = recovery.runs.filter((run) => run.status !== "NEEDS_APPROVAL" && run.status !== "RUNNING");
   if (settled.length === 0) return null;
   return (
-    <section className="card p-5 sm:p-6 space-y-3" aria-labelledby="recovery-status-title">
+    <section className="card recovery-outcome p-5 sm:p-6 space-y-3" aria-labelledby="recovery-status-title">
       <h2 id="recovery-status-title" className="text-[18px] font-semibold tracking-[-0.01em]">
         Charging change outcome
       </h2>
       <p className="meta">Disturbances on this reservation are SYNTHETIC simulated inputs.</p>
-      <ul className="space-y-2 text-[14px]">
+      <ul className="timeline space-y-2 text-[14px]">
         {settled.map((run) => (
           <li key={run.runId}>
             <strong>{runStatusLabel(run.status, run.consent)}</strong>

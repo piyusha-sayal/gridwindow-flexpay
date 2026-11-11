@@ -43,9 +43,9 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
   ];
 
   return (
-    <section className="space-y-6" aria-labelledby="approve-title">
+    <section className="step-enter space-y-6" aria-labelledby="approve-title">
       <header className="flex flex-wrap items-start justify-between gap-3">
-        <h1 id="approve-title" tabIndex={-1} className="font-semibold tracking-[-0.03em] leading-[1.08] text-[clamp(28px,3.6vw,40px)]">
+        <h1 id="approve-title" tabIndex={-1} className="step-title font-semibold leading-[1.05] text-[clamp(30px,4vw,46px)]">
           Approve these exact terms
         </h1>
         <div className="flex flex-wrap gap-2 badge-wrap">
@@ -54,12 +54,12 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
         </div>
       </header>
 
-      <div className="card overflow-hidden p-0">
-        <div className="flex flex-wrap items-end justify-between gap-6 p-[clamp(20px,3vw,32px)]">
+      <div className="card terms-card ring-flow overflow-hidden p-0">
+        <div className="terms-amount flex flex-wrap items-end justify-between gap-6 p-[clamp(20px,3vw,32px)]">
           <div>
             <p className="meta">Amount to authorize</p>
             <p className="mt-2 flex items-baseline gap-2">
-              <span className="font-semibold tracking-[-0.04em] leading-none tabular text-[clamp(52px,7vw,72px)]">{formatUsd(offer.priceCents)}</span>
+              <span className="text-gradient num-rise font-semibold tracking-[-0.05em] leading-none tabular text-[clamp(56px,7.5vw,84px)]">{formatUsd(offer.priceCents)}</span>
               <span className="font-mono text-[13px] text-muted">USD</span>
             </p>
             <p className="mt-2 text-[14px] text-text-2">Held now. Collected only after the energy is delivered.</p>
@@ -79,7 +79,7 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
         </div>
         <dl className="grid border-t border-line-2 min-[600px]:grid-cols-2">
           {terms.map(([k, v]) => (
-            <div key={k} className="border-b border-line-2 px-[clamp(20px,3vw,32px)] py-4 min-[600px]:odd:border-r">
+            <div key={k} className="terms-cell border-b border-line-2 px-[clamp(20px,3vw,32px)] py-4 min-[600px]:odd:border-r">
               <dt className="text-[13px] text-muted">{k}</dt>
               <dd className="mt-1 text-[16px] font-medium tabular">
                 {v}
@@ -94,9 +94,9 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
         <h2 id="how-pay" className="meta">
           How the payment works
         </h2>
-        <ol className="grid gap-4 min-[600px]:grid-cols-3">
+        <ol className="stagger grid gap-4 min-[600px]:grid-cols-3">
           {flow.map((f) => (
-            <li key={f.when} className={`border-t-2 pt-3 ${f.rule}`}>
+            <li key={f.when} className={`pay-step border-t-2 pt-3 ${f.rule}`}>
               <p className="font-mono text-[12px] text-ink">{f.when}</p>
               <p className="mt-1 text-[14px] text-text-2">{f.what}</p>
             </li>
@@ -104,7 +104,7 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
         </ol>
       </section>
 
-      <section aria-labelledby="failure-policy" className="space-y-2">
+      <section aria-labelledby="failure-policy" className="policy-note space-y-2">
         <h2 id="failure-policy" className="meta">
           If charging fails
         </h2>
@@ -114,7 +114,7 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
         </p>
       </section>
 
-      <details className="text-[14px]">
+      <details className="disclosure text-[14px]">
         <summary className="cursor-pointer text-text-2">Terms fingerprint</summary>
         <p className="mt-2 font-mono text-[12px] text-muted break-all">SHA-256 {offer.termsHash}</p>
         <p className="mt-1 text-muted">A fingerprint of these exact terms. The server rejects the approval if anything differs from the stored offer.</p>
@@ -126,7 +126,7 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
         </Alert>
       )}
 
-      <label className={`flex items-start gap-3 rounded-[var(--r-card-sm)] border p-4 transition-colors cursor-pointer ${consent ? "border-ink bg-teal-tint" : "border-line-strong bg-surface"}`}>
+      <label className={`consent-card flex items-start gap-3 rounded-[var(--r-card-sm)] border p-4 cursor-pointer ${consent ? "is-on border-ink bg-teal-tint" : "border-line-strong bg-surface"}`}>
         <input id="consent" type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-[var(--ink)]" checked={consent} onChange={(e) => onConsent(e.target.checked)} disabled={expired} />
         <span className="text-[15px]">
           I approve <strong>{formatUsd(offer.priceCents)}</strong> for at least {formatKWh(quote.request.targetBatteryWh)} delivered to my battery on port {port} before{" "}
@@ -136,7 +136,7 @@ export function TermsApproval({ config, quote, offer, preferredMinSavingsCents, 
       </label>
 
       <div className="flex flex-wrap items-center gap-4">
-        <button type="button" className="btn btn-primary btn-lg" onClick={onApprove} disabled={!consent || busy || expired}>
+        <button type="button" className="btn btn-primary btn-lg btn-glow" onClick={onApprove} disabled={!consent || busy || expired}>
           {busy ? "Starting checkout…" : `Approve ${formatUsd(offer.priceCents)} with ${mock ? "mock provider" : "PayPal Sandbox"}`}
         </button>
         <button type="button" className="btn btn-text" onClick={onBack}>

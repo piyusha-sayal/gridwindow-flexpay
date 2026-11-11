@@ -84,7 +84,7 @@ export function ReservationStatus({ id }: { id: string }) {
         {error} <Link href="/drive" className="underline">Request a charge</Link>
       </Alert>
     ) : (
-      <p aria-live="polite" className="text-muted">Loading reservation…</p>
+      <p aria-live="polite" className="flow-loading text-muted">Loading reservation…</p>
     );
   }
 
@@ -93,14 +93,14 @@ export function ReservationStatus({ id }: { id: string }) {
   const showReceipt = r.proofs.some((p) => p.type === "CAPTURED" || p.type === "VOIDED") || r.paymentState === "CAPTURE_PENDING" || r.paymentState === "CAPTURE_DECLINED";
 
   return (
-    <div className="space-y-8">
+    <div className="stagger space-y-8">
       <header className="space-y-3 no-print">
-        <p className="meta break-all">Reservation {r.id}</p>
+        <p className="meta step-kicker break-all">Reservation {r.id}</p>
         <p className="meta">
           Night of {new Intl.DateTimeFormat("en-US", { timeZone: r.timeZone, weekday: "short", month: "short", day: "numeric" }).format(r.plugInMs)} · parked {formatLocalTime(r.plugInMs, r.timeZone)} → departs{" "}
           {formatLocalTime(r.departMs, r.timeZone)}
         </p>
-        <h1 className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(30px,4.2vw,44px)]">
+        <h1 className="res-title font-semibold leading-[1.02] text-[clamp(32px,4.8vw,56px)]">
           {formatUsd(r.economics.priceCents)} for {formatKWh(r.targetBatteryWh)} on port {r.portLabel}
         </h1>
         <div className="flex flex-wrap items-center gap-2 badge-wrap">
@@ -116,7 +116,7 @@ export function ReservationStatus({ id }: { id: string }) {
         {r.recovery && <RecoveryStatus recovery={r.recovery} />}
       </div>
 
-      <div className="grid gap-5 min-[900px]:grid-cols-2 no-print">
+      <div className="stagger grid gap-5 min-[900px]:grid-cols-2 no-print">
         <ChargingPanel r={r} shown={shown} busy={busy} onSimulate={simulate} />
         <PaymentPanel r={r} />
       </div>
@@ -126,7 +126,7 @@ export function ReservationStatus({ id }: { id: string }) {
       <AskAssistant reservationId={r.id} />
 
       <p className="text-[14px] no-print">
-        <Link href="/drive" className="underline underline-offset-4">
+        <Link href="/drive" className="link-arrow">
           Request another charge
         </Link>
       </p>

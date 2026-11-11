@@ -39,7 +39,7 @@ interface BarRow {
 function Bars({ title, unit, rows, markW }: { title: string; unit: string; rows: BarRow[]; markW?: { value: number; label: string } }) {
   const max = Math.max(1, markW?.value ?? 0, ...rows.map((r) => r.value));
   return (
-    <figure className="card p-5 space-y-3 min-w-0">
+    <figure className="card card-lift p-5 space-y-3 min-w-0">
       <figcaption>
         <span className="block text-[15px] font-semibold">{title}</span>
         <span className="meta">
@@ -53,8 +53,8 @@ function Bars({ title, unit, rows, markW }: { title: string; unit: string; rows:
               <span className={r.highlight ? "font-semibold text-teal-ink" : "text-text-2"}>{r.label}</span>
               <span className="tabular">{r.text}</span>
             </div>
-            <div className="relative mt-1 h-2.5 rounded-[2px] bg-[var(--chart-track)]" aria-hidden="true">
-              <div className="h-full rounded-[2px]" style={{ width: `${(r.value / max) * 100}%`, background: r.highlight ? "var(--teal)" : "var(--chart-bar-muted)" }} />
+            <div className="bar-track relative mt-1 h-3 rounded-full bg-[var(--chart-track)]" aria-hidden="true">
+              <div className="bar-fill h-full rounded-full" style={{ width: `${(r.value / max) * 100}%`, background: r.highlight ? "var(--teal)" : "var(--chart-bar-muted)" }} />
               {markW && <span className="absolute -inset-y-1 border-l-2 border-ink" style={{ left: `${(markW.value / max) * 100}%` }} />}
             </div>
           </li>
@@ -67,9 +67,9 @@ function Bars({ title, unit, rows, markW }: { title: string; unit: string; rows:
 
 function Headline({ k, v, sub, alert = false }: { k: string; v: string; sub: string; alert?: boolean }) {
   return (
-    <div className="min-w-0 space-y-1">
+    <div className="stat min-w-0 space-y-1">
       <dt className="meta">{k}</dt>
-      <dd className={`text-[clamp(26px,3vw,34px)] font-semibold leading-tight tracking-[-0.02em] tabular ${alert ? "text-red" : ""}`}>{v}</dd>
+      <dd className={`num-rise text-[clamp(26px,3vw,34px)] font-semibold leading-tight tracking-[-0.02em] tabular ${alert ? "text-red" : ""}`}>{v}</dd>
       <dd className="text-[13px] text-muted">{sub}</dd>
     </div>
   );
@@ -89,7 +89,7 @@ export function Highlights({ s }: { s: BenchmarkSummary }) {
         <h2 id="hl" className="eyebrow">
           At a glance
         </h2>
-        <dl className="grid gap-x-5 gap-y-5 border-t border-ink pt-5 grid-cols-2 min-[700px]:grid-cols-[repeat(auto-fit,minmax(170px,1fr))]">
+        <dl className="stagger grid gap-x-5 gap-y-5 border-t border-ink pt-5 grid-cols-2 min-[700px]:grid-cols-[repeat(auto-fit,minmax(170px,1fr))]">
           <Headline k="Requests simulated" v={n(h.requestCount)} sub={`${n(s.scenarioCount)} seeded scenarios`} />
           <Headline k="Optimized served" v={o ? n(o.served) : "n/a"} sub={o ? `${o.infeasible} infeasible` : "no optimized policy in results"} />
           <Headline k="Hard-constraint violations" v={n(h.totalViolations)} sub="reported, all policies" />
@@ -108,7 +108,7 @@ export function Highlights({ s }: { s: BenchmarkSummary }) {
         </dl>
       </div>
 
-      <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))]">
+      <div className="stagger grid gap-4 grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))]">
         <Bars title="Mean modeled energy cost per served request" unit="USD" rows={rows((p) => p.meanEnergyCostCentsPerServed, (p) => usd(p.meanEnergyCostCentsPerServed))} />
         <Bars title="Mean site peak load" unit="kW" rows={rows((p) => p.meanPeakSiteW, (p) => kw(p.meanPeakSiteW))} markW={{ value: USABLE_CAP_W, label: `usable cap ${kw(USABLE_CAP_W)}` }} />
         <Bars title="Requests touching congestion" unit="count" rows={rows((p) => p.congestedRequests, (p) => `${n(p.congestedRequests)} of ${n(s.requestCount)}`)} />
@@ -125,9 +125,9 @@ export function Highlights({ s }: { s: BenchmarkSummary }) {
 function RequestByRequest({ s }: { s: BenchmarkSummary }) {
   const seg = (count: number, pairs: number) => (count === 0 ? "0" : `max(3px, ${(count / pairs) * 100}%)`);
   return (
-    <section aria-labelledby="rbr" className="card p-5 sm:p-6 space-y-5">
+    <section aria-labelledby="rbr" className="card ops-panel p-5 sm:p-6 space-y-5">
       <div className="space-y-1">
-        <h2 id="rbr" className="text-[22px] font-semibold tracking-[-0.01em]">
+        <h2 id="rbr" className="panel-title text-[22px] font-semibold">
           Request by request
         </h2>
         <p className="text-[14px] text-muted">Optimized versus each baseline on the same served request. Requests either policy could not serve are excluded and counted.</p>
@@ -141,9 +141,9 @@ function RequestByRequest({ s }: { s: BenchmarkSummary }) {
                 {n(c.pairs)} paired · mean difference {usd(c.meanDeltaCents)}
               </span>
             </div>
-            <div className="flex h-4 overflow-hidden rounded-[3px]" aria-hidden="true">
+            <div className="split-bar flex h-5 overflow-hidden rounded-full" aria-hidden="true">
               <span style={{ width: seg(c.optimizedCheaper, c.pairs), background: "var(--teal)" }} />
-              <span style={{ width: seg(c.equal, c.pairs), background: "#d9d5cb" }} />
+              <span style={{ width: seg(c.equal, c.pairs), background: "var(--line-strong)" }} />
               <span style={{ width: seg(c.optimizedWorse, c.pairs), background: "var(--red)" }} />
             </div>
             <p className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] tabular">

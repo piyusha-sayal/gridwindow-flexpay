@@ -30,19 +30,24 @@ export function AskAssistant({ reservationId }: { reservationId: string }) {
   }
 
   return (
-    <section className="card p-5 sm:p-6 space-y-4 no-print" aria-labelledby="ask-title">
-      <div className="space-y-1">
+    <section className="card agent-panel p-5 sm:p-6 space-y-4 no-print" aria-labelledby="ask-title">
+      <div className="ask-head">
+        <span aria-hidden="true" className="icon-tile">
+          <span className="ico ico-spark" />
+        </span>
+        <div className="space-y-1">
         <h2 id="ask-title" className="text-[20px] font-semibold tracking-[-0.01em]">
           Questions about this charge?
         </h2>
         <p className="text-[14px] text-muted">Answers use only this reservation&apos;s recorded facts. The assistant cannot change, cancel, refund or charge anything.</p>
+        </div>
       </div>
-      <ul className="flex flex-wrap gap-2" aria-label="Suggested questions">
+      <ul className="stagger flex flex-wrap gap-2" aria-label="Suggested questions">
         {SUGGESTIONS.map((s) => (
           <li key={s}>
             <button
               type="button"
-              className="rounded-[var(--r-pill)] border border-line-strong bg-surface px-3.5 py-1.5 text-[14px] hover:border-ink disabled:opacity-50"
+              className="suggest-chip rounded-[var(--r-pill)] border border-line-strong px-3.5 py-1.5 text-[14px] disabled:opacity-50"
               disabled={busy}
               onClick={() => {
                 setQuestion(s);
@@ -75,7 +80,7 @@ export function AskAssistant({ reservationId }: { reservationId: string }) {
         </p>
       )}
       {answer && (
-        <div className="space-y-2 border-l-2 border-teal pl-4 text-[15px]" aria-live="polite">
+        <div className="ai-answer space-y-2 text-[15px]" aria-live="polite">
           <AiSourceBadge src={answer} />
           <p>{answer.answer}</p>
         </div>

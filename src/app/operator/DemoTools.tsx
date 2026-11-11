@@ -36,7 +36,7 @@ export function DemoTools({ nightOf, onDone }: { nightOf: string; onDone: () => 
   }
 
   return (
-    <section className="rounded-[var(--r-card-sm)] border border-dashed border-line-strong px-4 py-3 space-y-2" aria-labelledby="demo-title">
+    <section className="demo-tools px-4 py-3 space-y-2" aria-labelledby="demo-title">
       <div className="flex flex-wrap gap-x-4 gap-y-2 items-center">
       <h2 id="demo-title" className="font-mono text-[11px] font-medium tracking-[0.1em] uppercase text-muted">
         Demo tools (development only · MOCK)
@@ -45,7 +45,7 @@ export function DemoTools({ nightOf, onDone }: { nightOf: string; onDone: () => 
           Seed background drivers for {nightOf}
         </button>
         {confirmReset ? (
-          <div role="group" aria-labelledby="reset-q" className="flex flex-wrap gap-2 items-center" onKeyDown={(e) => e.key === "Escape" && cancelReset()}>
+          <div role="group" aria-labelledby="reset-q" className="confirm-danger flex flex-wrap gap-2 items-center" onKeyDown={(e) => e.key === "Escape" && cancelReset()}>
             <span id="reset-q" className="text-[14px] text-red">
               Delete all reservations, quotes and events?
             </span>
@@ -63,7 +63,7 @@ export function DemoTools({ nightOf, onDone }: { nightOf: string; onDone: () => 
         )}
       </div>
       {message && (
-        <p className="text-[14px] text-muted" role="status">
+        <p className="demo-status text-[14px] text-text-2" role="status">
           {message}
         </p>
       )}

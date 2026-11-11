@@ -24,7 +24,8 @@ export function ScheduleChart({ model, lane }: ScheduleChartProps) {
   // Header labels in the station zone. Memoized so a poll does not reset the timeline.
   const viewPreset = useMemo(() => scheduleViewPreset(model.timeZone), [model.timeZone]);
   return (
-    <BryntumScheduler
+    <div className="schedule-chart">
+      <BryntumScheduler
       startDate={startDate}
       endDate={endDate}
       viewPreset={viewPreset}
@@ -34,6 +35,7 @@ export function ScheduleChart({ model, lane }: ScheduleChartProps) {
       readOnly
       rowHeight={56}
       height={260}
-    />
+      />
+    </div>
   );
 }

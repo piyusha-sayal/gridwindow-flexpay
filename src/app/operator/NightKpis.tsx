@@ -17,14 +17,14 @@ export function NightKpis({ d }: { d: OperatorDashboard }) {
 
   return (
     <section aria-label="Night summary" className="space-y-4">
-      <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))]">
-        <div className="card card-navy p-5 space-y-3">
+      <div className="stagger grid gap-4 grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))]">
+        <div className="card card-navy kpi-tile p-5 space-y-3">
           <p className="eyebrow">Planned peak load</p>
-          <p className="text-[44px] font-semibold leading-none tracking-[-0.03em] tabular">{kw(n.plannedPeakW)}</p>
+          <p className="kpi-figure num-rise text-[clamp(40px,4.4vw,52px)] font-semibold leading-none tracking-[-0.04em] tabular">{kw(n.plannedPeakW)}</p>
           <div className="space-y-1.5">
-            <div className="relative h-2.5 rounded-full bg-white/15" aria-hidden="true">
-              <span className={`absolute inset-y-0 left-0 rounded-full ${over ? "bg-red" : "bg-teal-bright"}`} style={{ width: pct(n.plannedPeakW, usableCapW) }} />
-              <span className="absolute -inset-y-1 border-l-2 border-dashed border-amber" style={{ left: pct(d.congestionThresholdW, usableCapW) }} />
+            <div className="load-track relative h-3 rounded-full bg-white/15" aria-hidden="true">
+              <span className={`load-fill absolute inset-y-0 left-0 rounded-full ${over ? "is-over bg-red" : "bg-teal-bright"}`} style={{ width: pct(n.plannedPeakW, usableCapW) }} />
+              <span className="load-mark absolute -inset-y-1 border-l-2 border-dashed border-amber" style={{ left: pct(d.congestionThresholdW, usableCapW) }} />
             </div>
             <p className="meta">
               of {kw(usableCapW)} usable cap · congestion above {kw(d.congestionThresholdW)}
@@ -35,17 +35,17 @@ export function NightKpis({ d }: { d: OperatorDashboard }) {
           </p>
         </div>
 
-        <div className="card p-5 space-y-3">
+        <div className="card kpi-tile p-5 space-y-3">
           <p className="eyebrow">Captured revenue · provider-confirmed</p>
-          <p className="text-[44px] font-semibold leading-none tracking-[-0.03em] tabular">{formatUsd(n.capturedRevenueCents)}</p>
+          <p className="kpi-figure num-rise text-gradient text-[clamp(40px,4.4vw,52px)] font-semibold leading-none tracking-[-0.04em] tabular">{formatUsd(n.capturedRevenueCents)}</p>
           <p className="text-[14px] text-text-2">
             {n.capturedCount} captured by provider · realized modeled contribution +{formatUsd(n.realizedContributionCents)}
           </p>
         </div>
 
-        <div className={`card p-5 space-y-3 ${attention.length > 0 ? "border-[var(--amber-line)] bg-warn-soft" : ""}`}>
+        <div className={`card kpi-tile p-5 space-y-3 ${attention.length > 0 ? "is-attention pulse-ring border-[var(--amber-line)] bg-warn-soft" : ""}`}>
           <p className="eyebrow">Needs attention</p>
-          <p className={`text-[44px] font-semibold leading-none tracking-[-0.03em] tabular ${attention.length > 0 ? "text-[var(--amber-ink)]" : ""}`}>{n.needsAttention}</p>
+          <p className={`kpi-figure num-rise text-[clamp(40px,4.4vw,52px)] font-semibold leading-none tracking-[-0.04em] tabular ${attention.length > 0 ? "text-warn" : ""}`}>{n.needsAttention}</p>
           {attention.length > 0 ? (
             <ul className="space-y-0.5 font-mono text-[12px]" aria-label="Reservations needing attention">
               {attention.map((s) => (
@@ -61,7 +61,7 @@ export function NightKpis({ d }: { d: OperatorDashboard }) {
         </div>
       </div>
 
-      <dl className="grid gap-x-6 gap-y-3 border-y border-line py-4 grid-cols-[repeat(auto-fit,minmax(min(170px,100%),1fr))]">
+      <dl className="stat-strip stagger grid gap-x-6 gap-y-3 py-4 grid-cols-[repeat(auto-fit,minmax(min(170px,100%),1fr))]">
         <Stat k="Vehicles parked" v={String(n.vehiclesParked)} sub={`${n.portsInUse} of ${d.ports.length} ports occupied`} />
         <Stat k="Scheduled to charge" v={String(n.activeReservations)} sub={`of ${d.sessions.length} reservation(s)`} />
         <Stat k="Modeled energy cost" v={formatUsd(n.energyCostCents)} sub={`vs ${formatUsd(n.baselineEnergyCostCents)} if charged on arrival`} />
@@ -74,9 +74,9 @@ export function NightKpis({ d }: { d: OperatorDashboard }) {
 
 function Stat({ k, v, sub }: { k: string; v: string; sub: string }) {
   return (
-    <div className="min-w-0">
+    <div className="stat min-w-0">
       <dt className="meta">{k}</dt>
-      <dd className="mt-1 text-[22px] font-semibold tracking-[-0.01em] tabular">{v}</dd>
+      <dd className="stat-value mt-1 text-[22px] font-semibold tabular">{v}</dd>
       <dd className="text-[13px] text-muted">{sub}</dd>
     </div>
   );

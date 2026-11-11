@@ -89,10 +89,10 @@ export function RecoveryPanel({ nightOf }: { nightOf: string }) {
   const selectedReservation = selectedDisruption?.reservationId ?? null;
   const selectedAttribution: FaultAttribution = selectedDisruption?.attribution ?? "UNKNOWN";
   return (
-    <section className="card p-5 sm:p-6 space-y-5" aria-labelledby="recovery-title">
+    <section className="card ops-panel p-5 sm:p-6 space-y-5" aria-labelledby="recovery-title">
       <div className="space-y-1">
         <p className="eyebrow">Synthetic disturbance</p>
-        <h2 id="recovery-title" className="text-[22px] font-semibold tracking-[-0.01em]">
+        <h2 id="recovery-title" className="panel-title text-[22px] font-semibold">
           Recovery engine
         </h2>
         <p className="meta">Injected disturbances are simulated inputs. They are not real grid or charger events.</p>
@@ -102,13 +102,13 @@ export function RecoveryPanel({ nightOf }: { nightOf: string }) {
       {notice && <Alert tone="info">{notice}</Alert>}
 
       {!schedule ? (
-        <p aria-live="polite" className="text-muted">
+        <p aria-live="polite" className="working text-muted">
           Loading sessions…
         </p>
       ) : schedule.sessions.length === 0 ? (
         <p className="text-muted text-[14px]">No authorized, scheduled sessions on this night to disturb.</p>
       ) : (
-        <form onSubmit={(e) => void inject(e)} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 items-end" aria-label="Inject a synthetic disturbance">
+        <form onSubmit={(e) => void inject(e)} className="inject-form grid gap-4 sm:grid-cols-2 lg:grid-cols-5 items-end" aria-label="Inject a synthetic disturbance">
           <div>
             <label htmlFor="rec-session" className="label">
               Session
@@ -178,7 +178,7 @@ function AttributionGroup({ type, value, onChange }: { type: DisturbanceType; va
       <legend className="label">Fault attribution</legend>
       <div className="flex flex-wrap gap-x-5 gap-y-2">
         {choices.map(({ value: option, allowed: isAllowed }) => (
-          <label key={option} className={`flex items-start gap-2 text-[14px] ${isAllowed ? "" : "text-muted"}`}>
+          <label key={option} className={`check-row flex items-start gap-2 text-[14px] ${isAllowed ? "" : "text-muted"}`}>
             <input
               type="radio"
               name="rec-attribution"
@@ -221,14 +221,14 @@ function DisturbanceList({
   return (
     <div className="space-y-2">
       <h3 className="text-[16px] font-semibold">Recorded disturbances</h3>
-      <ul className="space-y-2">
+      <ul className="stagger space-y-2">
         {disruptions.map((d) => (
           <li key={d.eventId}>
             <button
               type="button"
               aria-pressed={selected === d.eventId}
               onClick={() => onSelect(d.eventId)}
-              className="w-full flex flex-wrap items-center justify-between gap-2 rounded-[var(--r-card-sm)] border border-line px-3 py-2 text-left text-[14px] hover:bg-paper"
+              className="event-row w-full flex flex-wrap items-center justify-between gap-2 rounded-[var(--r-card-sm)] border border-line px-3 py-2 text-left text-[14px]"
             >
               <span>
                 {DISTURBANCE_LABEL[d.type]} · effective slot {d.effectiveSlot}

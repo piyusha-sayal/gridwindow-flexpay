@@ -79,8 +79,8 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
   const lowest = quote.offers.length > 1 ? lowestPriceOfferIds(quote.offers) : new Set<string>();
 
   return (
-    <div className={`space-y-3 min-[760px]:space-y-0 min-[760px]:rounded-[var(--r-panel)] min-[760px]:border min-[760px]:border-line min-[760px]:bg-surface min-[760px]:overflow-hidden transition-opacity ${expired ? "opacity-45" : ""}`}>
-      <div className={`${ROW} px-1 min-[760px]:px-5 min-[760px]:py-3`}>
+    <div className={`offer-table space-y-3 min-[760px]:space-y-0 min-[760px]:rounded-[var(--r-panel)] min-[760px]:border min-[760px]:border-line min-[760px]:bg-surface min-[760px]:overflow-hidden transition-opacity ${expired ? "opacity-45" : ""}`}>
+      <div className={`offer-head ${ROW} px-1 min-[760px]:px-5 min-[760px]:py-3`}>
         <span className="hidden min-[760px]:block meta">Option</span>
         <div className="col-span-2 min-[760px]:col-span-1 space-y-1.5">
           <TariffStrip axis={axis} className="h-5" />
@@ -90,7 +90,7 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
         <span className="hidden min-[760px]:block meta text-right">Price</span>
       </div>
 
-      <div className={`${ROW} rounded-[var(--r-card-sm)] border border-line bg-surface px-4 py-4 min-[760px]:rounded-none min-[760px]:border-0 min-[760px]:border-t min-[760px]:bg-paper/50 min-[760px]:px-5`}>
+      <div className={`offer-row ${ROW} rounded-[var(--r-card-sm)] border border-line bg-surface px-4 py-4 min-[760px]:rounded-none min-[760px]:border-0 min-[760px]:border-t min-[760px]:bg-paper/50 min-[760px]:px-5`}>
         <div className="min-w-0">
           <p className="text-[16px] font-semibold">Charge now</p>
           <p className="meta">Comparison only · not bookable</p>
@@ -125,9 +125,9 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
             const pct = Math.round((o.discountCents / o.listPriceCents) * 100);
             const t = offerTraits(o);
             return (
-              <div key={o.offerId}>
+              <div key={o.offerId} className="offer-item">
               <label
-                className={`${ROW} cursor-pointer rounded-[var(--r-card-sm)] border bg-surface px-4 py-4 transition-[background,box-shadow] min-[760px]:rounded-none min-[760px]:border-0 min-[760px]:border-t min-[760px]:border-line min-[760px]:px-5 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-teal-ink ${on ? "border-ink shadow-[inset_0_0_0_1px_var(--ink)] min-[760px]:bg-teal-tint min-[760px]:shadow-[inset_0_0_0_1.5px_var(--ink)]" : "border-line hover:bg-paper/60"}`}
+                className={`offer-row offer-card ${ROW} cursor-pointer rounded-[var(--r-card-sm)] border bg-surface px-4 py-4 min-[760px]:rounded-none min-[760px]:border-0 min-[760px]:border-t min-[760px]:border-line min-[760px]:px-5 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-teal-ink ${on ? "is-selected border-ink shadow-[inset_0_0_0_1px_var(--ink)] min-[760px]:bg-teal-tint min-[760px]:shadow-[inset_0_0_0_1.5px_var(--ink)]" : "border-line hover:bg-paper/60"}`}
               >
                 <span className="flex min-w-0 items-start gap-3">
                   <input id={`offer-${o.kind}`} type="radio" name="offer" className="mt-1 h-4 w-4 shrink-0 accent-[var(--ink)]" checked={on} disabled={blocked} onChange={() => onSelect(o.offerId)} />
@@ -140,7 +140,7 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
                           Tied lowest price ({lowest.size} of {quote.offers.length} offers)
                         </span>
                       )}
-                      {deal?.recommendedOfferId === o.offerId && <span className="badge no-dot tone-success">Agent recommends</span>}
+                      {deal?.recommendedOfferId === o.offerId && <span className="badge badge-rec no-dot tone-success">Agent recommends</span>}
                       {blocked && <span className="badge no-dot tone-warn">Below your required {formatUsd(quote.requiredMinSavingsCents!)} saving · change requirements to choose</span>}
                       {belowPreference && <span className="badge no-dot tone-warn">Below your preferred {formatUsd(preferredMinSavingsCents!)} saving</span>}
                       {o.kind === recommendedKind && <span className="badge no-dot tone-info">Your preference</span>}
@@ -154,7 +154,7 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
                   {formatLocalTime(t.readyByMs, tz)}
                 </span>
                 <span className={`col-start-2 row-start-1 text-right tabular ${CELL_RESET}`}>
-                  <span className="block text-[26px] font-semibold leading-tight tracking-[-0.02em]">{formatUsd(o.priceCents)}</span>
+                  <span className="offer-price block text-[26px] font-semibold leading-tight">{formatUsd(o.priceCents)}</span>
                   <span className="block text-[13px] font-medium text-teal-ink">
                     save {formatUsd(o.discountCents)} · {pct}%
                   </span>
@@ -168,7 +168,7 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
       )}
 
       {quote.rejected.length > 0 && (
-        <div className="rounded-[var(--r-card-sm)] border border-line bg-surface px-4 py-4 min-[760px]:rounded-none min-[760px]:border-0 min-[760px]:border-t min-[760px]:px-5">
+        <div className="offer-rejected rounded-[var(--r-card-sm)] border border-line bg-surface px-4 py-4 min-[760px]:rounded-none min-[760px]:border-0 min-[760px]:border-t min-[760px]:px-5">
           <h2 className="meta mb-2">Not offered ({quote.rejected.length})</h2>
           <ul className="space-y-1 text-[14px] text-muted">
             {quote.rejected.map((r) => (
@@ -180,7 +180,7 @@ export function OfferList({ quote, tz, selected, recommendedKind, deal = null, p
         </div>
       )}
 
-      <p className="flex flex-wrap gap-x-5 gap-y-1 px-1 py-3 meta min-[760px]:border-t min-[760px]:border-line min-[760px]:px-5">
+      <p className="offer-legend flex flex-wrap gap-x-5 gap-y-1 px-1 py-3 meta min-[760px]:border-t min-[760px]:border-line min-[760px]:px-5">
         <span>▒ Plugged in</span>
         <span>┆ You leave</span>
         <span>▮ Charging · bar height = power</span>
@@ -228,7 +228,7 @@ export function planFitPoints(offer: PricedOffer, quote: QuoteSet, recommendedKi
 function PlanFit({ offer, quote, recommendedKind, tz }: { offer: PricedOffer; quote: QuoteSet; recommendedKind: PricedOffer["kind"]; tz: string }) {
   const points = planFitPoints(offer, quote, recommendedKind, tz);
   return (
-    <details className="px-4 pb-3 pt-1 min-[760px]:px-5 text-[13px] text-text-2">
+    <details className="plan-fit px-4 pb-3 pt-1 min-[760px]:px-5 text-[13px] text-text-2">
       <summary className="cursor-pointer text-teal-ink underline underline-offset-4">Why this plan fits</summary>
       <ul className="mt-2 list-disc space-y-1 pl-5">
         {points.map((p) => (

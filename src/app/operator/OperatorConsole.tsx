@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { api, ApiError } from "@/components/api";
@@ -9,6 +10,7 @@ import { DemoTools } from "./DemoTools";
 import { DetailPanel } from "./DetailPanel";
 import { LoadPanel } from "./LoadPanel";
 import { NightKpis } from "./NightKpis";
+import { OperatorScene } from "./OperatorScene";
 import { PortTimeline } from "./PortTimeline";
 import { RecoveryPanel } from "./RecoveryPanel";
 import { ReservationTable, type OperatorAction } from "./ReservationTable";
@@ -23,7 +25,7 @@ export function OperatorConsole() {
       .catch(() => setAuthed(false));
   }, []);
 
-  if (authed === null) return <p aria-live="polite" className="text-muted">Checking operator session…</p>;
+  if (authed === null) return <p aria-live="polite" className="flow-loading text-muted">Checking operator session…</p>;
   if (!authed) return <Login onDone={() => setAuthed(true)} error={error} setError={setError} />;
   return (
     <Dashboard
@@ -52,24 +54,33 @@ function Login({ onDone, error, setError }: { onDone: () => void; error: string 
     }
   }
   return (
-    <form onSubmit={submit} className="card p-6 sm:p-8 max-w-sm mx-auto space-y-5">
-      <p className="eyebrow">Operator</p>
-      <h1 className="text-[28px] font-semibold tracking-[-0.02em]">Operator sign-in</h1>
-      {error && (
-        <p role="alert" className="text-red text-[14px]">
-          {error}
-        </p>
-      )}
-      <div>
-        <label htmlFor="pass" className="label">
-          Passphrase
-        </label>
-        <input id="pass" type="password" autoComplete="current-password" className="field" value={pass} onChange={(e) => setPass(e.target.value)} required />
+    <div className="login-split">
+      <div className="login-visual" aria-hidden="true">
+        <Image src="/images/operator-signin.jpg" alt="" width={800} height={522} sizes="(min-width: 860px) 480px, 100vw" priority className="login-visual-photo" />
       </div>
-      <button className="btn btn-primary btn-lg w-full" disabled={busy}>
-        {busy ? "Signing in…" : "Sign in"}
-      </button>
-    </form>
+      <form onSubmit={submit} className="card ring-flow login-card p-6 sm:p-10 space-y-5">
+        <span aria-hidden="true" className="icon-tile">
+          <span className="ico ico-shield" />
+        </span>
+        <p className="eyebrow">Operator</p>
+        <h1 className="login-title">Operator sign-in</h1>
+        <p className="login-sub">Authorised staff only. Enter the operator passphrase to open the reservation console.</p>
+        {error && (
+          <p role="alert" className="text-red text-[14px]">
+            {error}
+          </p>
+        )}
+        <div>
+          <label htmlFor="pass" className="label">
+            Passphrase
+          </label>
+          <input id="pass" type="password" autoComplete="current-password" className="field" placeholder="Enter passphrase" value={pass} onChange={(e) => setPass(e.target.value)} required />
+        </div>
+        <button className="btn btn-primary btn-lg btn-glow w-full" disabled={busy}>
+          {busy ? "Signing in…" : "Sign in"}
+        </button>
+      </form>
+    </div>
   );
 }
 
@@ -168,7 +179,7 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
 
   if (!data) return error ? <Alert tone="danger" title="Dashboard unavailable">{error}</Alert> : (
       <div aria-live="polite" aria-busy="true" className="space-y-3">
-        <p className="text-muted">Loading dashboard…</p>
+        <p className="working text-muted">Loading dashboard…</p>
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4" aria-hidden="true">
           {Array.from({ length: 4 }, (_, i) => (
             <div key={i} className="skeleton h-20" />
@@ -182,17 +193,21 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-5">
+      <div className="ops-scene-banner" aria-hidden="true">
+        <OperatorScene />
+      </div>
+      <header className="ops-head flex flex-wrap items-end justify-between gap-5">
         <div className="space-y-2">
-          <p className="meta">
+          <p className="meta ops-status">
+            <span aria-hidden="true" className="live-dot" />
             {d.ports.length} ports · provider {d.providerMode === "PAYPAL_SANDBOX" ? "PayPal Sandbox" : "MOCK (simulated)"} · {d.ai.label} · synthetic site and tariff
           </p>
-          <h1 className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(30px,4.2vw,44px)]">
+          <h1 className="ops-title font-semibold leading-[1.02] text-[clamp(30px,4.2vw,48px)]">
             {when} at {site}
           </h1>
         </div>
         <form
-          className="flex flex-wrap items-end gap-2"
+          className="ops-controls flex flex-wrap items-end gap-2"
           onSubmit={(e) => {
             e.preventDefault();
             void load(night);
@@ -223,7 +238,10 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
       {data.demoTools && <DemoTools nightOf={d.nightOf} onDone={() => void load(d.nightOf)} />}
 
       {d.sessions.length === 0 ? (
-        <section className="card p-8 text-center space-y-4" aria-labelledby="empty-title">
+        <section className="card empty-card p-8 text-center space-y-4" aria-labelledby="empty-title">
+          <span aria-hidden="true" className="icon-tile mx-auto">
+            <span className="ico ico-plug" />
+          </span>
           <h2 id="empty-title" className="text-[22px] font-semibold">
             No reservations for this night yet
           </h2>
@@ -244,11 +262,11 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
       {toast && (
         <div
           role="status"
-          className="fixed left-1/2 z-40 flex w-[min(560px,calc(100%-2rem))] -translate-x-1/2 items-center justify-between gap-4 rounded-[var(--r-card-sm)] bg-ink px-4 py-3 text-[14px] text-white shadow-[var(--shadow-receipt)]"
+          className="toast fixed left-1/2 z-40 flex w-[min(560px,calc(100%-2rem))] -translate-x-1/2 items-center justify-between gap-4 rounded-[var(--r-card-sm)] bg-navy px-4 py-3 text-[14px] text-white"
           style={{ bottom: "calc(1rem + env(safe-area-inset-bottom))" }}
         >
           <span className="min-w-0 [overflow-wrap:anywhere]">{toast}</span>
-          <button type="button" className="font-mono text-[12px] text-teal-bright" onClick={() => setToast(null)}>
+          <button type="button" className="toast-dismiss font-mono text-[12px] text-teal-bright" onClick={() => setToast(null)}>
             Dismiss
           </button>
         </div>

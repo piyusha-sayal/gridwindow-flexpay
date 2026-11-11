@@ -15,7 +15,7 @@ export function ExpiryChip({ secondsLeft, label = "Prices held" }: { secondsLeft
   const expired = secondsLeft === 0;
   const tone = expired ? "tone-danger" : secondsLeft < 120 ? "tone-warn" : "tone-neutral";
   return (
-    <span className={`badge ${tone}`}>
+    <span className={`badge expiry-chip ${tone}`}>
       <span aria-live="off">{expired ? "Offer expired" : `${label} ${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, "0")}`}</span>
     </span>
   );
@@ -46,13 +46,13 @@ export function OffersStep({ quote, tz, selected, offer, recommendedKind, deal, 
   const traits = offer ? offerTraits(offer) : null;
 
   return (
-    <div className="space-y-6">
+    <div className="step-enter space-y-6">
       <header className="space-y-3">
-        <p className="meta">
+        <p className="meta step-kicker">
           {formatKWh(quote.request.targetBatteryWh)} to battery · parked {formatLocalTime(quote.request.plugInMs, tz)}–{formatLocalTime(quote.request.departMs, tz)}
         </p>
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <h1 id="offers-title" tabIndex={-1} className="max-w-[22ch] font-semibold tracking-[-0.03em] leading-[1.08] text-[clamp(28px,3.6vw,40px)]">
+          <h1 id="offers-title" tabIndex={-1} className="step-title max-w-[22ch] font-semibold leading-[1.05] text-[clamp(30px,4vw,46px)]">
             {none ? (quote.baseline.feasible ? "No flexible offer is available for this request." : "This request cannot be met before your departure.") : offersHeadline(quote.offers)}
           </h1>
           {!none && (
@@ -65,7 +65,7 @@ export function OffersStep({ quote, tz, selected, offer, recommendedKind, deal, 
       </header>
 
       {expired && !none && (
-        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--r-card-sm)] border border-[var(--red-line)] bg-danger-soft px-4 py-3 text-[var(--red-ink)]">
+        <div role="alert" className="expired-banner pulse-ring pulse-ring-red flex flex-wrap items-center justify-between gap-3 px-4 py-3">
           <p className="text-[14px]">These prices expired. Prices and capacity can change, so request fresh offers.</p>
           <button type="button" className="btn btn-sm" onClick={onRefresh} disabled={refreshing}>
             {refreshing ? "Refreshing…" : "Refresh offers"}
@@ -83,13 +83,13 @@ export function OffersStep({ quote, tz, selected, offer, recommendedKind, deal, 
 
       {offer && traits && (
         <section aria-label={`${offer.label} at a glance`} className="space-y-4">
-          <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-[var(--r-card-sm)] border border-line bg-line text-[15px] tabular">
+          <dl className="glance grid grid-cols-3 gap-px overflow-hidden text-[15px] tabular">
             {[
               ["Charging time", hoursMinutes(traits.chargingSlots)],
               ["Max power", `${(traits.maxPowerW / 1000).toFixed(1)} kW`],
               ["To your battery", formatKWh(Math.floor(offer.batteryMilliWh / 1000))],
             ].map(([k, v]) => (
-              <div key={k} className="min-w-0 bg-surface px-3 py-3 sm:px-4">
+              <div key={k} className="glance-cell min-w-0 px-3 py-3 sm:px-4">
                 <dt className="meta">{k}</dt>
                 <dd className="mt-1 font-semibold">{v}</dd>
               </div>
@@ -100,12 +100,12 @@ export function OffersStep({ quote, tz, selected, offer, recommendedKind, deal, 
       )}
 
       {!none && (
-        <Link href={impactHref} className="inline-block text-[14px] text-teal-ink underline underline-offset-4">
+        <Link href={impactHref} className="link-arrow text-[14px]">
           Compare in Impact Lab
         </Link>
       )}
 
-      <p className="text-[13px] text-muted">
+      <p className="fine-print text-[13px] text-muted">
         All prices, tariffs and costs are synthetic modeled assumptions, not real fees or measured savings. Assumptions: {quote.assumptions.tariff}; {quote.assumptions.economics}; {quote.assumptions.forecast}. Provenance:{" "}
         {quote.assumptions.provenance}. Port limit: {quote.capacity.portMaxPowerW / 1000} kW; efficiency 92 % assumed.
       </p>
@@ -117,7 +117,7 @@ function NoOffers({ quote, onEdit }: { quote: QuoteSet; onEdit: () => void }) {
   const cap = quote.capacity;
   const physicallyImpossible = cap.maxBatteryWh < cap.requiredBatteryWh;
   return (
-    <div className="space-y-4" role="status">
+    <div className="no-offers space-y-4" role="status">
       {physicallyImpossible ? (
         <p className="text-text-2">
           You asked for {formatKWh(cap.requiredBatteryWh)}, but parked for {hoursMinutes(cap.parkedSlots)} on a {cap.portMaxPowerW / 1000} kW port at most {formatKWh(cap.maxBatteryWh)} can reach the

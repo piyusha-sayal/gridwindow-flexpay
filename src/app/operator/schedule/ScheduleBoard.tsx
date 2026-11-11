@@ -14,7 +14,7 @@ import { useScheduleView } from "./useScheduleView";
 /** Bryntum is loaded only on this operator route, never in public pages, and never on the server. */
 const ScheduleChart = dynamic(() => import("./ScheduleChart").then((m) => m.ScheduleChart), {
   ssr: false,
-  loading: () => <p className="p-4 text-muted" aria-live="polite">Loading timeline…</p>,
+  loading: () => <p className="working p-4 text-muted" aria-live="polite">Loading timeline…</p>,
 });
 
 type Gate = "checking" | "operator" | "signed-out";
@@ -35,7 +35,7 @@ export function ScheduleBoard({ nightOf }: { nightOf: string | null }) {
       .catch(() => setGate("signed-out"));
   }, []);
 
-  if (gate === "checking") return <p aria-live="polite" className="text-muted">Checking operator session…</p>;
+  if (gate === "checking") return <p aria-live="polite" className="flow-loading text-muted">Checking operator session…</p>;
   if (gate === "signed-out") {
     return (
       <Alert tone="warn" title="Operator sign-in required">
@@ -56,7 +56,7 @@ export function ScheduleBoard({ nightOf }: { nightOf: string | null }) {
   if (!view || !model) {
     return (
       <div aria-live="polite" aria-busy="true" className="space-y-3">
-        <p className="text-muted">Loading schedule…</p>
+        <p className="working text-muted">Loading schedule…</p>
         <div className="skeleton h-64" aria-hidden="true" />
       </div>
     );
@@ -72,7 +72,7 @@ export function ScheduleBoard({ nightOf }: { nightOf: string | null }) {
   return (
     <div className="space-y-6">
       {notice && (
-        <div role="status" className="card p-4 flex flex-wrap items-center justify-between gap-3">
+        <div role="status" className="card card-accent p-4 flex flex-wrap items-center justify-between gap-3">
           <p className="text-[14px]">
             Schedule updated by recovery at {timeLabel(notice.at.getTime(), view.timeZone)}, version {notice.version}.
           </p>
@@ -82,13 +82,14 @@ export function ScheduleBoard({ nightOf }: { nightOf: string | null }) {
         </div>
       )}
       {error && <Alert tone="warn">Latest refresh failed; showing the last loaded schedule. {error}</Alert>}
-      <p id="schedule-summary" aria-live="polite" className="meta">
+      <p id="schedule-summary" aria-live="polite" className="meta ops-status">
+        <span aria-hidden="true" className="live-dot" />
         {scheduleSummary(model)}
       </p>
 
-      <section className="card p-4 sm:p-5 space-y-4 min-w-0" aria-labelledby="timeline-title">
+      <section className="card ops-panel p-4 sm:p-5 space-y-4 min-w-0" aria-labelledby="timeline-title">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="timeline-title" className="text-[20px] font-semibold">
+          <h2 id="timeline-title" className="panel-title text-[20px] font-semibold">
             Timeline
           </h2>
           <div role="group" aria-label="Plan shown on the timeline" className="flex gap-2">
@@ -105,7 +106,7 @@ export function ScheduleBoard({ nightOf }: { nightOf: string | null }) {
             ))}
           </div>
         </div>
-        <div className="max-w-full overflow-hidden" data-testid="schedule-chart">
+        <div className="schedule-frame max-w-full overflow-hidden" data-testid="schedule-chart">
           <ScheduleChart model={model} lane={lane} />
         </div>
         {model.pendingProposals > 0 && (
@@ -122,15 +123,15 @@ export function ScheduleBoard({ nightOf }: { nightOf: string | null }) {
         </ul>
       </section>
 
-      <section className="card p-4 sm:p-5 space-y-4" aria-labelledby="capacity-title">
-        <h2 id="capacity-title" className="text-[20px] font-semibold">
+      <section className="card ops-panel rise p-4 sm:p-5 space-y-4" aria-labelledby="capacity-title">
+        <h2 id="capacity-title" className="panel-title text-[20px] font-semibold">
           Site demand vs usable limit
         </h2>
         <CapacityStrip model={model} />
       </section>
 
-      <section className="space-y-3" aria-labelledby="table-title">
-        <h2 id="table-title" className="text-[20px] font-semibold">
+      <section className="rise space-y-3" aria-labelledby="table-title">
+        <h2 id="table-title" className="panel-title text-[20px] font-semibold">
           Table view
         </h2>
         <ScheduleTable model={model} />

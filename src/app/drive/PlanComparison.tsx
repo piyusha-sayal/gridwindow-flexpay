@@ -64,13 +64,13 @@ export function PlanComparison({ quote, tz }: { quote: QuoteSet; tz: string }) {
       <h2 id="compare-plans" className="meta">
         Plan comparison
       </h2>
-      <ul className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(min(230px,100%),1fr))]">
+      <ul className="stagger grid gap-3 grid-cols-[repeat(auto-fit,minmax(min(230px,100%),1fr))]">
         {plans.map((p) => (
-          <li key={p.key} className="card px-4 py-4 space-y-3">
+          <li key={p.key} className="card card-lift plan-card px-4 py-4 space-y-3">
             <p className="font-semibold text-[15px]">{p.name}</p>
             <dl className="space-y-1.5 text-[13px]">
               {FIELDS.map(([k, label]) => (
-                <div key={k} className="flex justify-between gap-3">
+                <div key={k} className="plan-row flex justify-between gap-3">
                   <dt className="text-muted">{label}</dt>
                   <dd className="text-right font-medium tabular">{p[k]}</dd>
                 </div>

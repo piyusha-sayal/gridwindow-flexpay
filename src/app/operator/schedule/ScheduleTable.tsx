@@ -4,8 +4,8 @@ import { timeLabel, type ScheduleModel } from "./scheduleModel";
 export function ScheduleTable({ model }: { model: ScheduleModel }) {
   const portLabel = (id: string) => model.resources.find((r) => r.id === id)?.label ?? id;
   return (
-    <div role="region" tabIndex={0} aria-label="Schedule table, scroll sideways when narrow" className="overflow-x-auto rounded-[var(--r-card-sm)] border border-line">
-      <table className="w-full min-w-[640px] border-collapse text-left text-[14px]">
+    <div role="region" tabIndex={0} aria-label="Schedule table, scroll sideways when narrow" className="table-wrap sched-table-wrap overflow-x-auto rounded-[var(--r-card-sm)] border border-line">
+      <table className="sched-table w-full min-w-[640px] border-collapse text-left text-[14px]">
         <caption className="px-3 py-2 text-left meta">Sessions on this night, original and current plan (times in {model.timeZone})</caption>
         <thead>
           <tr className="border-b border-line bg-paper">

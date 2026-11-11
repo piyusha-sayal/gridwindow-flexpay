@@ -67,18 +67,18 @@ export function ImpactLabPanel({ ports, timeZone, initialScenario, initialCompar
   return (
     <section className="space-y-6" aria-labelledby="compare-title">
       <div className="space-y-2 max-w-[820px]">
-        <h2 id="compare-title" className="text-[22px] font-semibold tracking-[-0.01em]">
+        <h2 id="compare-title" className="section-title text-[clamp(22px,2.6vw,28px)] font-semibold">
           Compare Charge Now and Smart Flex
         </h2>
         <p className="text-[15px] text-text-2">
           Change the inputs and compare. This runs the same quote engine as Smart Charge, but nothing is saved, reserved or priced for payment.
         </p>
-        <Link href="/drive" className="inline-block text-teal-ink underline underline-offset-4">
+        <Link href="/drive" className="link-arrow">
           Back to Smart Charge
         </Link>
       </div>
 
-      <form onSubmit={onSubmit} className="card p-5 sm:p-6 grid gap-5 grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))]" aria-describedby="form-help">
+      <form onSubmit={onSubmit} className="card ops-panel p-5 sm:p-6 grid gap-5 grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))]" aria-describedby="form-help">
         <p id="form-help" className="sr-only">
           Times are local to the station. Plug-in and ready-by times in the early morning belong to the next day.
         </p>
@@ -121,7 +121,7 @@ export function ImpactLabPanel({ ports, timeZone, initialScenario, initialCompar
         <fieldset className="space-y-2">
           <legend className="text-[14px] font-semibold">Charging preference</legend>
           {PREFERENCES.map((p) => (
-            <label key={p.id} className="flex gap-2 text-[14px]">
+            <label key={p.id} className="check-row flex gap-2 text-[14px]">
               <input type="radio" name="preference" value={p.id} checked={form.preference === p.id} onChange={() => set("preference", p.id as PreferenceId)} className="mt-1" />
               <span>
                 <span className="font-semibold">{p.label}</span>
@@ -133,14 +133,14 @@ export function ImpactLabPanel({ ports, timeZone, initialScenario, initialCompar
         <fieldset className="space-y-2">
           <legend className="text-[14px] font-semibold">Tariff assumption (synthetic)</legend>
           {TARIFFS.map((t) => (
-            <label key={t.id} className="flex gap-2 text-[14px]">
+            <label key={t.id} className="check-row flex gap-2 text-[14px]">
               <input type="radio" name="tariff" value={t.id} checked={form.tariff === t.id} onChange={() => set("tariff", t.id as TariffId)} className="mt-1" />
               <span>{t.label}</span>
             </label>
           ))}
         </fieldset>
         <div className="flex items-end">
-          <button type="submit" className="btn btn-primary" disabled={pending} aria-disabled={pending}>
+          <button type="submit" className="btn btn-primary btn-glow" disabled={pending} aria-disabled={pending}>
             {pending ? "Comparing..." : "Compare"}
           </button>
         </div>
@@ -148,11 +148,11 @@ export function ImpactLabPanel({ ports, timeZone, initialScenario, initialCompar
 
       <div aria-live="polite" className="space-y-3">
         {error && (
-          <p role="alert" className="card p-4 text-[14px] text-[var(--red)]">
+          <p role="alert" className="card p-4 tone-danger text-[14px]">
             {error}
           </p>
         )}
-        {pending && <p className="text-[14px] text-muted">Running the comparison...</p>}
+        {pending && <p className="working text-[14px] text-muted">Running the comparison...</p>}
       </div>
 
       {comparison && !pending && <ImpactResults comparison={comparison} ports={ports} timeZone={timeZone} />}
