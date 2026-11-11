@@ -1,24 +1,24 @@
-# Final demo script (target 2:45, hard limit 2:55)
+# Final demo script (target 2:50, hard limit 2:58)
 
-Format: screen recording of the running app with voice-over. MOCK payments, SYNTHETIC charging. No real charger, no real PayPal, no model claim unless a REAL_GEMINI run has been certified.
+Record the **live site**, https://gridwindow-flexpay.onrender.com (open it a minute early so the free instance is awake), as a screen recording with voice-over. Upload to YouTube as **Public** or **Unlisted-but-public link** per the rules, and paste the link into Devpost. Payments are PayPal **Sandbox** (test money); charging and disturbances are **SYNTHETIC**. Say "synthetic" aloud once.
 
-Pre-flight (off camera): `docs/DEMO_RUNBOOK.md`. Browser time zone set to Pacific (see QA-3).
+Pre-flight (off camera): sign in to the operator console in a second tab; have a PayPal Sandbox **personal (buyer)** account login ready (developer.paypal.com → Testing Tools → Sandbox Accounts); Claude Desktop (or a terminal) set up with the MCP server from `docs/MCP.md` pointed at the live URL.
 
 | Time | Screen | Action | Voice-over |
 |---|---|---|---|
-| 0:00-0:12 | Home | Title card, then Smart Charge | "Charging sites cap total power. Drivers who agree to flexible charging get a cheaper night, but only if the promise survives when something goes wrong." |
-| 0:12-0:35 | `/drive` wizard, offers | Port B, 19:00 to 07:00, 30 kWh, $20. See offers. Show the flexible offer and its assumptions | "The engine only shows an offer when the driver saves money and the operator still earns. Prices are synthetic assumptions." |
-| 0:35-0:50 | Consent and mock payment | Tick consent, approve. "Authorized, not captured." | "The driver approves one exact offer. The payment is only a hold. Nothing is collected yet. This demo uses a mock provider, not PayPal." |
-| 0:50-1:05 | Operator schedule (Bryntum) | Show the original plan on Port B | "This is the operator's schedule in Bryntum, drawn from the database." |
-| 1:05-1:20 | Operator console, synthetic disturbance | Record "Charger power reduction, 4.8 kW from 22:00" (or early departure) | "Now a charger slows down. This is a synthetic event the operator injects; no real charger is connected." |
-| 1:20-1:45 | Bryntum, then run trace | Board shows the hatched proposal lane without reload. Open the run trace | "An agent run starts automatically and is stored durably. It asks the server for candidates and validates each one. In this recording no model key is configured, so the labelled deterministic path decides; a model can only pick among options the server has already validated." |
-| 1:45-2:05 | Reservation page, consent card | Driver reads the change and presses Approve | "The change moves the finish time, so the driver must consent. Nothing changes until they do. The price stays exactly the same." |
-| 2:05-2:20 | Bryntum | Schedule updates to version 2; reload and it is still there | "The validated schedule appears in Bryntum and survives a reload, because it was committed to the database, not drawn in the browser." |
-| 2:20-2:40 | Run synthetic night, FlexReceipt | Press run. Show delivered kWh, captured amount, receipt | "Charging is simulated. Money moves only after delivered energy is recorded. If the charger had failed, the hold would be voided and the driver pays nothing." |
-| 2:40-2:50 | Impact summary slide | Static text | "In a synthetic benchmark, rescheduling reached the energy target in 15 percent of disturbed cases, mostly by finishing later with the driver's consent; the rest are physically unrecoverable and are handled honestly. Not measured savings." |
+| 0:00-0:12 | Home | Title, then "Plan My Charge" | "Shared charging sites cap total power. Drivers who let us move their charging overnight get a cheaper night, and they only pay for energy actually delivered." |
+| 0:12-0:30 | `/drive`, "Say it" box | Type "30 kWh before 7 AM, save at least $4", press Fill form; the form fills. Request offers | "Gemini reads a plain sentence and fills the form. It never sets a price: the server prices every offer under the station's power cap." |
+| 0:30-0:45 | Offers + deal agent + explanation | Show the recommended offer and its plain-language explanation | "A deal agent checks the offers against the driver's goals and explains the pick, using only verified numbers." |
+| 0:45-1:05 | PayPal Sandbox checkout | Accept the exact terms, log in as the Sandbox buyer, approve; back on the reservation: "Authorized hold, not captured" | "The driver approves one exact offer in PayPal. It's an authorization hold, not a charge. Capture waits for delivered energy." |
+| 1:05-1:25 | Agent over MCP | In Claude Desktop: "Book me 25 kWh tonight, ready by 7, under $20, cheapest." Show offers, the pick, and the PayPal approval link | "Any AI agent can book through our MCP server. It finds and prepares the deal, then stops at a PayPal approval link that only the human can complete. The same agent can find a compatible adapter through Channel3." |
+| 1:25-1:40 | Operator console | Show KPIs, open the AG Grid data grid: sort by payment, filter "needs attention", Export CSV | "Operators see every reservation in an AG Grid data grid: sort, filter, search, export." |
+| 1:40-2:10 | Bryntum schedule + disturbance | Inject "Charger power reduction" on a reservation; show the recovery proposal lane in Bryntum, then the driver's consent card, approve, schedule updates | "When a charger slows down, a durable agent run proposes fixes, a deterministic validator proves each one, and the driver consents before anything changes. Bryntum shows the new committed plan." |
+| 2:10-2:30 | Simulated delivery + FlexReceipt | Run delivery; receipt shows delivered kWh and the PayPal capture; mention the void path | "Charging is simulated. Money moves only after delivered energy is recorded; if the charger fails, the hold is voided and the driver pays nothing." |
+| 2:30-2:42 | Rewards → Spend your savings; API portal | Show Channel3 gear cards; switch to the APIMatic portal tab, open "Accept offer", show the samples | "Savings turn into gear from real merchants through Channel3. Developers get an APIMatic portal and SDK from the same contract our agent uses." |
+| 2:42-2:50 | Closing card | Live URL, repo, "Built with PayPal, Gemini, Bryntum, AG Grid, Channel3, APIMatic, Render" | "GridWindow FlexPay: flexible charging people can trust, settled with PayPal." |
 
-Narrative check: a customer accepts a charging promise (0:35) -> a charger slows (1:05) -> the recovery workflow responds (1:20) -> deterministic validation (1:20-1:45) -> Bryntum shows the change (2:05) -> charging continues (2:20) -> the financial policy decides (2:20) -> FlexReceipt explains it (2:20).
+Narrative check: plain-language request → priced offers → PayPal authorization → an AI agent books the same way and stops at PayPal approval → operator view → disruption repaired with validation and consent → capture only after delivery.
 
-Honest-failure variant (optional 15 s, only if time remains): use the operator "Inject outage" on the reservation before delivery; the hold is voided and the receipt shows no charge. State that failure cases are unrecoverable by design.
+If Gemini is rate-limited on the day (free tier: 20 requests per model per day), the app answers with its labelled deterministic text. Record after the daily reset, avoid repeated test runs before recording, and keep `GEMINI_FALLBACK_MODEL` set.
 
-Never say: "live Gemini decided", "PayPal certified", "real chargers", "measured savings". Say "SYNTHETIC" aloud once.
+Never say: "PayPal certified", "real chargers", "measured savings", or that the AI moves money.
