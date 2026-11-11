@@ -69,6 +69,7 @@ Authorization is not escrow. "Recovered" must mean validated and consented, not 
 
 ## Honest limitations
 - All charging, tariffs, loads and disturbances are synthetic; no real charger or grid data.
+- AI runs on the Gemini Developer API free tier (20 requests per model per day). A second Gemini model is configured as a fallback; beyond both quotas every AI feature answers with its labelled deterministic text, so the product keeps working.
 - The live demo runs in PayPal Sandbox mode (test money). Order creation and the buyer approval link are verified live; a Sandbox capture or void after buyer approval is not claimed for this build.
 - Live Gemini (`gemini-3.6-flash`) drove the recovery agent's tool steps in two certification runs on 2026-11-11, but Google returned HTTP 503 on the final decision step both times, so the final decisions were the labelled deterministic fallback; a live model final decision is not claimed (`docs/AGENTIC_COMMERCE_EVIDENCE.md`).
 - Most severe disturbances (all charger failures) are physically unrecoverable; the benefit is honest handling, not rescue.
@@ -83,7 +84,7 @@ Fix QA-3 and QA-2; real tariff and charger telemetry; a measured pilot before an
 TypeScript, Next.js, React, PayPal REST Orders v2 / Payments v2 (Sandbox), Bryntum Scheduler (Community), AG Grid (Community), Model Context Protocol, Channel3, APIMatic (Context Plugin, CLI, portal and SDK), Render, Google Gemini, PostgreSQL / PGlite (Neon), Zod, Playwright, Vitest.
 
 ## Video
-Under 3 minutes, script in `docs/FINAL_DEMO_SCRIPT.md`. (URL to be added by the owner after recording and approving it; none exists yet.)
+Under 3 minutes, recorded on the live site; script in `docs/FINAL_DEMO_SCRIPT.md`. Public YouTube link to be added after recording.
 
 ---
 
@@ -116,4 +117,4 @@ Claims removed or softened from the older `docs/DEVPOST.md`: "344 tests and 67 P
 6. **Bryntum license**: confirm the Community package (MIT text in the installed package) is the edition you intend to claim.
 7. **QA-4 and QA-5 wording fixes** appear on screen in the demo; decide whether to authorize them before recording (recommended).
 8. **Repository link and README**: confirm which branch or merged main the judges will see, and that the final integrated commit is the one certified.
-9. **Screenshots**: choose which of `docs/evidence/` to upload as the gallery (suggested: 20, 03b, 05, 06, 14).
+9. **Screenshots**: a fresh gallery of the live site is in `docs/evidence/submission/` (01 to 10: home, Smart Charge, how it works, operator sign-in, console, AG Grid, Bryntum schedule, impact lab, rewards, APIMatic portal).
