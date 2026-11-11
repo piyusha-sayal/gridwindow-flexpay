@@ -1,0 +1,112 @@
+{
+  "ranAt": "2026-11-11T17:32:41.058Z",
+  "base": "https://gridwindow-flexpay.onrender.com",
+  "portal": "https://gridwindow-flexpay-developers.onrender.com",
+  "results": [
+    {
+      "area": "AI fallback chain (effective config)",
+      "ok": true,
+      "detail": "operator AI status before any call: \"AI ready: gemini-3.6-flash with fallback gemini-3.5-flash-lite, then baidu/ernie-5.5-flash-preview:free\" (state IDLE)"
+    },
+    {
+      "area": "Config",
+      "ok": true,
+      "detail": "providerMode=PAYPAL_SANDBOX, ai={\"enabled\":true,\"model\":\"gemini-3.6-flash\"}"
+    },
+    {
+      "area": "Security: config has no secrets",
+      "ok": true,
+      "detail": "public config exposes only station, provider mode, AI model and defaults"
+    },
+    {
+      "area": "Home and navigation",
+      "ok": true,
+      "detail": "navigated to /drive, /rewards, /impact-lab, /how-it-works"
+    },
+    {
+      "area": "AI assistant (request parsing)",
+      "ok": true,
+      "detail": "source=MODEL model=gemini-3.6-flash, energy=30"
+    },
+    {
+      "area": "Smart Charge offers",
+      "ok": true,
+      "detail": "2 validated offers for 2026-11-14: $11.54, $11.54"
+    },
+    {
+      "area": "Deal agent",
+      "ok": true,
+      "detail": "source=MODEL model=gemini-3.5-flash-lite, status=RECOMMENDED"
+    },
+    {
+      "area": "AI explanation",
+      "ok": true,
+      "detail": "source=MODEL model=gemini-3.5-flash-lite, points=3"
+    },
+    {
+      "area": "No 'How this was generated' label",
+      "ok": true,
+      "detail": "driver screens show no provenance label"
+    },
+    {
+      "area": "Consent cannot be bypassed",
+      "ok": true,
+      "detail": "consent=false -> HTTP 400; tampered terms -> HTTP 409; missing Origin -> HTTP 403 (no order created)"
+    },
+    {
+      "area": "Security: operator API needs a session",
+      "ok": true,
+      "detail": "anonymous dashboard -> HTTP 401"
+    },
+    {
+      "area": "Security: errors leak no internals",
+      "ok": true,
+      "detail": "malformed JSON -> HTTP 400"
+    },
+    {
+      "area": "Rewards / Channel3",
+      "ok": true,
+      "detail": "enabled=true, items=6, cards rendered=6"
+    },
+    {
+      "area": "AI answered by a model (hotfix)",
+      "ok": true,
+      "detail": "3 of 3 AI calls answered by a model (gemini-3.6-flash, gemini-3.5-flash-lite); operator AI status after the calls: \"AI degraded: fallback gemini-3.5-flash-lite is answering\" (state DEGRADED)"
+    },
+    {
+      "area": "AG Grid",
+      "ok": true,
+      "detail": "night 2026-11-10: 11 rows, needs attention 4, payment sort ascending, CSV 11 data rows"
+    },
+    {
+      "area": "MOCK rows distinguishable from Sandbox",
+      "ok": true,
+      "detail": "CSV provider column: 1 MOCK row(s), 10 PayPal Sandbox row(s)"
+    },
+    {
+      "area": "Bryntum schedule",
+      "ok": true,
+      "detail": "scheduler rendered; accessible table rows=6"
+    },
+    {
+      "area": "PayPal Sandbox evidence (read back)",
+      "ok": true,
+      "detail": "{\"2XfQtp\":\"CAPTURED/COMPLETED/PAYPAL_SANDBOX_API/1556c\",\"afKCrn\":\"VOIDED/VOIDED/PAYPAL_SANDBOX_API/1556c\"}"
+    },
+    {
+      "area": "Developer portal",
+      "ok": true,
+      "detail": "home HTTP 200; accept-offer documents consent as boolean (regenerated spec); deal result documents the source enum"
+    },
+    {
+      "area": "Mobile layout",
+      "ok": true,
+      "detail": "/ overflow 0px; /drive overflow 0px; /rewards overflow 0px; /operator overflow 0px"
+    },
+    {
+      "area": "Browser errors during smoke",
+      "ok": true,
+      "detail": "console=0, uncaught=0, unexpected HTTP errors=none (the refused accept calls above are intentional)"
+    }
+  ]
+}

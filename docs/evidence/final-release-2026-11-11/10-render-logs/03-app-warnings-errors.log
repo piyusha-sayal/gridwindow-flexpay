@@ -1,0 +1,9 @@
+# Application warnings and errors (filtered from the two logs above)
+# Source: Render REST API GET /v1/logs (official), captured 2026-11-11T17:35:39.139Z
+# Window (UTC): 2026-11-11T17:05:00Z to 2026-11-11T17:35:36Z; release commit 7959a1b570cc2b82037ffbf0201d3827e17a429e; 6 entries; sanitized (see README.md)
+2026-11-11T17:12:34.817334132Z [app] [WARNING] Found 1 warning while optimizing generated CSS:
+2026-11-11T17:15:11.256848346Z [app] [ERROR] [srv-dbq002tg1s2s739p32sg-bd68j] [gridwindow] model call failed: REQUEST_REJECTED (gemini) http=400 status=INVALID_ARGUMENT error=ApiError
+2026-11-11T17:15:13.603446395Z [app] [ERROR] [srv-dbq002tg1s2s739p32sg-bd68j] [gridwindow] model call failed: REQUEST_REJECTED (gemini) http=400 status=INVALID_ARGUMENT error=ApiError
+2026-11-11T17:15:14.354963242Z [app] [ERROR] [srv-dbq002tg1s2s739p32sg-bd68j] [gridwindow] model call failed: REQUEST_REJECTED (gemini) http=400 status=INVALID_ARGUMENT error=ApiError
+2026-11-11T17:27:17.13619659Z [app] [WARNING] Found 1 warning while optimizing generated CSS:
+2026-11-11T17:32:06.042329302Z [app] [ERROR] [srv-dbq002tg1s2s739p32sg-v55z4] [gridwindow] model call failed: QUOTA_EXHAUSTED (gemini) http=429 status=RESOURCE_EXHAUSTED error=ApiError

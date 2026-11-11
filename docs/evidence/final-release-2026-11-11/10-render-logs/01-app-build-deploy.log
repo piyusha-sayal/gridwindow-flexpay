@@ -1,0 +1,200 @@
+# Application build and deploy logs (gridwindow-flexpay, srv-dbq002tg1s2s739p32sg)
+# Source: Render REST API GET /v1/logs (official), captured 2026-11-11T17:35:39.132Z
+# Window (UTC): 2026-11-11T17:05:00Z to 2026-11-11T17:35:36Z; release commit 7959a1b570cc2b82037ffbf0201d3827e17a429e; 197 entries; sanitized (see README.md)
+2026-11-11T17:11:34.295617686Z [app] [INFO] ==> Downloading cache...
+2026-11-11T17:11:34.322170704Z [app] [INFO] ==> Cloning from https://github.com/piyusha-sayal/gridwindow-flexpay
+2026-11-11T17:11:41.875338824Z [app] [INFO] ==> Checking out commit 626565453e317445ce32bce502feb96e1caa514a in branch main
+2026-11-11T17:11:47.934071936Z [app] [INFO] ==> Downloaded and extracted 646 MiB cache in 13s.
+2026-11-11T17:11:49.009941719Z [app] [INFO] ==> Requesting Node.js version 22
+2026-11-11T17:11:49.175608873Z [app] [INFO] ==> Using Node.js version 22.23.5 via environment variable NODE_VERSION
+2026-11-11T17:11:49.175618544Z [app] [INFO] ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-11-11T17:11:49.17571608Z [app] [INFO] ==> Installing Node.js version 22.23.5...
+2026-11-11T17:11:50.483391304Z [app] [INFO] ==> Running build command 'npm ci && npm run build'...
+2026-11-11T17:12:29.939867299Z [app] [INFO] 
+2026-11-11T17:12:29.93988289Z [app] [INFO] added 551 packages, and audited 552 packages in 39s
+2026-11-11T17:12:29.939979228Z [app] [INFO] 
+2026-11-11T17:12:29.939998394Z [app] [INFO] 194 packages are looking for funding
+2026-11-11T17:12:29.940000243Z [app] [INFO]   run `npm fund` for details
+2026-11-11T17:12:30.123737598Z [app] [INFO] 
+2026-11-11T17:12:30.123755381Z [app] [INFO] 8 moderate severity vulnerabilities
+2026-11-11T17:12:30.123756911Z [app] [INFO] 
+2026-11-11T17:12:30.123758857Z [app] [INFO] To address issues that do not require attention, run:
+2026-11-11T17:12:30.123760267Z [app] [INFO]   npm audit fix
+2026-11-11T17:12:30.123761851Z [app] [INFO] 
+2026-11-11T17:12:30.12376359Z [app] [INFO] To address all issues (including breaking changes), run:
+2026-11-11T17:12:30.123774963Z [app] [INFO]   npm audit fix --force
+2026-11-11T17:12:30.123777187Z [app] [INFO] 
+2026-11-11T17:12:30.123779637Z [app] [INFO] Run `npm audit` for details.
+2026-11-11T17:12:30.323799009Z [app] [INFO] 
+2026-11-11T17:12:30.323816605Z [app] [INFO] > gridwindow-flexpay@0.1.0 build
+2026-11-11T17:12:30.323819077Z [app] [INFO] > next build
+2026-11-11T17:12:30.323820346Z [app] [INFO] 
+2026-11-11T17:12:30.648631175Z [app] [INFO] ▲ Next.js 16.4.3 (Turbopack)
+2026-11-11T17:12:30.671754972Z [app] [INFO] ✓ Running next.config.ts took 23ms
+2026-11-11T17:12:30.680800932Z [app] [INFO] 
+2026-11-11T17:12:30.705362433Z [app] [INFO]   Creating an optimized production build ...
+2026-11-11T17:12:34.817334132Z [app] [WARNING] Found 1 warning while optimizing generated CSS:
+2026-11-11T17:12:34.817349154Z [app] [INFO] 
+2026-11-11T17:12:34.817351521Z [app] [INFO] │     }
+2026-11-11T17:12:34.817353041Z [app] [INFO] │   }
+2026-11-11T17:12:34.81735471Z [app] [INFO] │   .\[\&_\:\:highlight\(fd-search\)\]\:underline ::highlight(fd-search) {
+2026-11-11T17:12:34.817356703Z [app] [INFO] ┆                                                             ^-- 'highlight' is not recognized as a valid pseudo-element. Did you mean ':highlight' (pseudo-class) or is this a typo?
+2026-11-11T17:12:34.817360141Z [app] [INFO] ┆
+2026-11-11T17:12:34.817361841Z [app] [INFO] │     text-decoration-line: underline;
+2026-11-11T17:12:34.817363125Z [app] [INFO] │   }
+2026-11-11T17:12:34.817364314Z [app] [INFO] 
+2026-11-11T17:12:45.129324243Z [app] [INFO] ✓ Compiled successfully in 14.4s
+2026-11-11T17:12:45.130948178Z [app] [INFO]   Running TypeScript ...
+2026-11-11T17:12:54.375994809Z [app] [INFO]   Finished TypeScript in 9.2s ...
+2026-11-11T17:12:54.377631024Z [app] [INFO]   Collecting page data using 40 workers ...
+2026-11-11T17:13:08.97336586Z [app] [INFO]   Generating static pages using 40 workers (0/21) ...
+2026-11-11T17:13:09.684272618Z [app] [INFO]   Generating static pages using 40 workers (5/21)
+2026-11-11T17:13:10.067092485Z [app] [INFO]   Generating static pages using 40 workers (10/21)
+2026-11-11T17:13:10.069246711Z [app] [INFO]   Generating static pages using 40 workers (15/21)
+2026-11-11T17:13:10.087456428Z [app] [INFO] ✓ Generating static pages using 40 workers (21/21) in 1114ms
+2026-11-11T17:13:10.091118872Z [app] [INFO]   Finalizing page optimization ...
+2026-11-11T17:13:10.956828872Z [app] [INFO] 
+2026-11-11T17:13:10.95920325Z [app] [INFO] Route (app)
+2026-11-11T17:13:10.959211339Z [app] [INFO] ┌ ƒ /
+2026-11-11T17:13:10.959212852Z [app] [INFO] ├ ƒ /_not-found
+2026-11-11T17:13:10.959214257Z [app] [INFO] ├ ƒ /api/agent/deals
+2026-11-11T17:13:10.959216055Z [app] [INFO] ├ ƒ /api/assist/ask
+2026-11-11T17:13:10.959217508Z [app] [INFO] ├ ƒ /api/assist/explain
+2026-11-11T17:13:10.959219303Z [app] [INFO] ├ ƒ /api/checkout/cancel
+2026-11-11T17:13:10.95922087Z [app] [INFO] ├ ƒ /api/checkout/return
+2026-11-11T17:13:10.959222301Z [app] [INFO] ├ ƒ /api/config
+2026-11-11T17:13:10.95922378Z [app] [INFO] ├ ƒ /api/gear
+2026-11-11T17:13:10.959225245Z [app] [INFO] ├ ƒ /api/impact/compare
+2026-11-11T17:13:10.959226519Z [app] [INFO] ├ ƒ /api/mock-provider/approve
+2026-11-11T17:13:10.959227771Z [app] [INFO] ├ ƒ /api/offers/accept
+2026-11-11T17:13:10.959229086Z [app] [INFO] ├ ƒ /api/operator/dashboard
+2026-11-11T17:13:10.959230345Z [app] [INFO] ├ ƒ /api/operator/demo
+2026-11-11T17:13:10.959231758Z [app] [INFO] ├ ƒ /api/operator/reservations/[id]/mock-capture
+2026-11-11T17:13:10.959233041Z [app] [INFO] ├ ƒ /api/operator/reservations/[id]/reconcile
+2026-11-11T17:13:10.959234367Z [app] [INFO] ├ ƒ /api/operator/reservations/[id]/simulate
+2026-11-11T17:13:10.959235688Z [app] [INFO] ├ ƒ /api/operator/session
+2026-11-11T17:13:10.959237017Z [app] [INFO] ├ ƒ /api/quotes
+2026-11-11T17:13:10.959238379Z [app] [INFO] ├ ƒ /api/quotes/parse
+2026-11-11T17:13:10.959239668Z [app] [INFO] ├ ƒ /api/recovery/events
+2026-11-11T17:13:10.959241029Z [app] [INFO] ├ ƒ /api/recovery/runs/[id]
+2026-11-11T17:13:10.959242395Z [app] [INFO] ├ ƒ /api/recovery/runs/[id]/approve
+2026-11-11T17:13:10.959243781Z [app] [INFO] ├ ƒ /api/recovery/runs/[id]/reject
+2026-11-11T17:13:10.959245081Z [app] [INFO] ├ ƒ /api/reservations
+2026-11-11T17:13:10.959246454Z [app] [INFO] ├ ƒ /api/reservations/[id]
+2026-11-11T17:13:10.959247806Z [app] [INFO] ├ ƒ /api/reservations/[id]/simulate
+2026-11-11T17:13:10.959249137Z [app] [INFO] ├ ƒ /api/schedule
+2026-11-11T17:13:10.959250478Z [app] [INFO] ├ ƒ /api/webhooks/paypal
+2026-11-11T17:13:10.95925178Z [app] [INFO] ├ ƒ /drive
+2026-11-11T17:13:10.959253085Z [app] [INFO] ├ ƒ /how-it-works
+2026-11-11T17:13:10.95925439Z [app] [INFO] ├ ○ /icon.svg
+2026-11-11T17:13:10.959255761Z [app] [INFO] ├ ƒ /impact-lab
+2026-11-11T17:13:10.959257041Z [app] [INFO] ├ ƒ /mock-checkout
+2026-11-11T17:13:10.959258355Z [app] [INFO] ├ ƒ /operator
+2026-11-11T17:13:10.959259639Z [app] [INFO] ├ ƒ /operator/schedule
+2026-11-11T17:13:10.959260905Z [app] [INFO] ├ ƒ /reservations/[id]
+2026-11-11T17:13:10.959262109Z [app] [INFO] └ ƒ /rewards
+2026-11-11T17:13:10.959263273Z [app] [INFO] 
+2026-11-11T17:13:10.959270856Z [app] [INFO] 
+2026-11-11T17:13:10.959328991Z [app] [INFO] ○  (Static)   prerendered as static content
+2026-11-11T17:13:10.959336081Z [app] [INFO] ƒ  (Dynamic)  server-rendered on demand
+2026-11-11T17:13:10.959340515Z [app] [INFO] 
+2026-11-11T17:13:12.067058691Z [app] [INFO] ==> Uploading build...
+2026-11-11T17:13:27.087922362Z [app] [INFO] ==> Uploaded in 11.3s. Compression took 3.7s
+2026-11-11T17:13:27.098304585Z [app] [INFO] ==> Build successful 🎉
+2026-11-11T17:26:45.152626415Z [app] [INFO] ==> Downloading cache...
+2026-11-11T17:26:45.17856764Z [app] [INFO] ==> Cloning from https://github.com/piyusha-sayal/gridwindow-flexpay
+2026-11-11T17:26:51.950636163Z [app] [INFO] ==> Checking out commit 7959a1b570cc2b82037ffbf0201d3827e17a429e in branch main
+2026-11-11T17:26:59.239298437Z [app] [INFO] ==> Downloaded and extracted 629 MiB cache in 14s.
+2026-11-11T17:26:59.75543949Z [app] [INFO] ==> Requesting Node.js version 22
+2026-11-11T17:26:59.85415998Z [app] [INFO] ==> Using Node.js version 22.23.5 via environment variable NODE_VERSION
+2026-11-11T17:26:59.854173125Z [app] [INFO] ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-11-11T17:26:59.854302922Z [app] [INFO] ==> Installing Node.js version 22.23.5...
+2026-11-11T17:27:01.213141409Z [app] [INFO] ==> Running build command 'npm ci && npm run build'...
+2026-11-11T17:27:13.255989214Z [app] [INFO] 
+2026-11-11T17:27:13.256011406Z [app] [INFO] added 551 packages, and audited 552 packages in 12s
+2026-11-11T17:27:13.256087619Z [app] [INFO] 
+2026-11-11T17:27:13.256101485Z [app] [INFO] 194 packages are looking for funding
+2026-11-11T17:27:13.256105574Z [app] [INFO]   run `npm fund` for details
+2026-11-11T17:27:13.443375951Z [app] [INFO] 
+2026-11-11T17:27:13.443395514Z [app] [INFO] 8 moderate severity vulnerabilities
+2026-11-11T17:27:13.443397481Z [app] [INFO] 
+2026-11-11T17:27:13.44339942Z [app] [INFO] To address all issues (including breaking changes), run:
+2026-11-11T17:27:13.443401592Z [app] [INFO]   npm audit fix --force
+2026-11-11T17:27:13.443403255Z [app] [INFO] 
+2026-11-11T17:27:13.443404981Z [app] [INFO] Run `npm audit` for details.
+2026-11-11T17:27:13.671728738Z [app] [INFO] 
+2026-11-11T17:27:13.671746282Z [app] [INFO] > gridwindow-flexpay@0.1.0 build
+2026-11-11T17:27:13.671748078Z [app] [INFO] > next build
+2026-11-11T17:27:13.671749264Z [app] [INFO] 
+2026-11-11T17:27:14.049466207Z [app] [INFO] ▲ Next.js 16.4.3 (Turbopack)
+2026-11-11T17:27:14.081586906Z [app] [INFO] ✓ Running next.config.ts took 32ms
+2026-11-11T17:27:14.091539221Z [app] [INFO] 
+2026-11-11T17:27:14.120789248Z [app] [INFO]   Creating an optimized production build ...
+2026-11-11T17:27:17.13619659Z [app] [WARNING] Found 1 warning while optimizing generated CSS:
+2026-11-11T17:27:17.136212967Z [app] [INFO] 
+2026-11-11T17:27:17.136215372Z [app] [INFO] │     }
+2026-11-11T17:27:17.136216942Z [app] [INFO] │   }
+2026-11-11T17:27:17.13621876Z [app] [INFO] │   .\[\&_\:\:highlight\(fd-search\)\]\:underline ::highlight(fd-search) {
+2026-11-11T17:27:17.136220846Z [app] [INFO] ┆                                                             ^-- 'highlight' is not recognized as a valid pseudo-element. Did you mean ':highlight' (pseudo-class) or is this a typo?
+2026-11-11T17:27:17.13622254Z [app] [INFO] ┆
+2026-11-11T17:27:17.136224313Z [app] [INFO] │     text-decoration-line: underline;
+2026-11-11T17:27:17.1362258Z [app] [INFO] │   }
+2026-11-11T17:27:17.136227065Z [app] [INFO] 
+2026-11-11T17:27:24.89599319Z [app] [INFO] ✓ Compiled successfully in 10.8s
+2026-11-11T17:27:24.897462117Z [app] [INFO]   Running TypeScript ...
+2026-11-11T17:27:30.79278759Z [app] [INFO]   Finished TypeScript in 5.9s ...
+2026-11-11T17:27:30.794456873Z [app] [INFO]   Collecting page data using 40 workers ...
+2026-11-11T17:27:46.66582483Z [app] [INFO]   Generating static pages using 40 workers (0/21) ...
+2026-11-11T17:27:47.531663536Z [app] [INFO]   Generating static pages using 40 workers (5/21)
+2026-11-11T17:27:47.983540331Z [app] [INFO]   Generating static pages using 40 workers (10/21)
+2026-11-11T17:27:47.986377941Z [app] [INFO]   Generating static pages using 40 workers (15/21)
+2026-11-11T17:27:48.008090888Z [app] [INFO] ✓ Generating static pages using 40 workers (21/21) in 1342ms
+2026-11-11T17:27:48.012209145Z [app] [INFO]   Finalizing page optimization ...
+2026-11-11T17:27:49.15070964Z [app] [INFO] 
+2026-11-11T17:27:49.154392481Z [app] [INFO] Route (app)
+2026-11-11T17:27:49.154406823Z [app] [INFO] ┌ ƒ /
+2026-11-11T17:27:49.154409888Z [app] [INFO] ├ ƒ /_not-found
+2026-11-11T17:27:49.154411344Z [app] [INFO] ├ ƒ /api/agent/deals
+2026-11-11T17:27:49.154412925Z [app] [INFO] ├ ƒ /api/assist/ask
+2026-11-11T17:27:49.154414644Z [app] [INFO] ├ ƒ /api/assist/explain
+2026-11-11T17:27:49.154416048Z [app] [INFO] ├ ƒ /api/checkout/cancel
+2026-11-11T17:27:49.154417407Z [app] [INFO] ├ ƒ /api/checkout/return
+2026-11-11T17:27:49.154418896Z [app] [INFO] ├ ƒ /api/config
+2026-11-11T17:27:49.15442033Z [app] [INFO] ├ ƒ /api/gear
+2026-11-11T17:27:49.154421868Z [app] [INFO] ├ ƒ /api/impact/compare
+2026-11-11T17:27:49.154423804Z [app] [INFO] ├ ƒ /api/mock-provider/approve
+2026-11-11T17:27:49.154425252Z [app] [INFO] ├ ƒ /api/offers/accept
+2026-11-11T17:27:49.154426651Z [app] [INFO] ├ ƒ /api/operator/dashboard
+2026-11-11T17:27:49.154427934Z [app] [INFO] ├ ƒ /api/operator/demo
+2026-11-11T17:27:49.154429628Z [app] [INFO] ├ ƒ /api/operator/reservations/[id]/mock-capture
+2026-11-11T17:27:49.154431025Z [app] [INFO] ├ ƒ /api/operator/reservations/[id]/reconcile
+2026-11-11T17:27:49.154432321Z [app] [INFO] ├ ƒ /api/operator/reservations/[id]/simulate
+2026-11-11T17:27:49.154433734Z [app] [INFO] ├ ƒ /api/operator/session
+2026-11-11T17:27:49.154435068Z [app] [INFO] ├ ƒ /api/quotes
+2026-11-11T17:27:49.154436442Z [app] [INFO] ├ ƒ /api/quotes/parse
+2026-11-11T17:27:49.154437798Z [app] [INFO] ├ ƒ /api/recovery/events
+2026-11-11T17:27:49.154439123Z [app] [INFO] ├ ƒ /api/recovery/runs/[id]
+2026-11-11T17:27:49.154440456Z [app] [INFO] ├ ƒ /api/recovery/runs/[id]/approve
+2026-11-11T17:27:49.154441863Z [app] [INFO] ├ ƒ /api/recovery/runs/[id]/reject
+2026-11-11T17:27:49.154443157Z [app] [INFO] ├ ƒ /api/reservations
+2026-11-11T17:27:49.154444478Z [app] [INFO] ├ ƒ /api/reservations/[id]
+2026-11-11T17:27:49.154445817Z [app] [INFO] ├ ƒ /api/reservations/[id]/simulate
+2026-11-11T17:27:49.154447104Z [app] [INFO] ├ ƒ /api/schedule
+2026-11-11T17:27:49.15444848Z [app] [INFO] ├ ƒ /api/webhooks/paypal
+2026-11-11T17:27:49.154449852Z [app] [INFO] ├ ƒ /drive
+2026-11-11T17:27:49.154451534Z [app] [INFO] ├ ƒ /how-it-works
+2026-11-11T17:27:49.154452806Z [app] [INFO] ├ ○ /icon.svg
+2026-11-11T17:27:49.154454056Z [app] [INFO] ├ ƒ /impact-lab
+2026-11-11T17:27:49.15445547Z [app] [INFO] ├ ƒ /mock-checkout
+2026-11-11T17:27:49.154456781Z [app] [INFO] ├ ƒ /operator
+2026-11-11T17:27:49.154458028Z [app] [INFO] ├ ƒ /operator/schedule
+2026-11-11T17:27:49.154459623Z [app] [INFO] ├ ƒ /reservations/[id]
+2026-11-11T17:27:49.154460832Z [app] [INFO] └ ƒ /rewards
+2026-11-11T17:27:49.154461993Z [app] [INFO] 
+2026-11-11T17:27:49.154463101Z [app] [INFO] 
+2026-11-11T17:27:49.154511063Z [app] [INFO] ○  (Static)   prerendered as static content
+2026-11-11T17:27:49.154521171Z [app] [INFO] ƒ  (Dynamic)  server-rendered on demand
+2026-11-11T17:27:49.15452467Z [app] [INFO] 
+2026-11-11T17:27:50.117017215Z [app] [INFO] ==> Uploading build...
+2026-11-11T17:28:13.02386992Z [app] [INFO] ==> Uploaded in 11.5s. Compression took 11.4s
+2026-11-11T17:28:13.061618082Z [app] [INFO] ==> Build successful 🎉

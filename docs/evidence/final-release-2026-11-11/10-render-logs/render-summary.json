@@ -1,0 +1,79 @@
+{
+  "capturedAt": "2026-11-11T17:35:39.140Z",
+  "window": {
+    "start": "2026-11-11T17:05:00Z",
+    "end": "2026-11-11T17:35:36Z"
+  },
+  "commit": "7959a1b570cc2b82037ffbf0201d3827e17a429e",
+  "app": {
+    "service": {
+      "id": "srv-dbq002tg1s2s739p32sg",
+      "name": "gridwindow-flexpay",
+      "type": "web_service",
+      "region": "oregon",
+      "autoDeploy": "yes",
+      "branch": "main"
+    },
+    "deploys": [
+      {
+        "id": "dep-dbqaakk9v7es73fr7t30",
+        "commit": "7959a1b570cc2b82037ffbf0201d3827e17a429e",
+        "status": "live",
+        "trigger": "new_commit",
+        "createdAt": "2026-11-11T17:26:42.131496Z",
+        "finishedAt": "2026-11-11T17:29:05.891915Z"
+      },
+      {
+        "id": "dep-dbqa3gp5efls73ahkn70",
+        "commit": "626565453e317445ce32bce502feb96e1caa514a",
+        "status": "deactivated",
+        "trigger": "new_commit",
+        "createdAt": "2026-11-11T17:11:31.20107Z",
+        "finishedAt": "2026-11-11T17:14:13.059173Z"
+      },
+      {
+        "id": "dep-dbq8ft6c6qcc739gic2g",
+        "commit": "19fa76e29309443380270e4baff3a41f1f9e71a8",
+        "status": "deactivated",
+        "trigger": "service_updated",
+        "createdAt": "2026-11-11T15:21:24.722047Z",
+        "finishedAt": "2026-11-11T15:24:14.612309Z"
+      }
+    ]
+  },
+  "portal": {
+    "service": {
+      "id": "srv-dbq1578ae00c73d0f9d0",
+      "name": "gridwindow-flexpay-developers",
+      "type": "static_site",
+      "region": null,
+      "autoDeploy": "yes",
+      "branch": "main"
+    },
+    "deploys": [
+      {
+        "id": "dep-dbqaakk9v7es73fr7tgg",
+        "commit": "7959a1b570cc2b82037ffbf0201d3827e17a429e",
+        "status": "live",
+        "trigger": "new_commit",
+        "createdAt": "2026-11-11T17:26:42.179814Z",
+        "finishedAt": "2026-11-11T17:27:09.927743Z"
+      },
+      {
+        "id": "dep-dbqa3gp5efls73ahknkg",
+        "commit": "626565453e317445ce32bce502feb96e1caa514a",
+        "status": "deactivated",
+        "trigger": "new_commit",
+        "createdAt": "2026-11-11T17:11:31.352322Z",
+        "finishedAt": "2026-11-11T17:12:41.574264Z"
+      }
+    ]
+  },
+  "counts": {
+    "appBuild": 197,
+    "appRuntime": 50,
+    "warningsErrors": 6,
+    "portalBuild": 80
+  },
+  "redactions": {}
+}

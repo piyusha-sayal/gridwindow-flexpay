@@ -1,0 +1,83 @@
+# Developer portal build and deploy logs (gridwindow-flexpay-developers, srv-dbq1578ae00c73d0f9d0; static site: no runtime logs exist)
+# Source: Render REST API GET /v1/logs (official), captured 2026-11-11T17:35:39.139Z
+# Window (UTC): 2026-11-11T17:05:00Z to 2026-11-11T17:35:36Z; release commit 7959a1b570cc2b82037ffbf0201d3827e17a429e; 80 entries; sanitized (see README.md)
+2026-11-11T17:11:34.148533233Z [app] [INFO] ==> Downloading cache...
+2026-11-11T17:11:34.173630184Z [app] [INFO] ==> Cloning from https://github.com/piyusha-sayal/gridwindow-flexpay
+2026-11-11T17:11:41.925708657Z [app] [INFO] ==> Checking out commit 626565453e317445ce32bce502feb96e1caa514a in branch main
+2026-11-11T17:11:47.581773838Z [app] [INFO] ==> Downloaded and extracted 466 MiB cache in 13s.
+2026-11-11T17:11:48.812733638Z [app] [INFO] ==> Installing dependencies with npm...
+2026-11-11T17:11:48.873860926Z [app] [INFO] ==> Requesting Node.js version >=22
+2026-11-11T17:11:49.099303245Z [app] [INFO] ==> Using Node.js version 26.13.1 via /opt/render/project/src/package.json
+2026-11-11T17:11:49.099316997Z [app] [INFO] ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-11-11T17:11:49.09938629Z [app] [INFO] ==> Installing Node.js version 26.13.1...
+2026-11-11T17:12:35.410957318Z [app] [INFO] 
+2026-11-11T17:12:35.41097119Z [app] [INFO] up to date, audited 548 packages in 45s
+2026-11-11T17:12:35.411028264Z [app] [INFO] 
+2026-11-11T17:12:35.411116613Z [app] [INFO] 194 packages are looking for funding
+2026-11-11T17:12:35.411181683Z [app] [INFO]   run `npm fund` for details
+2026-11-11T17:12:35.57329759Z [app] [INFO] 
+2026-11-11T17:12:35.573316871Z [app] [INFO] 7 moderate severity vulnerabilities
+2026-11-11T17:12:35.573318582Z [app] [INFO] 
+2026-11-11T17:12:35.573320573Z [app] [INFO] To address all issues, run:
+2026-11-11T17:12:35.573322006Z [app] [INFO]   npm audit fix
+2026-11-11T17:12:35.573323274Z [app] [INFO] 
+2026-11-11T17:12:35.573324836Z [app] [INFO] Run `npm audit` for details.
+2026-11-11T17:12:38.384272952Z [app] [INFO] 
+2026-11-11T17:12:38.384291479Z [app] [INFO] up to date, audited 548 packages in 3s
+2026-11-11T17:12:38.384318675Z [app] [INFO] 
+2026-11-11T17:12:38.384399869Z [app] [INFO] 194 packages are looking for funding
+2026-11-11T17:12:38.384435812Z [app] [INFO]   run `npm fund` for details
+2026-11-11T17:12:38.520028559Z [app] [INFO] 
+2026-11-11T17:12:38.520049475Z [app] [INFO] 7 moderate severity vulnerabilities
+2026-11-11T17:12:38.520052088Z [app] [INFO] 
+2026-11-11T17:12:38.520054682Z [app] [INFO] To address all issues, run:
+2026-11-11T17:12:38.520057408Z [app] [INFO]   npm audit fix
+2026-11-11T17:12:38.520059189Z [app] [INFO] 
+2026-11-11T17:12:38.520061929Z [app] [INFO] Run `npm audit` for details.
+2026-11-11T17:12:38.589566486Z [app] [INFO] ==> Running build command 'echo "prebuilt APIMatic portal"'...
+2026-11-11T17:12:38.591967205Z [app] [INFO] prebuilt APIMatic portal
+2026-11-11T17:12:38.659884676Z [app] [INFO] ==> Requesting Node.js version >=22
+2026-11-11T17:12:38.8125761Z [app] [INFO] ==> Using Node.js version 26.13.1 via /opt/render/project/src/package.json
+2026-11-11T17:12:38.812588967Z [app] [INFO] ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-11-11T17:12:40.106020182Z [app] [INFO] ==> Uploading build...
+2026-11-11T17:12:41.026905299Z [app] [INFO] ==> Your site is live 🎉
+2026-11-11T17:26:44.935779115Z [app] [INFO] ==> Downloading cache...
+2026-11-11T17:26:44.962153042Z [app] [INFO] ==> Cloning from https://github.com/piyusha-sayal/gridwindow-flexpay
+2026-11-11T17:26:51.698852521Z [app] [INFO] ==> Checking out commit 7959a1b570cc2b82037ffbf0201d3827e17a429e in branch main
+2026-11-11T17:26:58.671499117Z [app] [INFO] ==> Downloaded and extracted 476 MiB cache in 13s.
+2026-11-11T17:26:59.815149192Z [app] [INFO] ==> Installing dependencies with npm...
+2026-11-11T17:26:59.879840402Z [app] [INFO] ==> Requesting Node.js version >=22
+2026-11-11T17:26:59.99084582Z [app] [INFO] ==> Using Node.js version 26.13.1 via /opt/render/project/src/package.json
+2026-11-11T17:26:59.990858498Z [app] [INFO] ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-11-11T17:26:59.99097792Z [app] [INFO] ==> Installing Node.js version 26.13.1...
+2026-11-11T17:27:03.76817425Z [app] [INFO] 
+2026-11-11T17:27:03.768206242Z [app] [INFO] up to date, audited 548 packages in 2s
+2026-11-11T17:27:03.768221453Z [app] [INFO] 
+2026-11-11T17:27:03.76828503Z [app] [INFO] 194 packages are looking for funding
+2026-11-11T17:27:03.768325155Z [app] [INFO]   run `npm fund` for details
+2026-11-11T17:27:03.943651647Z [app] [INFO] 
+2026-11-11T17:27:03.943672118Z [app] [INFO] 7 moderate severity vulnerabilities
+2026-11-11T17:27:03.943673919Z [app] [INFO] 
+2026-11-11T17:27:03.943675762Z [app] [INFO] To address all issues, run:
+2026-11-11T17:27:03.94367717Z [app] [INFO]   npm audit fix
+2026-11-11T17:27:03.943678343Z [app] [INFO] 
+2026-11-11T17:27:03.943679788Z [app] [INFO] Run `npm audit` for details.
+2026-11-11T17:27:06.786124214Z [app] [INFO] 
+2026-11-11T17:27:06.786148576Z [app] [INFO] up to date, audited 548 packages in 3s
+2026-11-11T17:27:06.786172796Z [app] [INFO] 
+2026-11-11T17:27:06.786255467Z [app] [INFO] 194 packages are looking for funding
+2026-11-11T17:27:06.786303098Z [app] [INFO]   run `npm fund` for details
+2026-11-11T17:27:06.936677309Z [app] [INFO] 
+2026-11-11T17:27:06.936691695Z [app] [INFO] 7 moderate severity vulnerabilities
+2026-11-11T17:27:06.936693215Z [app] [INFO] 
+2026-11-11T17:27:06.936694998Z [app] [INFO] To address all issues, run:
+2026-11-11T17:27:06.936696431Z [app] [INFO]   npm audit fix
+2026-11-11T17:27:06.936697609Z [app] [INFO] 
+2026-11-11T17:27:06.936699085Z [app] [INFO] Run `npm audit` for details.
+2026-11-11T17:27:07.0098989Z [app] [INFO] ==> Running build command 'echo "prebuilt APIMatic portal"'...
+2026-11-11T17:27:07.012215Z [app] [INFO] prebuilt APIMatic portal
+2026-11-11T17:27:07.079888837Z [app] [INFO] ==> Requesting Node.js version >=22
+2026-11-11T17:27:07.17368042Z [app] [INFO] ==> Using Node.js version 26.13.1 via /opt/render/project/src/package.json
+2026-11-11T17:27:07.173696703Z [app] [INFO] ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-11-11T17:27:08.743219504Z [app] [INFO] ==> Uploading build...
+2026-11-11T17:27:09.465084735Z [app] [INFO] ==> Your site is live 🎉

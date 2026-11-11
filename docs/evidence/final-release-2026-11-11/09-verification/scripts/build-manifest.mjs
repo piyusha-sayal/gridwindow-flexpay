@@ -23,7 +23,7 @@ const envLabel = { LIVE: "LIVE (Render, PayPal Sandbox mode)", "LOCAL-MOCK": "LO
 
 let manifest = `# Evidence manifest: final release, 2026-11-11
 
-Commit under test: \`${meta.commit}\` (branch \`${meta.branch}\`). **LIVE** images show the deployed \`${meta.liveCommit}\`; **LOCAL** images show \`${meta.commit}\`, which adds the AI backup chain, the removed driver-screen label and the booking and recovery capacity fixes (not yet deployed; see \`docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md\`).
+Commit under test: \`${meta.commit}\` (branch \`${meta.branch}\`). **LIVE** images were captured on the deployed release \`${meta.liveCommit}\` (17:33–17:35 UTC); **LOCAL** images on \`${meta.commit}\`, whose runtime code equals the release except the Gemini server-deadline hotfix (PR #10), which local captures (no model key) do not exercise. See \`docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md\`.
 Captured ${meta.capturedOn} with Playwright (Chromium headless), time zone America/Los_Angeles. Desktop 1440×900 at 1×, phone 390×844 at 2×, tablet 820×1180 at 2×.
 
 Labels: **LIVE** = the public Render deployment (PayPal Sandbox mode, real Gemini key, real Channel3 key). **SANDBOX** = a state confirmed by the PayPal Sandbox API. **MOCK** = the built-in mock payment provider on an isolated local server (no PayPal call). **SYNTHETIC** = simulated charging, disturbances and tariffs. **FALLBACK** = the labelled deterministic answer (no model call).
@@ -57,6 +57,7 @@ for (const [dir, title] of sections) {
 manifest += `\n${count} screenshots captured.`;
 if (missing.length) manifest += ` Not captured: ${missing.map((m) => `\`${m.file}\` (${m.status})`).join(", ")}.`;
 manifest += `\n\n## Verification records in \`09-verification/\`\n\n${meta.records.map((r) => `- [\`${r.file}\`](09-verification/${r.file}): ${r.what}`).join("\n")}\n`;
+manifest += `\n## Render logs in \`10-render-logs/\`\n\nReal, sanitized Render build, deploy and runtime logs of the release window, the deploy records, and the production health verification: [\`10-render-logs/README.md\`](10-render-logs/README.md).\n`;
 writeFileSync(path.join(OUT, "EVIDENCE_MANIFEST.md"), manifest);
 writeFileSync(path.join(OUT, "SCREENSHOT_INDEX.md"), index);
 console.log(`manifest: ${count} images, ${missing.length} missing`);

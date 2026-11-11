@@ -35,3 +35,18 @@ Collected: 132 tests in 24 files (the operator sign-in setup counts once; it run
 - **Expected failures (2, desktop):** `independent-bryntum-tz.spec.ts` "QA-3 (known residual)" for 2027-03-13 and 2027-11-06 in an Asia/Kolkata browser. They are marked `test.fail`: Bryntum places ticks on browser-local hours in a half-hour-offset zone. Documented limitation.
 - **Skipped (6):** `qa.spec.ts` keyboard-only journeys (driver journey, invalid-input focus, operator journey) on mobile and tablet. By design, they run on desktop only.
 - An earlier run on `81d1d63` failed 13 desktop tests that still asserted the removed "Deterministic fallback" label. The specs were updated to assert the API's `source` field instead (no assertion was dropped), and this run is clean.
+
+## After the release: hotfix and deployed commit
+
+The production smoke test on the release (`6265654`) found that every live Gemini call was rejected (HTTP 400; fix 5 in `docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md`). Hotfix PR #10 (`ed68391`, merged as `7959a1b`) added two tests (`tests/unit/geminiLlm.test.ts`: the real SDK sends `X-Server-Timeout: 20` for an 8 s adapter timeout, mutation-checked; the deadline floor).
+
+| Gate on `7959a1b` | Result |
+|---|---|
+| TypeScript, ESLint | exit 0, exit 0 |
+| Vitest | 95 files passed, 1 skipped (96); **1,004 passed, 12 skipped (1,016)** |
+| Production build, release scan | exit 0; PASS |
+| GitHub Actions CI | run 43064443321 (PR #9, `a03382d`) success; 43065723689 (`main` `6265654`) success; 43067727398 (PR #10, `ed68391`) success; 43068227922 (`main` `7959a1b`) success |
+| Production smoke test (live) | 21 of 21 (`smoke-live-results-2026-11-11.json`) |
+| SDK contract | 17 of 17 calls, 13 operations, 6 live (`sdk-contract-2026-11-11.txt`) |
+
+Playwright was not re-run after `11cf209`: the later changes are the OpenAPI spec with the regenerated portal and SDK (not part of the app), documentation, and the Gemini client deadline, which applies only with a model key; e2e runs without one.
