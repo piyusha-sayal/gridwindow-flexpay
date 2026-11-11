@@ -5039,3 +5039,45 @@ body::after {
   font-size: 13px;
   margin-top: auto;
 }
+
+/* Disabled buttons: a quiet outline instead of a heavy grey block */
+.btn:disabled,
+.btn-primary:disabled,
+.btn-danger:disabled {
+  background: var(--line-2);
+  border-color: var(--line);
+  color: var(--faint);
+  box-shadow: none;
+  filter: none;
+}
+
+/* Operator reservation actions: one tidy column of equal-width, single-line buttons */
+.row-actions {
+  width: 11rem;
+}
+.row-actions-main,
+.row-actions-more {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+.row-actions .btn {
+  width: 100%;
+  white-space: nowrap;
+  min-height: 36px;
+  padding-inline: 0.75rem;
+}
+.row-actions .btn-text {
+  border: 1px solid var(--line);
+  background: transparent;
+  text-decoration: none;
+  color: var(--text-2);
+}
+.row-actions .btn-text:not(:disabled):hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.row-actions .btn-text:disabled {
+  background: transparent;
+  color: var(--faint);
+}
