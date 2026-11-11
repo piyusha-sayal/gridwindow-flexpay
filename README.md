@@ -719,7 +719,7 @@ The recovery benchmark may show unfavorable or infeasible results. The settlemen
 <p><a href="https://github.com/piyusha-sayal"><strong>GitHub profile</strong></a></p>
 </td>
 <td align="center" width="50%" valign="top">
-<a href="https://pandeysatyam.com/#satyam-pandey"><img src="https://ui-avatars.com/api/?name=Satyam+Pandey&amp;size=160&amp;background=0F766E&amp;color=FFFFFF&amp;bold=true" width="104" height="104" alt="Initials avatar for Satyam Pandey" /></a>
+<a href="https://github.com/satyamamarpandey"><img src="https://github.com/piyusha-sayal.png?size=160" width="104" height="104" alt="Piyusha Sayal's GitHub profile avatar" /></a>
 <h3>Satyam Pandey</h3>
 <sub>Co-creator of GridWindow FlexPay</sub>
 <p><a href="https://pandeysatyam.com/#satyam-pandey"><strong>Personal website</strong></a></p>
