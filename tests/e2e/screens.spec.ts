@@ -28,7 +28,7 @@ test("screens: home, driver offers, reservation receipt, operator console, bench
   await page.getByRole("button", { name: "See offers" }).click();
   await expect(page.getByRole("heading", { name: /flexible offer|cannot be met/ })).toBeVisible();
   await page.getByRole("button", { name: "Why is it cheaper?" }).first().click();
-  await expect(page.getByText(/Deterministic fallback/).first()).toBeAttached();
+  await expect(page.locator('[id^="why-"]:not([hidden]) ul li').first()).toBeVisible();
   await shot("2-driver-offers");
 
   await page.getByRole("button", { name: "Review and approve" }).click();

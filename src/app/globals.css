@@ -1132,15 +1132,6 @@ button.card:hover,
 .alert-title {
   letter-spacing: -0.01em;
 }
-/* AI provenance disclosure */
-.ai-source > summary {
-  color: var(--cyan-ink);
-  border-color: color-mix(in oklab, var(--cyan) 35%, var(--glass-border));
-}
-.ai-source-note {
-  padding-left: 0.75rem;
-  border-left: 2px solid color-mix(in oklab, var(--cyan) 45%, transparent);
-}
 .metric {
   font-size: clamp(44px, 6vw, 72px);
   font-weight: 600;

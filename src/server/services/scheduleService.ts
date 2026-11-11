@@ -6,7 +6,7 @@
 import { z } from "zod";
 import { canonicalJson } from "@/domain/terms";
 import { attributionFor, FAULT_ATTRIBUTIONS, isAllowedAttribution, type FaultAttribution } from "@/domain/faultAttribution";
-import { buildEnvelope, DISTURBANCE_TYPES, effectiveDepartMs, validateDisturbance, validateWithEnvelope, type DisturbanceRecord, type DisturbanceType, type NightEnvelope } from "@/domain/disturbance";
+import { buildEnvelope, DISTURBANCE_TYPES, effectiveDepartMs, validateDisturbance, violationsIntroducedBy, type DisturbanceRecord, type DisturbanceType, type NightEnvelope } from "@/domain/disturbance";
 import type { AgreedSession } from "@/domain/recovery";
 import type { QuoteSet } from "@/domain/quotes";
 import type { StationConfig } from "@/domain/station";
@@ -239,12 +239,14 @@ export async function commitScheduleVersion(
 
       const others = await committedPlans(q, deps.station.id, r.night_of, r.id);
       const own = { ...planOf(r, newPlan), departMs: effectiveDepartMs(envelope, r.id, r.terms.departMs) };
-      const violations = validateWithEnvelope({
+      // Same rule as candidate validation: re-checked here under the night lock, counting only what this plan causes.
+      const violations = violationsIntroducedBy({
         station: deps.station,
         grid: scenario.grid,
         forecastBaseLoadW: scenario.forecastBaseLoadW,
         envelope,
-        plans: [...others, own],
+        committed: others,
+        candidate: own,
         targets: [{ sessionId: r.id, targetBatteryWh: r.terms.targetBatteryWh, efficiencyBp: r.terms.efficiencyBp }],
       });
       if (violations.length > 0) {

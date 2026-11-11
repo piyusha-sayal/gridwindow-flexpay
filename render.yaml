@@ -44,6 +44,13 @@ services:
         value: gemini-3.6-flash
       - key: GEMINI_FALLBACK_MODEL
         value: gemini-3.5-flash-lite
+      # Third hop, free model only ($0 per token). Active only once OPENROUTER_API_KEY is entered in the dashboard.
+      - key: AI_FALLBACK_PROVIDER
+        value: openrouter
+      - key: OPENROUTER_MODEL
+        value: baidu/ernie-5.5-flash-preview:free
+      - key: OPENROUTER_API_KEY
+        sync: false
       - key: CHANNEL3_API_KEY
         sync: false
       - key: DEMO_TOOLS

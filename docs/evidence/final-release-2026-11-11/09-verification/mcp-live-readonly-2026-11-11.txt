@@ -1,0 +1,16 @@
+# MCP check (live) against https://gridwindow-flexpay.onrender.com at 2026-11-11T16:29:24.301Z
+tools (7): get_site_info, parse_charging_request, request_charging_offers, recommend_offer, prepare_paypal_checkout, get_reservation_status, find_ev_gear
+  get_site_info()
+  parse_charging_request(text)
+  request_charging_offers(portId, nightOf, plugInLocal, departLocal, targetBatteryKWh, spendCapCents, requiredMinSavingsCents)
+  recommend_offer(quoteSetId, preference, minSavingsCents)
+  prepare_paypal_checkout(quoteSetId, offerId, termsHash, driverConfirmed)
+  get_reservation_status(reservationId)
+  find_ev_gear(query, maxPriceCents, limit)
+payment-moving tools exposed: none
+tools that accept a price or amount: none
+get_site_info: Harbor Lane Overnight Depot (synthetic) | provider PAYPAL_SANDBOX | ports 3
+find_ev_gear: enabled=true items=6 https=true
+  - Power Sentry EV Charger Handle Dock and Cord Organizer for J | $7.59 USD | shop.advanceautoparts.com
+  - J1772 to Tesla Charging Adapter | $39.99 USD | menards.com
+  - Tesla to J1772 Charging Adapter | $59.97 USD | menards.com

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEMO_STATION, type SessionPlan } from "@/domain/station";
-import { buildEnvelope, checkPortCaps, effectiveDepartMs, envelopeBaseLoadW, validateDisturbance, validateWithEnvelope, type DisturbanceRecord } from "@/domain/disturbance";
+import { buildEnvelope, checkPortCaps, effectiveDepartMs, envelopeBaseLoadW, validateDisturbance, validateWithEnvelope, violationsIntroducedBy, type DisturbanceRecord } from "@/domain/disturbance";
 import { buildNightGrid, slotStartMs } from "@/domain/time";
 
 const grid = buildNightGrid("2026-11-05", DEMO_STATION.timeZone);
@@ -121,5 +121,39 @@ describe("validateWithEnvelope and checkPortCaps", () => {
       plans: [plan],
     });
     expect(violations.some((v) => v.code === "STATION_CAP" && v.slot === 8)).toBe(true);
+  });
+});
+
+describe("violationsIntroducedBy (quoting, acceptance and the capacity commit share this rule)", () => {
+  const plan = (sessionId: string, portId: string, slots: Record<number, number>): SessionPlan => {
+    const powerW = zeros();
+    for (const [slot, w] of Object.entries(slots)) powerW[Number(slot)] = w;
+    return { sessionId, portId, plugInMs: at(0), departMs: at(grid.slotCount), powerW };
+  };
+
+  it("does not blame a new plan for another session's existing port-cap violation", () => {
+    // Port B was cut to 2.4 kW from slot 4 and its session still holds a 7.2 kW plan (no feasible recovery).
+    const env = buildEnvelope(DEMO_STATION, grid, [rec({ portId: "port_b", type: "CHARGER_POWER_REDUCTION", params: { maxPowerW: 2_400 } })]);
+    const committed = [plan("res_1", "port_b", { 4: 7_200, 5: 7_200, 6: 7_200 })];
+    const candidate = plan("candidate", "port_c", { 4: 3_600, 5: 3_600 });
+    const input = { station: DEMO_STATION, grid, forecastBaseLoadW: zeros(), envelope: env };
+    expect(validateWithEnvelope({ ...input, plans: [...committed, candidate] }).length).toBeGreaterThan(0); // the old, all-plans check
+    expect(violationsIntroducedBy({ ...input, committed, candidate })).toEqual([]);
+  });
+
+  it("still blames a new plan that draws power in a slot that is already over the site cap", () => {
+    const env = buildEnvelope(DEMO_STATION, grid, [rec({ type: "SITE_CAP_REDUCTION", params: { stationCapW: 10_000 } })]);
+    const committed = [plan("res_1", "port_c", { 8: 11_000 })];
+    const input = { station: DEMO_STATION, grid, forecastBaseLoadW: zeros(), envelope: env, committed };
+    const intoOverload = violationsIntroducedBy({ ...input, candidate: plan("candidate", "port_a", { 8: 3_600 }) });
+    expect(intoOverload.some((v) => v.code === "STATION_CAP" && v.slot === 8)).toBe(true);
+    expect(violationsIntroducedBy({ ...input, candidate: plan("candidate", "port_a", { 20: 3_600 }) })).toEqual([]);
+  });
+
+  it("checks the candidate's own energy target when one is given", () => {
+    const env = buildEnvelope(DEMO_STATION, grid, []);
+    const candidate = plan("candidate", "port_a", { 20: 3_600 });
+    const short = violationsIntroducedBy({ station: DEMO_STATION, grid, forecastBaseLoadW: zeros(), envelope: env, committed: [], candidate, targets: [{ sessionId: "candidate", targetBatteryWh: 30_000, efficiencyBp: 9_200 }] });
+    expect(short.length).toBeGreaterThan(0);
   });
 });

@@ -41,12 +41,12 @@ Accessor: `client.operator` · Source: `src/resources/operator.ts` · 4 operatio
 
 ### operatorSignIn
 
-- **Signature**: `operatorSignIn(request: Operator.OperatorSignInRequest, options?: RequestOptions): ApiPromise<undefined, Operator.OperatorSignInError>`
+- **Signature**: `operatorSignIn(request: Operator.OperatorSignInRequest, options?: RequestOptions): ApiPromise<OperatorSessionState, Operator.OperatorSignInError>`
 - **Wire**: `POST /api/operator/session`
 - **Auth**: none — public; no credential is sent
 - **Request body**: `application/json` — the `body` field
 - **SDK-sent**: `header Idempotency-Key` (minted per call)
-- **Returns**: `undefined` — the operation resolves to nothing
+- **Returns**: `OperatorSessionState`
 - **Error**: `GridWindowFlexPayApiError` with `kind: "api"`, an instance of `Operator.OperatorSignInError` — **typed arms**, narrowed on `err.payload.kind`
 - **Error arms**: `"error"` [401] `Error` · `"undeclared"` [any other] `rawBody: ArrayBuffer`
 
@@ -59,15 +59,20 @@ Accessor: `client.operator` · Source: `src/resources/operator.ts` · 4 operatio
 | Type | Schema value | Source |
 | --- | --- | --- |
 | `ApiOperatorSessionRequest` | `apiOperatorSessionRequestSchema` | `src/models/api-operator-session-request.ts` |
+| `OperatorSessionState` | `operatorSessionStateSchema` | `src/models/operator-session-state.ts` |
 | `Error` | `errorSchema` | `src/models/error.ts` |
 
 ### operatorSignOut
 
-- **Signature**: `operatorSignOut(options?: RequestOptions): ApiPromise<undefined, ApiError>`
+- **Signature**: `operatorSignOut(options?: RequestOptions): ApiPromise<OperatorSessionState, ApiError>`
 - **Wire**: `DELETE /api/operator/session`
 - **Auth**: none — public; no credential is sent
 - **Request body**: none — no `Content-Type` header is sent
 - **SDK-sent**: `header Idempotency-Key` (minted per call)
-- **Returns**: `undefined` — the operation resolves to nothing
+- **Returns**: `OperatorSessionState`
 - **Error**: `GridWindowFlexPayApiError` with `kind: "api"` — untyped, `payload.kind` always `"undeclared"`
+
+| Type | Schema value | Source |
+| --- | --- | --- |
+| `OperatorSessionState` | `operatorSessionStateSchema` | `src/models/operator-session-state.ts` |
 

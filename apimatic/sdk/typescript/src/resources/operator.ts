@@ -17,6 +17,7 @@ import {
   type ApiOperatorSessionResponse,
 } from "../models/api-operator-session-response.js";
 import { errorSchema, type Error } from "../models/error.js";
+import { operatorSessionStateSchema, type OperatorSessionState } from "../models/operator-session-state.js";
 import type { Servers } from "../servers.js";
 
 /**
@@ -121,7 +122,7 @@ export class Operator {
   operatorSignIn(
     request: Operator.OperatorSignInRequest,
     options?: RequestOptions,
-  ): ApiPromise<undefined, Operator.OperatorSignInError> {
+  ): ApiPromise<OperatorSessionState, Operator.OperatorSignInError> {
     return this.#rawClient.execute(
       {
         method: "POST",
@@ -133,7 +134,7 @@ export class Operator {
         body: { kind: "json", value: request.body, schema: apiOperatorSessionRequestInternalSchema },
       },
       {
-        success: { kind: "empty" },
+        success: { kind: "json", schema: operatorSessionStateSchema },
         errorFactory: Operator.OperatorSignInError,
       },
       options,
@@ -146,7 +147,7 @@ export class Operator {
    * @remarks
    * Sign out.
    *
-   * @returns Signed out
+   * @returns Signed out; clears the operator cookie
    *
    * @throws {@link ApiError} when the API answers with an error status
    *
@@ -154,7 +155,7 @@ export class Operator {
    * failure, a timeout, a body that would not decode, a value that would not encode, or a
    * credential that could not be obtained
    */
-  operatorSignOut(options?: RequestOptions): ApiPromise<undefined, ApiError> {
+  operatorSignOut(options?: RequestOptions): ApiPromise<OperatorSessionState, ApiError> {
     return this.#rawClient.execute(
       {
         method: "DELETE",
@@ -166,7 +167,7 @@ export class Operator {
         body: { kind: "empty" },
       },
       {
-        success: { kind: "empty" },
+        success: { kind: "json", schema: operatorSessionStateSchema },
         errorFactory: ApiError,
       },
       options,

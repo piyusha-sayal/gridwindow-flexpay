@@ -51,7 +51,8 @@ paths:
                   pattern: ^[0-9a-f]{64}$
                 consent:
                   type: boolean
-                  const: true
+                  description: Must be `true` (the driver's explicit consent to these exact
+                    terms); any other value is refused.
       responses:
         "200":
           description: Reservation created, waiting for buyer approval
@@ -86,6 +87,7 @@ paths:
                           quote_set_id="some example string",
                           offer_id="some example string",
                           terms_hash="some example string",
+                          consent=True,
                       ),
                   )
                   # TODO: Handle 'response' of type
@@ -103,6 +105,7 @@ paths:
                     quoteSetId: "some example string",
                     offerId: "some example string",
                     termsHash: "some example string",
+                    consent: true,
                   },
                 });
                 // TODO: Handle 'response' of type ApiOffersAcceptResponse

@@ -36,6 +36,10 @@ paths:
       responses:
         "200":
           description: Signed in; sets the operator cookie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperatorSessionState"
         "401":
           $ref: "#/components/responses/Unauthorized"
       description: Sign in with the operator passphrase.
@@ -45,11 +49,12 @@ paths:
           sources:
             Example: |-
               try:
-                  client.operator.operator_sign_in(
+                  response = client.operator.operator_sign_in(
                       ApiOperatorSessionRequest(
                           passphrase="some example string"
                       ),
                   )
+                  # TODO: Handle 'response' of type OperatorSessionState
               except ApiError as e:
                   # TODO: Handle 'e.error' of type OperatorSignInErrorBody
                   ...
@@ -58,9 +63,10 @@ paths:
           sources:
             Example: >-
               try {
-                await client.operator.operatorSignIn({
+                const response = await client.operator.operatorSignIn({
                   body: { passphrase: "some example string" },
                 });
+                // TODO: Handle 'response' of type OperatorSessionState
               } catch (err) {
                 // TODO: Handle 'err' of type Operator.OperatorSignInError, discriminated with 'err.payload.kind'
               }
@@ -71,14 +77,15 @@ components:
       in: cookie
       name: gw_op
       description: Signed operator session cookie set by POST /api/operator/session.
-  responses:
-    Unauthorized:
-      description: Operator session required or passphrase wrong
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
   schemas:
+    OperatorSessionState:
+      type: object
+      required:
+        - operator
+      properties:
+        operator:
+          type: boolean
+          description: Whether the caller holds an operator session after this call
     Error:
       type: object
       required:
@@ -103,6 +110,13 @@ components:
               type: array
               items:
                 type: string
+  responses:
+    Unauthorized:
+      description: Operator session required or passphrase wrong
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
 info:
   title: GridWindow FlexPay API
   version: 1.0.0

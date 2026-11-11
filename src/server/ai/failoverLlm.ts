@@ -1,7 +1,8 @@
 /**
  * Primary model with ONE controlled fallback. The wrapper only decides which adapter to ask; every answer, from either
  * adapter, still goes through the same schema parse and grounding checks in the assistant, deal agent and recovery agent,
- * and no model has any payment capability. It never retries the same provider.
+ * and no model has any payment capability. It never retries the same provider. The fallback may itself be a FailoverLlm,
+ * which makes a chain (primary, then second, then third); each hop is still asked at most once per call.
  *
  * Routing:
  *  - transient primary failure (UNAVAILABLE: network or 5xx, TIMEOUT, QUOTA_EXHAUSTED: 429) -> ask the fallback once;
@@ -41,6 +42,8 @@ export class FailoverLlm implements StructuredLlm {
   private readonly minFallbackBudgetMs: number;
   private primaryDownUntil = 0;
   private recent: AiAttempt[] = [];
+  /** Whether the last successful answer came from the primary adapter itself (not from anything behind the fallback). */
+  private lastAnswerFromPrimary = false;
 
   constructor(
     private readonly primary: StructuredLlm,
@@ -92,15 +95,19 @@ export class FailoverLlm implements StructuredLlm {
     } finally {
       clearTimeout(timer);
     }
+    // A nested failover (fallback chain) already names the adapter that answered; keep it, so an answer from the end of the
+    // chain is never relabelled as the provider of the wrapper in front of it (recovery provenance depends on this).
+    const answeredBy = res.ok ? (res.provider ?? llm.provider) : llm.provider;
+    if (res.ok) this.lastAnswerFromPrimary = llm === this.primary;
     this.record({
       at: t0,
-      provider: llm.provider,
+      provider: answeredBy,
       model: res.ok ? res.model : llm.model,
       outcome: res.ok ? "OK" : res.reason,
       latencyMs: Math.max(0, this.now() - t0),
       ...(res.usage ? { inputTokens: res.usage.inputTokens, outputTokens: res.usage.outputTokens } : {}),
     });
-    return res.ok ? { ...res, provider: llm.provider } : res;
+    return res.ok ? { ...res, provider: answeredBy } : res;
   }
 
   private record(a: AiAttempt): void {
@@ -109,11 +116,13 @@ export class FailoverLlm implements StructuredLlm {
 
   health(): AiHealth {
     const last = this.recent[this.recent.length - 1];
-    const state: AiHealth["state"] = !last ? "IDLE" : last.outcome !== "OK" ? "DOWN" : last.provider === this.primary.provider ? "OK" : "DEGRADED";
+    const state: AiHealth["state"] = !last ? "IDLE" : last.outcome !== "OK" ? "DOWN" : this.lastAnswerFromPrimary ? "OK" : "DEGRADED";
+    // A fallback that is itself a failover is described as the whole chain, in the order it is tried.
+    const next = this.fallback.health?.().fallback;
     return {
       state,
       primary: { provider: this.primary.provider, model: this.primary.model },
-      fallback: { provider: this.fallback.provider, model: this.fallback.model },
+      fallback: { provider: this.fallback.provider, model: next ? `${this.fallback.model}, then ${next.model}` : this.fallback.model },
       recent: [...this.recent],
     };
   }

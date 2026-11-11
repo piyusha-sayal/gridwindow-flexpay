@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { api, ApiError } from "@/components/api";
-import { AiSourceBadge, type AiSource } from "@/components/ui";
+import type { AiSource } from "@/components/ui";
 
 type Explanation = { summary: string; points: string[] } & AiSource;
 type State = { status: "closed" | "loading" } | { status: "done"; data: Explanation } | { status: "error"; message: string };
@@ -48,9 +48,6 @@ export function AiExplain({ quoteSetId, offerId }: { quoteSetId: string; offerId
         )}
         {state.status === "done" && (
           <>
-            <div className="badge-wrap">
-              <AiSourceBadge src={state.data} />
-            </div>
             <p>{state.data.summary}</p>
             <ul className="list-disc pl-5 space-y-1 text-text-2">
               {state.data.points.map((p) => (

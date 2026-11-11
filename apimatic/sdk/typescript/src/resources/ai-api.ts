@@ -22,8 +22,10 @@ import {
   apiQuotesParseRequestInternalSchema,
   type ApiQuotesParseRequest,
 } from "../models/api-quotes-parse-request.js";
+import { askResultSchema, type AskResult } from "../models/ask-result.js";
 import { dealResultSchema, type DealResult } from "../models/deal-result.js";
 import { errorSchema, type Error } from "../models/error.js";
+import { explainResultSchema, type ExplainResult } from "../models/explain-result.js";
 import { parseResultSchema, type ParseResult } from "../models/parse-result.js";
 import type { Servers } from "../servers.js";
 
@@ -57,7 +59,7 @@ export class AiApi {
   askAboutReservation(
     request: AiApi.AskAboutReservationRequest,
     options?: RequestOptions,
-  ): ApiPromise<Record<string, unknown>, AiApi.AskAboutReservationError> {
+  ): ApiPromise<AskResult, AiApi.AskAboutReservationError> {
     return this.#rawClient.execute(
       {
         method: "POST",
@@ -69,7 +71,7 @@ export class AiApi {
         body: { kind: "json", value: request.body, schema: apiAssistAskRequestInternalSchema },
       },
       {
-        success: { kind: "json", schema: s.record(s.string(), s.unknown()) },
+        success: { kind: "json", schema: askResultSchema },
         errorFactory: AiApi.AskAboutReservationError,
       },
       options,
@@ -94,7 +96,7 @@ export class AiApi {
   explainOffer(
     request: AiApi.ExplainOfferRequest,
     options?: RequestOptions,
-  ): ApiPromise<Record<string, unknown>, AiApi.ExplainOfferError> {
+  ): ApiPromise<ExplainResult, AiApi.ExplainOfferError> {
     return this.#rawClient.execute(
       {
         method: "POST",
@@ -106,7 +108,7 @@ export class AiApi {
         body: { kind: "json", value: request.body, schema: apiAssistExplainRequestInternalSchema },
       },
       {
-        success: { kind: "json", schema: s.record(s.string(), s.unknown()) },
+        success: { kind: "json", schema: explainResultSchema },
         errorFactory: AiApi.ExplainOfferError,
       },
       options,

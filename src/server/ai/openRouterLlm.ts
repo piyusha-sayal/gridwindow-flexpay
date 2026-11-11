@@ -3,17 +3,22 @@
  * JSON object in, text-only out, no tools, no function calling, no state access. Every failure maps to an LlmFailure and
  * ends in the deterministic fallback. Chat Completions request shape, provider routing and error codes follow
  * https://openrouter.ai/docs/features/structured-outputs, /docs/guides/routing/provider-selection and /docs/api-reference/errors
- * (read 2026-11-10). The adapter has not been exercised against the live service.
+ * (read 2026-11-10). Exercised against the live service on 2026-11-11 with the default model below: the request-parsing
+ * feature returned a schema-valid MODEL answer, and a capped recovery run had a tool step answered through this adapter.
  */
 import { z } from "zod";
 import { classifyHttpStatus, type LlmDiagnostic, type LlmFailure, type LlmResult, type LlmUsage, type ModelProvider, type StructuredLlm } from "./llm";
 
 /**
- * Selected from the public catalog (2026-11-10): lists response_format + structured_outputs, 1M context, several independent
- * endpoints (Anthropic, Azure, Bedrock, Google), $0.10 / $0.50 per million tokens. The Amazon Nova models are on OpenRouter
- * (served by Amazon Bedrock) but advertise no response_format or structured_outputs, so they cannot honour the strict schema.
+ * Free model ($0 per token), selected from the public catalog on 2026-11-11. Of the 16 free models listed, five advertise
+ * both response_format and structured_outputs (needed for the strict schema below). Of those, this is the only large model
+ * whose free endpoint passes `data_collection: "deny"` and answered a production-shaped request: NVIDIA Nemotron 3.5 Super's
+ * only free endpoint trains on prompts and is refused by the data policy (HTTP 404), dots-3-note-preview returned no content,
+ * and the two Liquid models are 1.7B/2.6B. It is a preview served by a single free endpoint that answers HTTP 429 at
+ * times; a 429 is a transient failure, so the caller shows its labelled deterministic answer.
+ * The Amazon Nova models advertise no response_format or structured_outputs, so they cannot honour the strict schema.
  */
-export const DEFAULT_OPENROUTER_MODEL = "anthropic/claude-haiku-5.5";
+export const DEFAULT_OPENROUTER_MODEL = "baidu/ernie-5.5-flash-preview:free";
 /**
  * Models whose published OpenRouter parameters omit response_format. With require_parameters, sending it would leave no
  * endpoint to serve the request. For these the schema goes in the system prompt instead; the local schema parse below stays
@@ -25,7 +30,11 @@ export function supportsResponseFormat(model: string): boolean {
   return !PROMPT_ONLY_JSON_MODELS.some((re) => re.test(model));
 }
 export const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
-const TIMEOUT_MS = 8_000;
+/**
+ * The default model is a reasoning model: 4.4 s and 4.7 s measured on 2026-11-11 for short prompts (about 330 tokens in,
+ * 530 to 790 out). Longer prompts need headroom. Total waiting stays capped by the failover wrapper's overall budget.
+ */
+const TIMEOUT_MS = 12_000;
 /** Reasoning-capable models count thinking against max_tokens; headroom keeps a short answer from being cut off. */
 const OUTPUT_HEADROOM_TOKENS = 1_024;
 const JSON_ONLY = "Respond with exactly one JSON object that matches the response schema. No prose, no code fences.";

@@ -77,51 +77,11 @@ export function Kpi({ label, value, hint, variant = "default", children }: { lab
   );
 }
 
+/**
+ * Where an assistant answer came from, as returned by the API. Driver screens no longer print it (owner decision,
+ * 2026-11-11); it stays in every API response, and recovery provenance stays on the operator's run detail.
+ */
 export type AiSource = { source: "MODEL"; model: string } | { source: "DETERMINISTIC_FALLBACK"; reason: string };
-
-const FALLBACK_COPY: Record<string, string> = {
-  NOT_CONFIGURED: "AI not configured on this server",
-  UNAVAILABLE: "AI service unavailable",
-  TIMEOUT: "AI service timed out",
-  REFUSED: "AI declined the request",
-  INVALID_OUTPUT: "AI output was malformed or incomplete",
-  SCHEMA_MISMATCH: "AI output failed validation",
-  UNGROUNDED_OUTPUT: "AI used numbers not from the backend",
-  AUTH_FAILED: "AI service rejected the server's credentials",
-  QUOTA_EXHAUSTED: "AI service quota reached",
-  REQUEST_REJECTED: "AI service rejected the request",
-};
-
-/**
- * Provenance stays one click away instead of a banner: the text says whether a model wrote this or the
- * deterministic fallback did, so a fallback answer is never presented as an AI answer.
- */
-/**
- * What the provenance details say. A model answer names the model; a fallback is always labelled deterministic and never as
- * a model. When the fallback was used because a configured provider failed (not because none is configured), the summary
- * says so too, so an operator can see a provider failure without opening the details.
- */
-export function aiSourceText(src: AiSource): { summary: string; detail: string } {
-  if (src.source === "MODEL") return { summary: "How this was generated", detail: `AI · ${src.model} · numbers verified against backend` };
-  const failed = src.reason !== "NOT_CONFIGURED";
-  return {
-    summary: failed ? "How this was generated · fallback used" : "How this was generated",
-    detail: `Deterministic fallback (no AI) · ${FALLBACK_COPY[src.reason] ?? src.reason}`,
-  };
-}
-
-export function AiSourceBadge({ src }: { src: AiSource }) {
-  const t = aiSourceText(src);
-  return (
-    <details className="disclosure ai-source text-[12px] text-muted">
-      <summary className="cursor-pointer">
-        <span aria-hidden="true" className="ico ico-spark" />
-        {t.summary}
-      </summary>
-      <p className="ai-source-note mt-2">{t.detail}</p>
-    </details>
-  );
-}
 
 export function Alert({ tone, title, children }: { tone: Tone; title?: string; children?: ReactNode }) {
   return (

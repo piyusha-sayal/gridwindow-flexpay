@@ -52,8 +52,10 @@ test("demo rehearsal (MOCK): timed per DEMO_PLAN", async ({ page }) => {
   });
   await step("driver request → offers (port A; the seed occupies B and C)", () => requestOffers(page, "A", night));
   await step("grounded explanation (fallback)", async () => {
+    const explain = page.waitForResponse((r) => r.url().includes("/api/assist/explain") && r.request().method() === "POST");
     await page.getByRole("button", { name: "Why is it cheaper?" }).first().click();
-    await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeAttached();
+    expect(((await (await explain).json()) as { source: string }).source).toBe("DETERMINISTIC_FALLBACK");
+    await expect(page.locator('[id^="why-"]:not([hidden]) ul li').first()).toBeVisible();
   });
   await step("consent → MOCK checkout → authorized", async () => {
     await page.getByRole("button", { name: "Review and approve" }).click();

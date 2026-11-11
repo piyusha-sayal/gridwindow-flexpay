@@ -39,25 +39,33 @@ export function fallbackConfigured(env: AiEnv): boolean {
 }
 
 /**
- * A second Gemini model is used only with Gemini as the provider, a key, a different model id, and no OpenRouter fallback.
+ * A second Gemini model is used only with Gemini as the provider, a key, and a different model id.
  * Free-tier Gemini quotas are per model, so this doubles the free capacity without a second account.
  */
 export function geminiFallbackModel(env: AiEnv): string | null {
   const m = env.GEMINI_FALLBACK_MODEL?.trim();
-  if (!m || selectProvider(env) !== "gemini" || fallbackConfigured(env)) return null;
+  if (!m || selectProvider(env) !== "gemini") return null;
   return m === (env.GEMINI_MODEL?.trim() || undefined) ? null : m;
 }
 
-/** Null when no usable credentials exist; the assistant then runs its labeled deterministic fallback. */
+/**
+ * Null when no usable credentials exist; the assistant then runs its labeled deterministic fallback.
+ * Order of providers, each asked at most once per call: the primary, then the second Gemini model (if configured), then
+ * OpenRouter (if opted in with a key). Both backups are optional and independent.
+ */
 export function createLlm(env: AiEnv): { llm: StructuredLlm; provider: AiProvider } | null {
   const provider = selectProvider(env);
   if (!provider) return null;
   const geminiSecond = geminiFallbackModel(env);
-  const withFallback = fallbackConfigured(env) || geminiSecond !== null;
+  const openRouter = fallbackConfigured(env) ? new OpenRouterLlm(env.OPENROUTER_API_KEY!, env.OPENROUTER_MODEL) : null;
+  const withFallback = openRouter !== null || geminiSecond !== null;
   const timeoutMs = withFallback ? PRIMARY_TIMEOUT_WITH_FALLBACK_MS : undefined;
   const primary: StructuredLlm =
     provider === "gemini" ? new GeminiLlm(env.GEMINI_API_KEY!, env.GEMINI_MODEL, timeoutMs ? { timeoutMs } : {}) : new AnthropicLlm(env.ANTHROPIC_API_KEY!, env.AI_MODEL, timeoutMs ? { timeoutMs } : {});
   if (!withFallback) return { llm: primary, provider };
-  if (geminiSecond) return { llm: new FailoverLlm(primary, new GeminiLlm(env.GEMINI_API_KEY!, geminiSecond)), provider };
-  return { llm: new FailoverLlm(primary, new OpenRouterLlm(env.OPENROUTER_API_KEY!, env.OPENROUTER_MODEL)), provider };
+  // With OpenRouter behind it, the second Gemini model gets the same short per-attempt timeout as the primary, so the
+  // overall failover budget still leaves room for the last hop.
+  const second = geminiSecond ? new GeminiLlm(env.GEMINI_API_KEY!, geminiSecond, openRouter ? { timeoutMs: PRIMARY_TIMEOUT_WITH_FALLBACK_MS } : {}) : null;
+  const tail: StructuredLlm = second && openRouter ? new FailoverLlm(second, openRouter) : (second ?? openRouter)!;
+  return { llm: new FailoverLlm(primary, tail), provider };
 }

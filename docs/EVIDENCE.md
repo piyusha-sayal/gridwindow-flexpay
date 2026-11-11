@@ -38,3 +38,7 @@ Earlier release-candidate run, before the recovery work (superseded by the combi
 - A PayPal authorization is not escrow. The honor period is three days and the lifetime up to 29 days; the application does not capture after expiry.
 - Free-tier Gemini traffic may be used by Google to improve its products: do not enter personal data into the assistant.
 - Operator and driver identities are pseudonymous demo sessions, not production authentication.
+
+## Final release evidence (2026-11-11)
+
+Screenshots with an evidence manifest, live PayPal Sandbox capture and void read-backs, SDK, MCP and OpenRouter run records: `docs/evidence/final-release-2026-11-11/`. Report: `docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md`.

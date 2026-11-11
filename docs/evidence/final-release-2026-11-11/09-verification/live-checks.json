@@ -1,0 +1,658 @@
+{
+  "capturedAt": "2026-11-11T16:47:18.069Z",
+  "base": "https://gridwindow-flexpay.onrender.com",
+  "portal": "https://gridwindow-flexpay-developers.onrender.com",
+  "records": [
+    {
+      "file": "01-product/01-home-desktop.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/",
+      "viewport": "1440x900",
+      "feature": "Home page",
+      "note": "",
+      "bytes": 418945,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "01-product/03-smart-charge-request.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/drive",
+      "viewport": "1440x900",
+      "feature": "Smart Charge request form (filled in the browser, not submitted: submitting runs the live AI deal agent)",
+      "note": "",
+      "bytes": 361095,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "01-product/07-how-it-works.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/how-it-works",
+      "viewport": "1440x900",
+      "feature": "How it works",
+      "note": "",
+      "bytes": 179837,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "01-product/08-impact-lab.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/impact-lab",
+      "viewport": "1440x900",
+      "feature": "Impact Lab (synthetic benchmark, labelled modeled)",
+      "note": "",
+      "bytes": 184887,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "06-channel3/01-rewards-overview.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/rewards",
+      "viewport": "1440x900",
+      "feature": "Rewards overview (modeled savings)",
+      "note": "",
+      "bytes": 170750,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/operator net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "06-channel3/02-channel3-product-cards.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/rewards",
+      "viewport": "1440x900",
+      "feature": "Channel3 live product cards",
+      "note": "",
+      "bytes": 350860,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "06-channel3/03-channel3-product-details.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/rewards",
+      "viewport": "1440x900",
+      "feature": "One Channel3 product card (title, merchant, price, image)",
+      "note": "",
+      "bytes": 173492,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "03-operator-ag-grid/01-operator-dashboard.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/operator",
+      "viewport": "1440x900",
+      "feature": "Operator console (live PayPal Sandbox deployment)",
+      "note": "",
+      "bytes": 142430,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/rewards net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "03-operator-ag-grid/02-ag-grid-reservations.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/operator",
+      "viewport": "1440x900",
+      "feature": "AG Grid reservation grid (night of 2026-11-11)",
+      "note": "",
+      "bytes": 77432,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "03-operator-ag-grid/03-ag-grid-needs-attention-filter.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/operator",
+      "viewport": "1440x900",
+      "feature": "'Needs attention only' filter applied (night of 2026-11-10)",
+      "note": "",
+      "bytes": 67432,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "03-operator-ag-grid/04-ag-grid-payment-status.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/operator",
+      "viewport": "1440x900",
+      "feature": "Grid sorted by payment status (provider-confirmed states, MOCK rows flagged)",
+      "note": "",
+      "bytes": 115663,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "03-operator-ag-grid/05-reservation-details.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/operator",
+      "viewport": "1440x900",
+      "feature": "Row click opens the reservation details panel",
+      "note": "",
+      "bytes": 192126,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/reservations/res_LBnfZ-mrH62XfQtp net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "02-paypal/05-successful-capture.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/reservations/<id>",
+      "viewport": "1440x900",
+      "feature": "Live Sandbox reservation after delivery: capture confirmed by PayPal",
+      "note": "",
+      "bytes": 191742,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "02-paypal/06-flexreceipt.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/reservations/<id>",
+      "viewport": "1440x900",
+      "feature": "FlexReceipt: paid amount equals the provider-confirmed capture",
+      "note": "",
+      "bytes": 95585,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "02-paypal/07-operator-failure-void.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/reservations/<id>",
+      "viewport": "1440x900",
+      "feature": "Live Sandbox reservation after a synthetic charger failure: authorization voided by PayPal",
+      "note": "",
+      "bytes": 197895,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/impact-lab net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/ net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "02-paypal/08-zero-charge-receipt.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/reservations/<id>",
+      "viewport": "1440x900",
+      "feature": "FlexReceipt: nothing collected, authorization voided",
+      "note": "",
+      "bytes": 107221,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "07-apimatic/01-developer-portal-home.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay-developers.onrender.com/",
+      "viewport": "1440x900",
+      "feature": "APIMatic developer portal home",
+      "note": "",
+      "bytes": 32635,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "07-apimatic/02-openapi-endpoints.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay-developers.onrender.com/api/openapi/site/getSiteConfig",
+      "viewport": "1440x900",
+      "feature": "API reference with the endpoint list (site group)",
+      "note": "",
+      "bytes": 106056,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "07-apimatic/03-accept-offer-api-reference.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay-developers.onrender.com/api/openapi/checkout/acceptOffer",
+      "viewport": "1440x900",
+      "feature": "Accept offer API reference",
+      "note": "",
+      "bytes": 136113,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "07-apimatic/04-request-response-example.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay-developers.onrender.com/api/openapi/checkout/acceptOffer",
+      "viewport": "1440x900",
+      "feature": "Request and response examples for accept offer",
+      "note": "",
+      "bytes": 136113,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "07-apimatic/05-typescript-sdk-documentation.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay-developers.onrender.com/sdks/typescript",
+      "viewport": "1440x900",
+      "feature": "Generated TypeScript SDK documentation",
+      "note": "",
+      "bytes": 96335,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "01-product/02-home-mobile.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/",
+      "viewport": "390x844",
+      "feature": "Home page on a phone",
+      "note": "",
+      "bytes": 397705,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED",
+          "gridwindow-flexpay.onrender.com/how-it-works net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "08-responsive/01-mobile-home.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/",
+      "viewport": "390x844",
+      "feature": "Home page on a phone, second screen, with the bottom navigation (no horizontal scroll)",
+      "note": "",
+      "bytes": 143811,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "08-responsive/02-mobile-smart-charge.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/drive",
+      "viewport": "390x844",
+      "feature": "Smart Charge form on a phone (energy, window and ports)",
+      "note": "",
+      "bytes": 157920,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "08-responsive/04-mobile-rewards.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/rewards",
+      "viewport": "390x844",
+      "feature": "Rewards on a phone",
+      "note": "",
+      "bytes": 169828,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "06-channel3/04-channel3-mobile.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/rewards",
+      "viewport": "390x844",
+      "feature": "Channel3 cards on a phone",
+      "note": "",
+      "bytes": 314442,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "07-apimatic/06-developer-portal-mobile.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay-developers.onrender.com/",
+      "viewport": "390x844",
+      "feature": "Developer portal on a phone",
+      "note": "",
+      "bytes": 48119,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "08-responsive/05-tablet-operator.png",
+      "env": "LIVE",
+      "url": "https://gridwindow-flexpay.onrender.com/operator",
+      "viewport": "820x1180",
+      "feature": "Operator console on a tablet",
+      "note": "",
+      "bytes": 324520,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "gridwindow-flexpay.onrender.com/drive net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    }
+  ],
+  "checks": {
+    "channel3": {
+      "sectionVisible": true,
+      "heading": "Gear for smarter overnight charging",
+      "cards": [
+        {
+          "https": true,
+          "host": "buy.trychannel3.com",
+          "target": "_blank",
+          "rel": "noopener noreferrer sponsored",
+          "text": "Power Sentry EV Charger Handle Dock and Cord Organizer for J1772 $7.59 · shop.advanceautoparts.com (opens the merchant s",
+          "imgLoaded": true
+        },
+        {
+          "https": true,
+          "host": "buy.trychannel3.com",
+          "target": "_blank",
+          "rel": "noopener noreferrer sponsored",
+          "text": "J1772 to Tesla Charging Adapter $39.99 · menards.com (opens the merchant site in a new tab)",
+          "imgLoaded": true
+        },
+        {
+          "https": true,
+          "host": "buy.trychannel3.com",
+          "target": "_blank",
+          "rel": "noopener noreferrer sponsored",
+          "text": "Tesla to J1772 Charging Adapter $59.97 · menards.com (opens the merchant site in a new tab)",
+          "imgLoaded": true
+        },
+        {
+          "https": true,
+          "host": "buy.trychannel3.com",
+          "target": "_blank",
+          "rel": "noopener noreferrer sponsored",
+          "text": "TOPDON J1772 to Tesla Charging Adapter for Model S, 3, X, Y $48.99 · northerntool.com (opens the merchant site in a new ",
+          "imgLoaded": true
+        },
+        {
+          "https": true,
+          "host": "buy.trychannel3.com",
+          "target": "_blank",
+          "rel": "noopener noreferrer sponsored",
+          "text": "Lectron J1772 to Tesla Adapter 80 Amp (240V) EV Electric Vehicle Charger Adapter $49.99 · macys.com (opens the merchant ",
+          "imgLoaded": true
+        },
+        {
+          "https": true,
+          "host": "buy.trychannel3.com",
+          "target": "_blank",
+          "rel": "noopener noreferrer sponsored",
+          "text": "Rexing J1772 to Tesla Charging Adapter $49.99 · bestbuy.com (opens the merchant site in a new tab)",
+          "imgLoaded": true
+        }
+      ],
+      "firstLinkOpened": {
+        "newTab": true,
+        "host": "buy.trychannel3.com"
+      }
+    },
+    "agGrid": {
+      "night": "2026-11-10",
+      "rowsAll": [
+        11,
+        11
+      ],
+      "rowsAttention": [
+        4,
+        11
+      ],
+      "searchCapturedRows": [
+        11,
+        11
+      ],
+      "paymentHeaderAriaSort": "ascending",
+      "csv": {
+        "file": "reservations-2026-11-10.csv",
+        "dataRows": 11,
+        "header": "\"Reservation\",\"Port\",\"Plug in\",\"Ready by\",\"Energy (kWh)\",\"Amount\",\"Driver discount\",\"Operator gain\",\"Payment\",\"Service\",\"Provider\",\"Last event\""
+      }
+    },
+    "paypal": {
+      "capture": {
+        "reservation": "…2XfQtp",
+        "providerMode": "PAYPAL_SANDBOX",
+        "paymentState": "CAPTURED",
+        "serviceState": "DELIVERED",
+        "proofs": [
+          {
+            "type": "ORDER_CREATED",
+            "providerStatus": "PAYER_ACTION_REQUIRED",
+            "amountCents": 1556,
+            "evidenceSource": "PAYPAL_SANDBOX_API",
+            "observedAt": "2026-11-11T00:18:32.300Z"
+          },
+          {
+            "type": "BUYER_APPROVED",
+            "providerStatus": "APPROVED",
+            "amountCents": 1556,
+            "evidenceSource": "PAYPAL_SANDBOX_API",
+            "observedAt": "2026-11-11T00:18:38.491Z"
+          },
+          {
+            "type": "AUTHORIZED",
+            "providerStatus": "CREATED",
+            "amountCents": 1556,
+            "evidenceSource": "PAYPAL_SANDBOX_API",
+            "observedAt": "2026-11-11T00:18:40.434Z"
+          },
+          {
+            "type": "CAPTURED",
+            "providerStatus": "COMPLETED",
+            "amountCents": 1556,
+            "evidenceSource": "PAYPAL_SANDBOX_API",
+            "observedAt": "2026-11-11T08:21:40.661Z"
+          }
+        ],
+        "webhooksVerified": 2
+      },
+      "void": {
+        "reservation": "…afKCrn",
+        "providerMode": "PAYPAL_SANDBOX",
+        "paymentState": "VOIDED",
+        "serviceState": "FAILED",
+        "proofs": [
+          {
+            "type": "ORDER_CREATED",
+            "providerStatus": "PAYER_ACTION_REQUIRED",
+            "amountCents": 1556,
+            "evidenceSource": "PAYPAL_SANDBOX_API",
+            "observedAt": "2026-11-11T08:55:21.870Z"
+          },
+          {
+            "type": "BUYER_APPROVED",
+            "providerStatus": "APPROVED",
+            "amountCents": 1556,
+            "evidenceSource": "PAYPAL_SANDBOX_API",
+            "observedAt": "2026-11-11T08:56:07.509Z"
+          },
+          {
+            "type": "AUTHORIZED",
+            "providerStatus": "CREATED",
+            "amountCents": 1556,
+            "evidenceSource": "PAYPAL_SANDBOX_API",
+            "observedAt": "2026-11-11T08:56:09.814Z"
+          },
+          {
+            "type": "VOIDED",
+            "providerStatus": "VOIDED",
+            "amountCents": 1556,
+            "evidenceSource": "PAYPAL_SANDBOX_API",
+            "observedAt": "2026-11-11T08:56:54.930Z"
+          }
+        ],
+        "webhooksVerified": 3
+      }
+    }
+  }
+}

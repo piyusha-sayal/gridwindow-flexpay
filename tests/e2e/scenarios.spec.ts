@@ -55,9 +55,11 @@ test("Scenario A: flexible agreement → mock authorization → simulated charge
   const night = nightAt(8);
   await requestOffers(page, { night, port: "A" });
   await expect(page.getByText("Feasible · validated").first()).toBeVisible();
-  // Grounded explanation: without model credentials the deterministic fallback is labeled as such.
+  // Grounded explanation: without model credentials the deterministic fallback answers, and the API labels it as such.
+  const explain = page.waitForResponse((r) => r.url().includes("/api/assist/explain") && r.request().method() === "POST");
   await page.getByRole("button", { name: "Why is it cheaper?" }).first().click();
-  await expect(page.getByText(/Deterministic fallback \(no AI\)/).first()).toBeAttached();
+  expect(((await (await explain).json()) as { source: string }).source).toBe("DETERMINISTIC_FALLBACK");
+  await expect(page.locator('[id^="why-"]:not([hidden]) ul li').first()).toBeVisible();
   await page.getByRole("button", { name: "Review and approve" }).click();
   await expect(page.getByText("Merchant", { exact: true })).toBeVisible();
   await expect(page.getByText("MOCK payment · simulated").first()).toBeVisible();

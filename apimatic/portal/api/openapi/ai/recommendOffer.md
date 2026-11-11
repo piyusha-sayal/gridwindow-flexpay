@@ -123,9 +123,23 @@ components:
               type: array
               items:
                 type: object
+        summary:
+          type: string
+          description: Plain-language recommendation; every figure comes from the
+            server-priced quote
+        points:
+          type: array
+          items:
+            type: string
         source:
-          type: object
-          description: Which model or the deterministic fallback produced the narrative
+          $ref: "#/components/schemas/AiSourceKind"
+        model:
+          type: string
+          description: Model that wrote the narrative (present when source is MODEL)
+        reason:
+          type: string
+          description: Why the deterministic fallback answered (present when source is
+            DETERMINISTIC_FALLBACK)
     Error:
       type: object
       required:
@@ -150,6 +164,13 @@ components:
               type: array
               items:
                 type: string
+    AiSourceKind:
+      type: string
+      description: Which produced the text. A deterministic fallback is never
+        presented as a model answer.
+      enum:
+        - MODEL
+        - DETERMINISTIC_FALLBACK
   responses:
     NotFound:
       description: Not found (or not the caller's)

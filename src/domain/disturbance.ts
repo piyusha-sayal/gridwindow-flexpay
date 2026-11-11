@@ -149,7 +149,9 @@ export function chargeEndMs(grid: SlotGrid, powerW: readonly number[]): number |
 /**
  * Violations that a candidate plan introduces on top of the committed night, under the disturbed envelope.
  * Violations that already exist without the candidate are not attributed to it, so one broken session never
- * hides every offer on the night.
+ * hides every offer on the night (or blocks every booking: quoting, acceptance and the capacity commit after
+ * authorization all use this rule). A station-cap violation carries no session id, so it is attributed to the
+ * candidate whenever the candidate draws power in that slot: a new plan may never add load to an overloaded slot.
  */
 export function violationsIntroducedBy(input: {
   station: StationConfig;
@@ -158,9 +160,14 @@ export function violationsIntroducedBy(input: {
   envelope: NightEnvelope;
   committed: readonly SessionPlan[];
   candidate: SessionPlan;
+  /** Energy targets checked for the candidate (other sessions' targets are not re-judged here). */
+  targets?: readonly ValidationTarget[];
 }): Violation[] {
   const { station, grid, forecastBaseLoadW, envelope, committed, candidate } = input;
   const key = (v: Violation) => `${v.code}|${v.sessionId}|${v.slot ?? ""}`;
   const before = new Set(validateWithEnvelope({ station, grid, forecastBaseLoadW, envelope, plans: committed }).map(key));
-  return validateWithEnvelope({ station, grid, forecastBaseLoadW, envelope, plans: [...committed, candidate] }).filter((v) => !before.has(key(v)));
+  const draws = (slot: number | undefined) => slot !== undefined && (candidate.powerW[slot] ?? 0) > 0;
+  return validateWithEnvelope({ station, grid, forecastBaseLoadW, envelope, plans: [...committed, candidate], ...(input.targets ? { targets: input.targets } : {}) }).filter(
+    (v) => !before.has(key(v)) || (v.code === "STATION_CAP" && draws(v.slot)),
+  );
 }

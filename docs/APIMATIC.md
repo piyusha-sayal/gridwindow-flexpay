@@ -44,3 +44,14 @@ npx @apimatic/cli@2.0.0 sdk generate -l typescript -i apimatic -f -k "$APIMATIC_
 ```
 
 So GridWindow offers three integration surfaces from one contract: the website, an MCP server for AI agents ([MCP.md](MCP.md)), and an APIMatic SDK and portal for developers.
+
+**Where the APIMatic key is needed.** Only for the two CLI commands above, on the machine that regenerates the portal and SDK. The portal is served as prebuilt static files (`staticPublishPath: ./apimatic/portal`, build command `echo`), and nothing in `src/` reads `APIMATIC_API_KEY`. A copy of the key on the Render web service is unused and can be removed.
+
+## Verification, 2026-11-11 (final release)
+
+The contract was tested end to end: OpenAPI spec, APIMatic-generated TypeScript SDK, real HTTP, response decoded by the SDK's generated schemas.
+
+- **Three spec errors found and fixed** (the SDK caught them; the website was unaffected): `acceptOffer.consent` was declared `type: boolean, const: true`, which the generator turned into the string literal `"True"`, so the SDK could not accept an offer (now `type: boolean`; the server still refuses anything but `true`). The deal agent's `source` was typed as an object while the API returns `MODEL` or `DETERMINISTIC_FALLBACK`, and `summary` and `points` were missing (new `DealResult`, `AiSourceKind`). Operator sign-in and sign-out were declared with empty bodies while they return `{ "operator": boolean }` (new `OperatorSessionState`). Explain and ask now have typed results (`ExplainResult`, `AskResult`).
+- **Regenerated** with the commands above (`apimatic api validate`: Succeeded, warnings only for missing parameter descriptions and examples); portal and SDK updated in `apimatic/`.
+- **SDK typecheck** with its own declared toolchain (TypeScript 7.0.2, `@types/node` 20): exit 0. With the app's TypeScript 6 and `@types/node` 24 it reports four `Uint8Array` generic errors in `core/request-body.ts`; that is a toolchain mismatch, not a runtime problem.
+- **Contract run: 13 of 13 operations PASS**: `site.getSiteConfig` and `gear.findEvGear` against the live deployment (read-only); `parseChargingRequest`, `requestOffers`, `recommendOffer`, `acceptOffer`, `getReservation`, `explainOffer`, `askAboutReservation`, `listMyReservations`, `operatorSignIn`, `getOperatorDashboard` against an isolated MOCK server. Transcript and script: `docs/evidence/final-release-2026-11-11/09-verification/`.

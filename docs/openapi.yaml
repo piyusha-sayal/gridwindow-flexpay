@@ -201,7 +201,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/ExplainResult'
         '404':
           $ref: '#/components/responses/NotFound'
   /api/assist/ask:
@@ -234,7 +234,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/AskResult'
         '404':
           $ref: '#/components/responses/NotFound'
       description: Ask a question about one of the caller's reservations.
@@ -271,7 +271,7 @@ paths:
                   pattern: ^[0-9a-f]{64}$
                 consent:
                   type: boolean
-                  const: true
+                  description: Must be `true` (the driver's explicit consent to these exact terms); any other value is refused.
       responses:
         '200':
           description: Reservation created, waiting for buyer approval
@@ -427,6 +427,10 @@ paths:
       responses:
         '200':
           description: Signed in; sets the operator cookie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorSessionState'
         '401':
           $ref: '#/components/responses/Unauthorized'
       description: Sign in with the operator passphrase.
@@ -437,7 +441,11 @@ paths:
       summary: Sign out
       responses:
         '200':
-          description: Signed out
+          description: Signed out; clears the operator cookie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorSessionState'
       description: Sign out.
   /api/operator/dashboard:
     get:
@@ -893,9 +901,72 @@ components:
               type: array
               items:
                 type: object
+        summary:
+          type: string
+          description: Plain-language recommendation; every figure comes from the server-priced quote
+        points:
+          type: array
+          items:
+            type: string
         source:
-          type: object
-          description: Which model or the deterministic fallback produced the narrative
+          $ref: '#/components/schemas/AiSourceKind'
+        model:
+          type: string
+          description: Model that wrote the narrative (present when source is MODEL)
+        reason:
+          type: string
+          description: Why the deterministic fallback answered (present when source is DETERMINISTIC_FALLBACK)
+    AiSourceKind:
+      type: string
+      description: Which produced the text. A deterministic fallback is never presented as a model answer.
+      enum:
+        - MODEL
+        - DETERMINISTIC_FALLBACK
+    ExplainResult:
+      type: object
+      required:
+        - summary
+        - points
+        - source
+      properties:
+        summary:
+          type: string
+        points:
+          type: array
+          items:
+            type: string
+        source:
+          $ref: '#/components/schemas/AiSourceKind'
+        model:
+          type: string
+        reason:
+          type: string
+    AskResult:
+      type: object
+      required:
+        - answer
+        - inScope
+        - source
+      properties:
+        answer:
+          type: string
+        inScope:
+          type: boolean
+          description: False when the question is outside what the assistant may answer
+        source:
+          $ref: '#/components/schemas/AiSourceKind'
+        model:
+          type: string
+        reason:
+          type: string
+    OperatorSessionState:
+      type: object
+      required:
+        - operator
+      properties:
+        operator:
+          type: boolean
+          description: Whether the caller holds an operator session after this call
     ProofView:
       type: object
       description: Provider evidence read back from PayPal (or MOCK) before any paid or voided label

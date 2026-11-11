@@ -1,6 +1,6 @@
 # PayPal Sandbox certification through the real app (owner runbook)
 
-Status: **prepared, nothing executed.** No order, quote row, tunnel or webhook has been created. The standalone smoke results (capture PASS and void PASS, 2026-10-30) stay as historical evidence and are not repeated.
+Status (updated 2026-11-11): **executed on the Render deployment.** The owner ran one capture and one void through the app UI on the public deployment (the webhook is registered at the Render URL, so no tunnel was needed). Provider read-backs: capture COMPLETED and authorization VOIDED, both `PAYPAL_SANDBOX_API`, with signature-verified webhooks. Results and limits: `docs/PAYPAL_AI_EVIDENCE.md`, section "Live PayPal Sandbox capture and void on the deployed build". The text below is the original runbook, kept as written. The standalone smoke results (capture PASS and void PASS, 2026-10-30) stay as historical evidence and are not repeated.
 
 Words: PASS / FAIL / BLOCKED / NOT TESTED / NEEDS APPROVAL. Everything below that touches PayPal is NEEDS APPROVAL.
 
