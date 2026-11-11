@@ -54,6 +54,9 @@ const SAVINGS = new RegExp(String.raw`sav(?:e|ing)\s*(?:me\s*)?(?:at least|a min
 /** "save up to $5" states a ceiling on savings, which is neither a minimum nor a budget. */
 const SAVE_UP_TO = new RegExp(String.raw`sav(?:e|ing)\s*(?:me\s*)?up to\s*${MONEY}`, "g");
 const BUDGET = new RegExp(String.raw`(?:don'?t spend more than|no more than|not more than|max(?:imum)?(?:\s+is)?|at most|up to|under|budget(?:\s+(?:of|is))?|cap(?:\s+(?:of|is))?|spend(?:ing)?\s+limit)\s*(?:of\s*)?${MONEY}`, "g");
+/** Start of every note about a request the form assistant will not act on. The driver page keys its MCP hint on it. */
+export const OUT_OF_SCOPE_NOTE = "Not something the assistant can do";
+
 const INJECTION = /\b(ignore|approve|authori[sz]e|capture|auto(?:matically)?[- ]?(?:approve|pay)|free|set (?:the |my )?price|\$0\.\d+ price|override)\b/;
 
 /** Distinct positive amounts in cents for every match of a global money pattern. */
@@ -149,7 +152,7 @@ export function parseChargeRequestText(text: string): ParsedRequest {
   else if (/\b(early|earlier|ahead of time|buffer)\b/.test(input)) out.preference = "early_finish";
   else if (savings.length > 0 || /\b(cheap|cheapest|lowest|save|saving)\b/.test(input)) out.preference = "lowest_cost";
 
-  if (INJECTION.test(input)) notes.push("Not something the assistant can do: price changes and payment approvals. Prices and payments are set only by the backend, and only you can approve.");
+  if (INJECTION.test(input)) notes.push(`${OUT_OF_SCOPE_NOTE}: price changes and payment approvals. Prices and payments are set only by the backend, and only you can approve.`);
   const recognized = kwh || savings.length > 0 || upTo || cap.length > 0 || out.departLocal || within !== undefined || plugIn || port;
   if (!recognized) notes.push("No request fields recognized; please use the form.");
   return out;
