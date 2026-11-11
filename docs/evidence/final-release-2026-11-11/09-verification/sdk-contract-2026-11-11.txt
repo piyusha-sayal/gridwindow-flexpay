@@ -1,0 +1,14 @@
+PASS LIVE site.getSiteConfig providerMode=PAYPAL_SANDBOX ports=3 ai={"enabled":true,"model":"gemini-3.6-flash"}
+PASS LIVE gear.findEvGear enabled=true items=3 https=true
+PASS LOCAL site.getSiteConfig providerMode=MOCK
+PASS LOCAL aiApi.parseChargingRequest source=DETERMINISTIC_FALLBACK
+PASS LOCAL offers.requestOffers offers=2
+PASS LOCAL aiApi.recommendOffer source=DETERMINISTIC_FALLBACK status=RECOMMENDED
+PASS LOCAL checkout.acceptOffer approveUrl=http://localhost:3210/mock-checkout?… (stops at buyer approval)
+PASS LOCAL reservations.getReservation paymentState=ORDER_CREATED
+PASS LOCAL aiApi.explainOffer source=DETERMINISTIC_FALLBACK points=4
+PASS LOCAL aiApi.askAboutReservation source=DETERMINISTIC_FALLBACK inScope=true
+PASS LOCAL reservations.listMyReservations count=1
+PASS LOCAL operator.operatorSignIn session cookie set
+PASS LOCAL operator.getOperatorDashboard sessions=1
+SUMMARY 13/13 passed

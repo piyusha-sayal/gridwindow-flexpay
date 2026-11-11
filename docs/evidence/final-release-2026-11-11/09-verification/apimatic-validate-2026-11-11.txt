@@ -1,0 +1,826 @@
+┌   Validate API 
+│
+⠋  Validating API⠙  Validating API⠹  Validating API⠸  Validating API⠼  Validating API⠴  Validating API⠦  Validating API⠧  Validating API⠇  Validating API.◇  API validation completed
+│
+▲  Warnings
+│
+│  Include environment information for each server. [openapi.yaml:24:1] (#)
+│
+│  Schema should include a non-empty description. [openapi.yaml:75:15] (#/paths/~1api~1quotes~1parse/post/requestBody/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:81:19] (#/paths/~1api~1quotes~1parse/post/requestBody/content/application~1json/schema/properties/text)
+│
+│  Schema should include a non-empty description. [openapi.yaml:115:17] (#/paths/~1api~1quotes/post/responses/200/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:141:15] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:149:19] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema/properties/quoteSetId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:152:19] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema/properties/minSavingsCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:158:19] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema/properties/preference)
+│
+│  Schema should include a non-empty description. [openapi.yaml:186:15] (#/paths/~1api~1assist~1explain/post/requestBody/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:193:19] (#/paths/~1api~1assist~1explain/post/requestBody/content/application~1json/schema/properties/quoteSetId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:196:19] (#/paths/~1api~1assist~1explain/post/requestBody/content/application~1json/schema/properties/offerId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:218:15] (#/paths/~1api~1assist~1ask/post/requestBody/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:225:19] (#/paths/~1api~1assist~1ask/post/requestBody/content/application~1json/schema/properties/reservationId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:228:19] (#/paths/~1api~1assist~1ask/post/requestBody/content/application~1json/schema/properties/question)
+│
+│  Schema should include a non-empty description. [openapi.yaml:255:15] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:264:19] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema/properties/quoteSetId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:267:19] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema/properties/offerId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:270:19] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema/properties/termsHash)
+│
+│  Schema should include a non-empty description. [openapi.yaml:281:17] (#/paths/~1api~1offers~1accept/post/responses/200/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:288:21] (#/paths/~1api~1offers~1accept/post/responses/200/content/application~1json/schema/properties/reservationId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:309:13] (#/paths/~1api~1checkout~1return/get/parameters/0/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:314:13] (#/paths/~1api~1checkout~1return/get/parameters/1/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:320:13] (#/paths/~1api~1checkout~1return/get/parameters/2/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:337:13] (#/paths/~1api~1checkout~1cancel/get/parameters/0/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:342:13] (#/paths/~1api~1checkout~1cancel/get/parameters/1/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:359:17] (#/paths/~1api~1reservations/get/responses/200/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:362:21] (#/paths/~1api~1reservations/get/responses/200/content/application~1json/schema/properties/reservations)
+│
+│  Schema should include a non-empty description. [openapi.yaml:377:13] (#/paths/~1api~1reservations~1{id}/get/parameters/0/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:384:17] (#/paths/~1api~1reservations~1{id}/get/responses/200/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:403:17] (#/paths/~1api~1operator~1session/get/responses/200/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:406:21] (#/paths/~1api~1operator~1session/get/responses/200/content/application~1json/schema/properties/operator)
+│
+│  Schema should include a non-empty description. [openapi.yaml:418:15] (#/paths/~1api~1operator~1session/post/requestBody/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:424:19] (#/paths/~1api~1operator~1session/post/requestBody/content/application~1json/schema/properties/passphrase)
+│
+│  Schema should include a non-empty description. [openapi.yaml:463:13] (#/paths/~1api~1operator~1dashboard/get/parameters/0/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:473:17] (#/paths/~1api~1operator~1dashboard/get/responses/200/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:491:15] (#/paths/~1api~1webhooks~1paypal/post/requestBody/content/application~1json/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:512:13] (#/paths/~1api~1gear/get/parameters/0/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:520:13] (#/paths/~1api~1gear/get/parameters/1/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:529:13] (#/paths/~1api~1gear/get/parameters/2/schema)
+│
+│  Schema should include a non-empty description. [openapi.yaml:633:7] (#/components/schemas/Error)
+│
+│  Schema should include a non-empty description. [openapi.yaml:638:11] (#/components/schemas/Error/properties/error)
+│
+│  Schema should include a non-empty description. [openapi.yaml:644:15] (#/components/schemas/Error/properties/error/properties/code)
+│
+│  Schema should include a non-empty description. [openapi.yaml:651:15] (#/components/schemas/Error/properties/error/properties/message)
+│
+│  Schema should include a non-empty description. [openapi.yaml:653:15] (#/components/schemas/Error/properties/error/properties/fields)
+│
+│  Schema should include a non-empty description. [openapi.yaml:655:17] (#/components/schemas/Error/properties/error/properties/fields/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:657:7] (#/components/schemas/ProviderMode)
+│
+│  Schema should include a non-empty description. [openapi.yaml:662:7] (#/components/schemas/PaymentState)
+│
+│  Schema should include a non-empty description. [openapi.yaml:676:7] (#/components/schemas/ServiceState)
+│
+│  Schema should include a non-empty description. [openapi.yaml:684:7] (#/components/schemas/SiteConfig)
+│
+│  Schema should include a non-empty description. [openapi.yaml:689:11] (#/components/schemas/SiteConfig/properties/station)
+│
+│  Schema should include a non-empty description. [openapi.yaml:692:15] (#/components/schemas/SiteConfig/properties/station/properties/name)
+│
+│  Schema should include a non-empty description. [openapi.yaml:694:15] (#/components/schemas/SiteConfig/properties/station/properties/timeZone)
+│
+│  Schema should include a non-empty description. [openapi.yaml:698:15] (#/components/schemas/SiteConfig/properties/station/properties/stationCapW)
+│
+│  Schema should include a non-empty description. [openapi.yaml:700:15] (#/components/schemas/SiteConfig/properties/station/properties/ports)
+│
+│  Schema should include a non-empty description. [openapi.yaml:702:17] (#/components/schemas/SiteConfig/properties/station/properties/ports/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:704:11] (#/components/schemas/SiteConfig/properties/ai)
+│
+│  Schema should include a non-empty description. [openapi.yaml:707:15] (#/components/schemas/SiteConfig/properties/ai/properties/enabled)
+│
+│  Schema should include a non-empty description. [openapi.yaml:709:15] (#/components/schemas/SiteConfig/properties/ai/properties/model)
+│
+│  Schema should include a non-empty description. [openapi.yaml:713:11] (#/components/schemas/SiteConfig/properties/defaultNightOf)
+│
+│  Schema should include a non-empty description. [openapi.yaml:716:11] (#/components/schemas/SiteConfig/properties/defaultPlugInLocal)
+│
+│  Schema should include a non-empty description. [openapi.yaml:719:11] (#/components/schemas/SiteConfig/properties/defaultDepartLocal)
+│
+│  Schema should include a non-empty description. [openapi.yaml:722:7] (#/components/schemas/ParseResult)
+│
+│  Schema should include a non-empty description. [openapi.yaml:728:11] (#/components/schemas/ParseResult/properties/source)
+│
+│  Schema should include a non-empty description. [openapi.yaml:733:11] (#/components/schemas/ParseResult/properties/reason)
+│
+│  Schema should include a non-empty description. [openapi.yaml:735:7] (#/components/schemas/QuoteRequest)
+│
+│  Schema should include a non-empty description. [openapi.yaml:746:11] (#/components/schemas/QuoteRequest/properties/portId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:749:11] (#/components/schemas/QuoteRequest/properties/nightOf)
+│
+│  Schema should include a non-empty description. [openapi.yaml:765:11] (#/components/schemas/QuoteRequest/properties/spendCapCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:778:11] (#/components/schemas/OfferTerms/properties/version)
+│
+│  Schema should include a non-empty description. [openapi.yaml:780:11] (#/components/schemas/OfferTerms/properties/quoteSetId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:782:11] (#/components/schemas/OfferTerms/properties/offerId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:784:11] (#/components/schemas/OfferTerms/properties/stationId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:786:11] (#/components/schemas/OfferTerms/properties/merchantRef)
+│
+│  Schema should include a non-empty description. [openapi.yaml:788:11] (#/components/schemas/OfferTerms/properties/portId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:790:11] (#/components/schemas/OfferTerms/properties/currency)
+│
+│  Schema should include a non-empty description. [openapi.yaml:793:11] (#/components/schemas/OfferTerms/properties/amountCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:795:11] (#/components/schemas/OfferTerms/properties/listPriceCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:797:11] (#/components/schemas/OfferTerms/properties/targetBatteryWh)
+│
+│  Schema should include a non-empty description. [openapi.yaml:799:11] (#/components/schemas/OfferTerms/properties/plugInMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:801:11] (#/components/schemas/OfferTerms/properties/departMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:803:11] (#/components/schemas/OfferTerms/properties/gridStartMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:807:13] (#/components/schemas/OfferTerms/properties/powerW/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:810:11] (#/components/schemas/OfferTerms/properties/expiresAtMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:812:7] (#/components/schemas/PricedOffer)
+│
+│  Schema should include a non-empty description. [openapi.yaml:815:11] (#/components/schemas/PricedOffer/properties/offerId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:817:11] (#/components/schemas/PricedOffer/properties/kind)
+│
+│  Schema should include a non-empty description. [openapi.yaml:823:11] (#/components/schemas/PricedOffer/properties/label)
+│
+│  Schema should include a non-empty description. [openapi.yaml:825:11] (#/components/schemas/PricedOffer/properties/chargeStartMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:827:11] (#/components/schemas/PricedOffer/properties/chargeEndMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:829:11] (#/components/schemas/PricedOffer/properties/listPriceCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:831:11] (#/components/schemas/PricedOffer/properties/priceCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:833:11] (#/components/schemas/PricedOffer/properties/discountCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:835:11] (#/components/schemas/PricedOffer/properties/energyCostCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:837:11] (#/components/schemas/PricedOffer/properties/operatorImprovementCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:839:11] (#/components/schemas/PricedOffer/properties/powerW)
+│
+│  Schema should include a non-empty description. [openapi.yaml:841:13] (#/components/schemas/PricedOffer/properties/powerW/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:845:11] (#/components/schemas/PricedOffer/properties/termsHash)
+│
+│  Schema should include a non-empty description. [openapi.yaml:848:7] (#/components/schemas/QuoteSet)
+│
+│  Schema should include a non-empty description. [openapi.yaml:851:11] (#/components/schemas/QuoteSet/properties/quoteSetId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:853:11] (#/components/schemas/QuoteSet/properties/stationId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:855:11] (#/components/schemas/QuoteSet/properties/createdAtMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:857:11] (#/components/schemas/QuoteSet/properties/expiresAtMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:859:11] (#/components/schemas/QuoteSet/properties/offers)
+│
+│  Schema should include a non-empty description. [openapi.yaml:863:11] (#/components/schemas/QuoteSet/properties/rejected)
+│
+│  Schema should include a non-empty description. [openapi.yaml:865:13] (#/components/schemas/QuoteSet/properties/rejected/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:868:17] (#/components/schemas/QuoteSet/properties/rejected/items/properties/kind)
+│
+│  Schema should include a non-empty description. [openapi.yaml:870:17] (#/components/schemas/QuoteSet/properties/rejected/items/properties/reason)
+│
+│  Schema should include a non-empty description. [openapi.yaml:878:11] (#/components/schemas/QuoteSet/properties/requiredMinSavingsCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:882:7] (#/components/schemas/DealResult)
+│
+│  Schema should include a non-empty description. [openapi.yaml:885:11] (#/components/schemas/DealResult/properties/evaluation)
+│
+│  Schema should include a non-empty description. [openapi.yaml:888:15] (#/components/schemas/DealResult/properties/evaluation/properties/status)
+│
+│  Schema should include a non-empty description. [openapi.yaml:893:15] (#/components/schemas/DealResult/properties/evaluation/properties/recommendedOfferId)
+│
+│  Schema should include a non-empty description. [openapi.yaml:897:15] (#/components/schemas/DealResult/properties/evaluation/properties/candidates)
+│
+│  Schema should include a non-empty description. [openapi.yaml:899:17] (#/components/schemas/DealResult/properties/evaluation/properties/candidates/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:901:15] (#/components/schemas/DealResult/properties/evaluation/properties/backendRejected)
+│
+│  Schema should include a non-empty description. [openapi.yaml:903:17] (#/components/schemas/DealResult/properties/evaluation/properties/backendRejected/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:908:11] (#/components/schemas/DealResult/properties/points)
+│
+│  Schema should include a non-empty description. [openapi.yaml:910:13] (#/components/schemas/DealResult/properties/points/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:926:7] (#/components/schemas/ExplainResult)
+│
+│  Schema should include a non-empty description. [openapi.yaml:933:11] (#/components/schemas/ExplainResult/properties/summary)
+│
+│  Schema should include a non-empty description. [openapi.yaml:935:11] (#/components/schemas/ExplainResult/properties/points)
+│
+│  Schema should include a non-empty description. [openapi.yaml:937:13] (#/components/schemas/ExplainResult/properties/points/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:941:11] (#/components/schemas/ExplainResult/properties/model)
+│
+│  Schema should include a non-empty description. [openapi.yaml:943:11] (#/components/schemas/ExplainResult/properties/reason)
+│
+│  Schema should include a non-empty description. [openapi.yaml:945:7] (#/components/schemas/AskResult)
+│
+│  Schema should include a non-empty description. [openapi.yaml:952:11] (#/components/schemas/AskResult/properties/answer)
+│
+│  Schema should include a non-empty description. [openapi.yaml:959:11] (#/components/schemas/AskResult/properties/model)
+│
+│  Schema should include a non-empty description. [openapi.yaml:961:11] (#/components/schemas/AskResult/properties/reason)
+│
+│  Schema should include a non-empty description. [openapi.yaml:963:7] (#/components/schemas/OperatorSessionState)
+│
+│  Schema should include a non-empty description. [openapi.yaml:975:11] (#/components/schemas/ProofView/properties/type)
+│
+│  Schema should include a non-empty description. [openapi.yaml:982:11] (#/components/schemas/ProofView/properties/ref)
+│
+│  Schema should include a non-empty description. [openapi.yaml:984:11] (#/components/schemas/ProofView/properties/status)
+│
+│  Schema should include a non-empty description. [openapi.yaml:986:11] (#/components/schemas/ProofView/properties/amountCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:988:7] (#/components/schemas/ReservationView)
+│
+│  Schema should include a non-empty description. [openapi.yaml:991:11] (#/components/schemas/ReservationView/properties/id)
+│
+│  Schema should include a non-empty description. [openapi.yaml:999:11] (#/components/schemas/ReservationView/properties/slotsCommitted)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1001:11] (#/components/schemas/ReservationView/properties/portLabel)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1003:11] (#/components/schemas/ReservationView/properties/merchantName)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1005:11] (#/components/schemas/ReservationView/properties/timeZone)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1007:11] (#/components/schemas/ReservationView/properties/plugInMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1009:11] (#/components/schemas/ReservationView/properties/departMs)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1011:11] (#/components/schemas/ReservationView/properties/targetBatteryWh)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1013:11] (#/components/schemas/ReservationView/properties/powerW)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1015:13] (#/components/schemas/ReservationView/properties/powerW/items)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1017:11] (#/components/schemas/ReservationView/properties/termsHash)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1019:11] (#/components/schemas/ReservationView/properties/economics)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1022:15] (#/components/schemas/ReservationView/properties/economics/properties/listPriceCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1024:15] (#/components/schemas/ReservationView/properties/economics/properties/priceCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1026:15] (#/components/schemas/ReservationView/properties/economics/properties/discountCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1028:15] (#/components/schemas/ReservationView/properties/economics/properties/energyCostCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1030:15] (#/components/schemas/ReservationView/properties/economics/properties/baselineEnergyCostCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1034:15] (#/components/schemas/ReservationView/properties/economics/properties/operatorImprovementCents)
+│
+│  Schema should include a non-empty description. [openapi.yaml:1036:11] (#/components/schemas/ReservationView/properties/proofs)
+│
+│  Inline complex schema definition found. [openapi.yaml:75:15] (#/paths/~1api~1quotes~1parse/post/requestBody/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:115:17] (#/paths/~1api~1quotes/post/responses/200/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:141:15] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:186:15] (#/paths/~1api~1assist~1explain/post/requestBody/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:218:15] (#/paths/~1api~1assist~1ask/post/requestBody/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:255:15] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:281:17] (#/paths/~1api~1offers~1accept/post/responses/200/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:359:17] (#/paths/~1api~1reservations/get/responses/200/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:384:17] (#/paths/~1api~1reservations~1{id}/get/responses/200/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:403:17] (#/paths/~1api~1operator~1session/get/responses/200/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:418:15] (#/paths/~1api~1operator~1session/post/requestBody/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:539:17] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema)
+│
+│  Inline complex schema definition found. [openapi.yaml:549:23] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items)
+│
+│  Inline complex schema definition found. [openapi.yaml:638:11] (#/components/schemas/Error/properties/error)
+│
+│  Inline complex schema definition found. [openapi.yaml:689:11] (#/components/schemas/SiteConfig/properties/station)
+│
+│  Inline complex schema definition found. [openapi.yaml:704:11] (#/components/schemas/SiteConfig/properties/ai)
+│
+│  Inline complex schema definition found. [openapi.yaml:865:13] (#/components/schemas/QuoteSet/properties/rejected/items)
+│
+│  Inline complex schema definition found. [openapi.yaml:885:11] (#/components/schemas/DealResult/properties/evaluation)
+│
+│  Inline complex schema definition found. [openapi.yaml:1019:11] (#/components/schemas/ReservationView/properties/economics)
+│
+│  Object schema must define properties. [openapi.yaml:473:17] (#/paths/~1api~1operator~1dashboard/get/responses/200/content/application~1json/schema)
+│
+│  Object schema must define properties. [openapi.yaml:491:15] (#/paths/~1api~1webhooks~1paypal/post/requestBody/content/application~1json/schema)
+│
+│  Object schema must define properties. [openapi.yaml:702:17] (#/components/schemas/SiteConfig/properties/station/properties/ports/items)
+│
+│  Object schema must define properties. [openapi.yaml:725:11] (#/components/schemas/ParseResult/properties/parsed)
+│
+│  Object schema must define properties. [openapi.yaml:872:11] (#/components/schemas/QuoteSet/properties/baseline)
+│
+│  Object schema must define properties. [openapi.yaml:875:11] (#/components/schemas/QuoteSet/properties/assumptions)
+│
+│  Object schema must define properties. [openapi.yaml:899:17] (#/components/schemas/DealResult/properties/evaluation/properties/candidates/items)
+│
+│  Object schema must define properties. [openapi.yaml:903:17] (#/components/schemas/DealResult/properties/evaluation/properties/backendRejected/items)
+│
+│  Schema key and property name conflict with each other. [openapi.yaml:637:9] (#/components/schemas/Error/properties)
+│
+│  Inline enum schema definition found. [openapi.yaml:158:19] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema/properties/preference)
+│
+│  Inline enum schema definition found. [openapi.yaml:817:11] (#/components/schemas/PricedOffer/properties/kind)
+│
+│  No success response definition found in the responses list. [openapi.yaml:322:7] (#/paths/~1api~1checkout~1return/get)
+│
+│  No success response definition found in the responses list. [openapi.yaml:343:7] (#/paths/~1api~1checkout~1cancel/get)
+│
+●  Information
+│
+│  Schema object example/default value is missing. [openapi.yaml:75:15] (#/paths/~1api~1quotes~1parse/post/requestBody/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:115:17] (#/paths/~1api~1quotes/post/responses/200/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:141:15] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:149:19] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema/properties/quoteSetId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:152:19] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema/properties/minSavingsCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:158:19] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json/schema/properties/preference)
+│
+│  Schema object example/default value is missing. [openapi.yaml:186:15] (#/paths/~1api~1assist~1explain/post/requestBody/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:193:19] (#/paths/~1api~1assist~1explain/post/requestBody/content/application~1json/schema/properties/quoteSetId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:196:19] (#/paths/~1api~1assist~1explain/post/requestBody/content/application~1json/schema/properties/offerId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:218:15] (#/paths/~1api~1assist~1ask/post/requestBody/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:225:19] (#/paths/~1api~1assist~1ask/post/requestBody/content/application~1json/schema/properties/reservationId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:228:19] (#/paths/~1api~1assist~1ask/post/requestBody/content/application~1json/schema/properties/question)
+│
+│  Schema object example/default value is missing. [openapi.yaml:255:15] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:264:19] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema/properties/quoteSetId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:267:19] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema/properties/offerId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:270:19] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema/properties/termsHash)
+│
+│  Schema object example/default value is missing. [openapi.yaml:273:19] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json/schema/properties/consent)
+│
+│  Schema object example/default value is missing. [openapi.yaml:281:17] (#/paths/~1api~1offers~1accept/post/responses/200/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:288:21] (#/paths/~1api~1offers~1accept/post/responses/200/content/application~1json/schema/properties/reservationId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:290:21] (#/paths/~1api~1offers~1accept/post/responses/200/content/application~1json/schema/properties/approveUrl)
+│
+│  Schema object example/default value is missing. [openapi.yaml:309:13] (#/paths/~1api~1checkout~1return/get/parameters/0/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:314:13] (#/paths/~1api~1checkout~1return/get/parameters/1/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:320:13] (#/paths/~1api~1checkout~1return/get/parameters/2/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:337:13] (#/paths/~1api~1checkout~1cancel/get/parameters/0/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:342:13] (#/paths/~1api~1checkout~1cancel/get/parameters/1/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:359:17] (#/paths/~1api~1reservations/get/responses/200/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:362:21] (#/paths/~1api~1reservations/get/responses/200/content/application~1json/schema/properties/reservations)
+│
+│  Schema object example/default value is missing. [openapi.yaml:377:13] (#/paths/~1api~1reservations~1{id}/get/parameters/0/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:384:17] (#/paths/~1api~1reservations~1{id}/get/responses/200/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:403:17] (#/paths/~1api~1operator~1session/get/responses/200/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:406:21] (#/paths/~1api~1operator~1session/get/responses/200/content/application~1json/schema/properties/operator)
+│
+│  Schema object example/default value is missing. [openapi.yaml:418:15] (#/paths/~1api~1operator~1session/post/requestBody/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:424:19] (#/paths/~1api~1operator~1session/post/requestBody/content/application~1json/schema/properties/passphrase)
+│
+│  Schema object example/default value is missing. [openapi.yaml:473:17] (#/paths/~1api~1operator~1dashboard/get/responses/200/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:491:15] (#/paths/~1api~1webhooks~1paypal/post/requestBody/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:539:17] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema)
+│
+│  Schema object example/default value is missing. [openapi.yaml:543:21] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/enabled)
+│
+│  Schema object example/default value is missing. [openapi.yaml:546:21] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:549:23] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:553:27] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items/properties/id)
+│
+│  Schema object example/default value is missing. [openapi.yaml:556:27] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items/properties/title)
+│
+│  Schema object example/default value is missing. [openapi.yaml:559:27] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items/properties/brand)
+│
+│  Schema object example/default value is missing. [openapi.yaml:564:27] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items/properties/imageUrl)
+│
+│  Schema object example/default value is missing. [openapi.yaml:569:27] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items/properties/priceCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:572:27] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items/properties/compareAtCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:577:27] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items/properties/currency)
+│
+│  Schema object example/default value is missing. [openapi.yaml:580:27] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items/properties/url)
+│
+│  Schema object example/default value is missing. [openapi.yaml:583:27] (#/paths/~1api~1gear/get/responses/200/content/application~1json/schema/properties/items/items/properties/domain)
+│
+│  Schema object example/default value is missing. [openapi.yaml:633:7] (#/components/schemas/Error)
+│
+│  Schema object example/default value is missing. [openapi.yaml:638:11] (#/components/schemas/Error/properties/error)
+│
+│  Schema object example/default value is missing. [openapi.yaml:651:15] (#/components/schemas/Error/properties/error/properties/message)
+│
+│  Schema object example/default value is missing. [openapi.yaml:653:15] (#/components/schemas/Error/properties/error/properties/fields)
+│
+│  Schema object example/default value is missing. [openapi.yaml:655:17] (#/components/schemas/Error/properties/error/properties/fields/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:657:7] (#/components/schemas/ProviderMode)
+│
+│  Schema object example/default value is missing. [openapi.yaml:662:7] (#/components/schemas/PaymentState)
+│
+│  Schema object example/default value is missing. [openapi.yaml:676:7] (#/components/schemas/ServiceState)
+│
+│  Schema object example/default value is missing. [openapi.yaml:684:7] (#/components/schemas/SiteConfig)
+│
+│  Schema object example/default value is missing. [openapi.yaml:689:11] (#/components/schemas/SiteConfig/properties/station)
+│
+│  Schema object example/default value is missing. [openapi.yaml:692:15] (#/components/schemas/SiteConfig/properties/station/properties/name)
+│
+│  Schema object example/default value is missing. [openapi.yaml:698:15] (#/components/schemas/SiteConfig/properties/station/properties/stationCapW)
+│
+│  Schema object example/default value is missing. [openapi.yaml:700:15] (#/components/schemas/SiteConfig/properties/station/properties/ports)
+│
+│  Schema object example/default value is missing. [openapi.yaml:702:17] (#/components/schemas/SiteConfig/properties/station/properties/ports/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:704:11] (#/components/schemas/SiteConfig/properties/ai)
+│
+│  Schema object example/default value is missing. [openapi.yaml:707:15] (#/components/schemas/SiteConfig/properties/ai/properties/enabled)
+│
+│  Schema object example/default value is missing. [openapi.yaml:709:15] (#/components/schemas/SiteConfig/properties/ai/properties/model)
+│
+│  Schema object example/default value is missing. [openapi.yaml:713:11] (#/components/schemas/SiteConfig/properties/defaultNightOf)
+│
+│  Schema object example/default value is missing. [openapi.yaml:716:11] (#/components/schemas/SiteConfig/properties/defaultPlugInLocal)
+│
+│  Schema object example/default value is missing. [openapi.yaml:719:11] (#/components/schemas/SiteConfig/properties/defaultDepartLocal)
+│
+│  Schema object example/default value is missing. [openapi.yaml:722:7] (#/components/schemas/ParseResult)
+│
+│  Schema object example/default value is missing. [openapi.yaml:725:11] (#/components/schemas/ParseResult/properties/parsed)
+│
+│  Schema object example/default value is missing. [openapi.yaml:733:11] (#/components/schemas/ParseResult/properties/reason)
+│
+│  Schema object example/default value is missing. [openapi.yaml:735:7] (#/components/schemas/QuoteRequest)
+│
+│  Schema object example/default value is missing. [openapi.yaml:746:11] (#/components/schemas/QuoteRequest/properties/portId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:749:11] (#/components/schemas/QuoteRequest/properties/nightOf)
+│
+│  Schema object example/default value is missing. [openapi.yaml:752:11] (#/components/schemas/QuoteRequest/properties/plugInLocal)
+│
+│  Schema object example/default value is missing. [openapi.yaml:756:11] (#/components/schemas/QuoteRequest/properties/departLocal)
+│
+│  Schema object example/default value is missing. [openapi.yaml:760:11] (#/components/schemas/QuoteRequest/properties/targetBatteryKWh)
+│
+│  Schema object example/default value is missing. [openapi.yaml:765:11] (#/components/schemas/QuoteRequest/properties/spendCapCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:769:11] (#/components/schemas/QuoteRequest/properties/requiredMinSavingsCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:774:7] (#/components/schemas/OfferTerms)
+│
+│  Schema object example/default value is missing. [openapi.yaml:778:11] (#/components/schemas/OfferTerms/properties/version)
+│
+│  Schema object example/default value is missing. [openapi.yaml:780:11] (#/components/schemas/OfferTerms/properties/quoteSetId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:782:11] (#/components/schemas/OfferTerms/properties/offerId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:784:11] (#/components/schemas/OfferTerms/properties/stationId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:786:11] (#/components/schemas/OfferTerms/properties/merchantRef)
+│
+│  Schema object example/default value is missing. [openapi.yaml:788:11] (#/components/schemas/OfferTerms/properties/portId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:790:11] (#/components/schemas/OfferTerms/properties/currency)
+│
+│  Schema object example/default value is missing. [openapi.yaml:793:11] (#/components/schemas/OfferTerms/properties/amountCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:795:11] (#/components/schemas/OfferTerms/properties/listPriceCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:797:11] (#/components/schemas/OfferTerms/properties/targetBatteryWh)
+│
+│  Schema object example/default value is missing. [openapi.yaml:799:11] (#/components/schemas/OfferTerms/properties/plugInMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:801:11] (#/components/schemas/OfferTerms/properties/departMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:803:11] (#/components/schemas/OfferTerms/properties/gridStartMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:805:11] (#/components/schemas/OfferTerms/properties/powerW)
+│
+│  Schema object example/default value is missing. [openapi.yaml:807:13] (#/components/schemas/OfferTerms/properties/powerW/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:810:11] (#/components/schemas/OfferTerms/properties/expiresAtMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:812:7] (#/components/schemas/PricedOffer)
+│
+│  Schema object example/default value is missing. [openapi.yaml:815:11] (#/components/schemas/PricedOffer/properties/offerId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:817:11] (#/components/schemas/PricedOffer/properties/kind)
+│
+│  Schema object example/default value is missing. [openapi.yaml:823:11] (#/components/schemas/PricedOffer/properties/label)
+│
+│  Schema object example/default value is missing. [openapi.yaml:825:11] (#/components/schemas/PricedOffer/properties/chargeStartMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:827:11] (#/components/schemas/PricedOffer/properties/chargeEndMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:829:11] (#/components/schemas/PricedOffer/properties/listPriceCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:831:11] (#/components/schemas/PricedOffer/properties/priceCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:833:11] (#/components/schemas/PricedOffer/properties/discountCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:835:11] (#/components/schemas/PricedOffer/properties/energyCostCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:837:11] (#/components/schemas/PricedOffer/properties/operatorImprovementCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:839:11] (#/components/schemas/PricedOffer/properties/powerW)
+│
+│  Schema object example/default value is missing. [openapi.yaml:841:13] (#/components/schemas/PricedOffer/properties/powerW/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:845:11] (#/components/schemas/PricedOffer/properties/termsHash)
+│
+│  Schema object example/default value is missing. [openapi.yaml:848:7] (#/components/schemas/QuoteSet)
+│
+│  Schema object example/default value is missing. [openapi.yaml:851:11] (#/components/schemas/QuoteSet/properties/quoteSetId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:853:11] (#/components/schemas/QuoteSet/properties/stationId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:855:11] (#/components/schemas/QuoteSet/properties/createdAtMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:857:11] (#/components/schemas/QuoteSet/properties/expiresAtMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:859:11] (#/components/schemas/QuoteSet/properties/offers)
+│
+│  Schema object example/default value is missing. [openapi.yaml:863:11] (#/components/schemas/QuoteSet/properties/rejected)
+│
+│  Schema object example/default value is missing. [openapi.yaml:865:13] (#/components/schemas/QuoteSet/properties/rejected/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:868:17] (#/components/schemas/QuoteSet/properties/rejected/items/properties/kind)
+│
+│  Schema object example/default value is missing. [openapi.yaml:870:17] (#/components/schemas/QuoteSet/properties/rejected/items/properties/reason)
+│
+│  Schema object example/default value is missing. [openapi.yaml:872:11] (#/components/schemas/QuoteSet/properties/baseline)
+│
+│  Schema object example/default value is missing. [openapi.yaml:875:11] (#/components/schemas/QuoteSet/properties/assumptions)
+│
+│  Schema object example/default value is missing. [openapi.yaml:878:11] (#/components/schemas/QuoteSet/properties/requiredMinSavingsCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:882:7] (#/components/schemas/DealResult)
+│
+│  Schema object example/default value is missing. [openapi.yaml:885:11] (#/components/schemas/DealResult/properties/evaluation)
+│
+│  Schema object example/default value is missing. [openapi.yaml:893:15] (#/components/schemas/DealResult/properties/evaluation/properties/recommendedOfferId)
+│
+│  Schema object example/default value is missing. [openapi.yaml:897:15] (#/components/schemas/DealResult/properties/evaluation/properties/candidates)
+│
+│  Schema object example/default value is missing. [openapi.yaml:899:17] (#/components/schemas/DealResult/properties/evaluation/properties/candidates/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:901:15] (#/components/schemas/DealResult/properties/evaluation/properties/backendRejected)
+│
+│  Schema object example/default value is missing. [openapi.yaml:903:17] (#/components/schemas/DealResult/properties/evaluation/properties/backendRejected/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:905:11] (#/components/schemas/DealResult/properties/summary)
+│
+│  Schema object example/default value is missing. [openapi.yaml:908:11] (#/components/schemas/DealResult/properties/points)
+│
+│  Schema object example/default value is missing. [openapi.yaml:910:13] (#/components/schemas/DealResult/properties/points/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:914:11] (#/components/schemas/DealResult/properties/model)
+│
+│  Schema object example/default value is missing. [openapi.yaml:917:11] (#/components/schemas/DealResult/properties/reason)
+│
+│  Schema object example/default value is missing. [openapi.yaml:920:7] (#/components/schemas/AiSourceKind)
+│
+│  Schema object example/default value is missing. [openapi.yaml:926:7] (#/components/schemas/ExplainResult)
+│
+│  Schema object example/default value is missing. [openapi.yaml:933:11] (#/components/schemas/ExplainResult/properties/summary)
+│
+│  Schema object example/default value is missing. [openapi.yaml:935:11] (#/components/schemas/ExplainResult/properties/points)
+│
+│  Schema object example/default value is missing. [openapi.yaml:937:13] (#/components/schemas/ExplainResult/properties/points/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:941:11] (#/components/schemas/ExplainResult/properties/model)
+│
+│  Schema object example/default value is missing. [openapi.yaml:943:11] (#/components/schemas/ExplainResult/properties/reason)
+│
+│  Schema object example/default value is missing. [openapi.yaml:945:7] (#/components/schemas/AskResult)
+│
+│  Schema object example/default value is missing. [openapi.yaml:952:11] (#/components/schemas/AskResult/properties/answer)
+│
+│  Schema object example/default value is missing. [openapi.yaml:954:11] (#/components/schemas/AskResult/properties/inScope)
+│
+│  Schema object example/default value is missing. [openapi.yaml:959:11] (#/components/schemas/AskResult/properties/model)
+│
+│  Schema object example/default value is missing. [openapi.yaml:961:11] (#/components/schemas/AskResult/properties/reason)
+│
+│  Schema object example/default value is missing. [openapi.yaml:963:7] (#/components/schemas/OperatorSessionState)
+│
+│  Schema object example/default value is missing. [openapi.yaml:968:11] (#/components/schemas/OperatorSessionState/properties/operator)
+│
+│  Schema object example/default value is missing. [openapi.yaml:971:7] (#/components/schemas/ProofView)
+│
+│  Schema object example/default value is missing. [openapi.yaml:982:11] (#/components/schemas/ProofView/properties/ref)
+│
+│  Schema object example/default value is missing. [openapi.yaml:984:11] (#/components/schemas/ProofView/properties/status)
+│
+│  Schema object example/default value is missing. [openapi.yaml:986:11] (#/components/schemas/ProofView/properties/amountCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:988:7] (#/components/schemas/ReservationView)
+│
+│  Schema object example/default value is missing. [openapi.yaml:991:11] (#/components/schemas/ReservationView/properties/id)
+│
+│  Schema object example/default value is missing. [openapi.yaml:999:11] (#/components/schemas/ReservationView/properties/slotsCommitted)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1001:11] (#/components/schemas/ReservationView/properties/portLabel)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1003:11] (#/components/schemas/ReservationView/properties/merchantName)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1005:11] (#/components/schemas/ReservationView/properties/timeZone)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1007:11] (#/components/schemas/ReservationView/properties/plugInMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1009:11] (#/components/schemas/ReservationView/properties/departMs)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1011:11] (#/components/schemas/ReservationView/properties/targetBatteryWh)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1013:11] (#/components/schemas/ReservationView/properties/powerW)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1015:13] (#/components/schemas/ReservationView/properties/powerW/items)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1017:11] (#/components/schemas/ReservationView/properties/termsHash)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1019:11] (#/components/schemas/ReservationView/properties/economics)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1022:15] (#/components/schemas/ReservationView/properties/economics/properties/listPriceCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1024:15] (#/components/schemas/ReservationView/properties/economics/properties/priceCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1026:15] (#/components/schemas/ReservationView/properties/economics/properties/discountCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1028:15] (#/components/schemas/ReservationView/properties/economics/properties/energyCostCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1030:15] (#/components/schemas/ReservationView/properties/economics/properties/baselineEnergyCostCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1034:15] (#/components/schemas/ReservationView/properties/economics/properties/operatorImprovementCents)
+│
+│  Schema object example/default value is missing. [openapi.yaml:1036:11] (#/components/schemas/ReservationView/properties/proofs)
+│
+│  Media type object example is missing. [openapi.yaml:58:15] (#/paths/~1api~1config/get/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:74:13] (#/paths/~1api~1quotes~1parse/post/requestBody/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:90:15] (#/paths/~1api~1quotes~1parse/post/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:107:13] (#/paths/~1api~1quotes/post/requestBody/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:114:15] (#/paths/~1api~1quotes/post/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:140:13] (#/paths/~1api~1agent~1deals/post/requestBody/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:168:15] (#/paths/~1api~1agent~1deals/post/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:185:13] (#/paths/~1api~1assist~1explain/post/requestBody/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:203:15] (#/paths/~1api~1assist~1explain/post/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:217:13] (#/paths/~1api~1assist~1ask/post/requestBody/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:236:15] (#/paths/~1api~1assist~1ask/post/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:254:13] (#/paths/~1api~1offers~1accept/post/requestBody/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:280:15] (#/paths/~1api~1offers~1accept/post/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:358:15] (#/paths/~1api~1reservations/get/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:383:15] (#/paths/~1api~1reservations~1{id}/get/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:402:15] (#/paths/~1api~1operator~1session/get/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:417:13] (#/paths/~1api~1operator~1session/post/requestBody/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:432:15] (#/paths/~1api~1operator~1session/post/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:447:15] (#/paths/~1api~1operator~1session/delete/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:472:15] (#/paths/~1api~1operator~1dashboard/get/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:490:13] (#/paths/~1api~1webhooks~1paypal/post/requestBody/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:538:15] (#/paths/~1api~1gear/get/responses/200/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:599:11] (#/components/responses/ValidationError/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:605:11] (#/components/responses/BadOrigin/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:611:11] (#/components/responses/NotFound/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:617:11] (#/components/responses/Conflict/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:623:11] (#/components/responses/Unauthorized/content/application~1json)
+│
+│  Media type object example is missing. [openapi.yaml:629:11] (#/components/responses/RateLimited/content/application~1json)
+│
+│  RequestBody object description is missing. [openapi.yaml:71:9] (#/paths/~1api~1quotes~1parse/post/requestBody)
+│
+│  RequestBody object description is missing. [openapi.yaml:104:9] (#/paths/~1api~1quotes/post/requestBody)
+│
+│  RequestBody object description is missing. [openapi.yaml:137:9] (#/paths/~1api~1agent~1deals/post/requestBody)
+│
+│  RequestBody object description is missing. [openapi.yaml:182:9] (#/paths/~1api~1assist~1explain/post/requestBody)
+│
+│  RequestBody object description is missing. [openapi.yaml:214:9] (#/paths/~1api~1assist~1ask/post/requestBody)
+│
+│  RequestBody object description is missing. [openapi.yaml:251:9] (#/paths/~1api~1offers~1accept/post/requestBody)
+│
+│  RequestBody object description is missing. [openapi.yaml:414:9] (#/paths/~1api~1operator~1session/post/requestBody)
+│
+│  RequestBody object description is missing. [openapi.yaml:487:9] (#/paths/~1api~1webhooks~1paypal/post/requestBody)
+│
+│  Response content is missing. [openapi.yaml:324:11] (#/paths/~1api~1checkout~1return/get/responses/303)
+│
+│  Response content is missing. [openapi.yaml:345:11] (#/paths/~1api~1checkout~1cancel/get/responses/303)
+│
+│  Response content is missing. [openapi.yaml:494:11] (#/paths/~1api~1webhooks~1paypal/post/responses/200)
+│
+│  Response content is missing. [openapi.yaml:496:11] (#/paths/~1api~1webhooks~1paypal/post/responses/400)
+│
+│  Parameter object description is missing. [openapi.yaml:305:11] (#/paths/~1api~1checkout~1return/get/parameters/0)
+│
+│  Parameter object description is missing. [openapi.yaml:333:11] (#/paths/~1api~1checkout~1cancel/get/parameters/0)
+│
+│  Parameter object description is missing. [openapi.yaml:338:11] (#/paths/~1api~1checkout~1cancel/get/parameters/1)
+│
+│  Parameter object description is missing. [openapi.yaml:373:11] (#/paths/~1api~1reservations~1{id}/get/parameters/0)
+│
+│  Parameter object example is missing. [openapi.yaml:305:11] (#/paths/~1api~1checkout~1return/get/parameters/0)
+│
+│  Parameter object example is missing. [openapi.yaml:310:11] (#/paths/~1api~1checkout~1return/get/parameters/1)
+│
+│  Parameter object example is missing. [openapi.yaml:316:11] (#/paths/~1api~1checkout~1return/get/parameters/2)
+│
+│  Parameter object example is missing. [openapi.yaml:333:11] (#/paths/~1api~1checkout~1cancel/get/parameters/0)
+│
+│  Parameter object example is missing. [openapi.yaml:338:11] (#/paths/~1api~1checkout~1cancel/get/parameters/1)
+│
+│  Parameter object example is missing. [openapi.yaml:373:11] (#/paths/~1api~1reservations~1{id}/get/parameters/0)
+│
+└  Succeeded
+

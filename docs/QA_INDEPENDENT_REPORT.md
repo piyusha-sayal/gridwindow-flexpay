@@ -1,5 +1,8 @@
 > **Superseded in part by `docs/FINAL_INTEGRATION_RESULT.md`:** after integration V1's migration implementation replaced V2's (`scripts/db-migrate.ts`, `runExplicitMigration`), and QA-3 is partly fixed. Statuses below describe the V2 branch before integration.
 
+> **Note (2026-11-11):** this is a dated record. Current test counts, benchmark figures and live PayPal evidence are in `docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md`.
+
+
 # Independent QA Report (Satyam V2 workstream)
 
 - Date: 2026-11-09

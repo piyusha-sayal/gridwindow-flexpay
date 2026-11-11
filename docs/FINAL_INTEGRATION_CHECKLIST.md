@@ -1,5 +1,8 @@
 # Final integration certification checklist
 
+> **Note (2026-11-11):** this is a dated record. Current test counts, benchmark figures and live PayPal evidence are in `docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md`.
+
+
 Execute on the exact integrated release commit (Satyam's V2 work merged with Piyusha's branch, as it will be submitted). Nothing below is marked PASS in advance. Record the commit SHA first; if a single file changes afterward, every gate that could be affected is re-run.
 
 Release commit under test: `________` (filled in at execution)   Date/time: ________   Tester: ________

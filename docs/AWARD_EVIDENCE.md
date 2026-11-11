@@ -98,11 +98,20 @@ Claim: money follows delivered energy, also when a disturbance changes the plan.
 
 - No claim of real grid benefit, real charger behavior or real vehicles.
 - No claim that a live Gemini model makes good recovery decisions, or that a live model decision has happened in the recovery flow.
-- No claim of PayPal Sandbox recovery settlement.
+- No claim of PayPal Sandbox settlement after a *recovery run* (live Sandbox capture and void are verified on the deployed build through the ordinary delivery and outage paths; see the 2026-11-11 update below).
 - No claim of Bryntum accessibility compliance for the timeline.
-- No claim of a recorded demo video or a hosted live demo URL. None exists.
-- No screenshot of the recovery UI is claimed; the screenshots in `docs/screenshots/` predate this release.
+- No claim of a recorded demo video from the engineering side (the owner records it). A hosted live demo exists since 2026-11-11: https://gridwindow-flexpay.onrender.com.
+- Screenshots of the recovery UI for the final release: `docs/evidence/final-release-2026-11-11/04-bryntum-recovery/` (isolated MOCK server, SYNTHETIC).
 
 ## Update, 2026-11-10
 
 Post-UI QA closure (operator capacity semantics, provider-mode badges, OpenRouter test isolation, accessibility fixes) and its full test matrix: `docs/QA_CLOSURE.md`. The schedule capacity chart now matches the validator's limit (cap minus headroom, with forecast base load) and excludes released sessions.
+
+## Update, 2026-11-11 (final release)
+
+Supersedes the stale rows above where they differ. Full report: `docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md`; screenshots: `docs/evidence/final-release-2026-11-11/`.
+
+- **Hosted demo:** live on Render (app in PayPal Sandbox mode, APIMatic portal as a static site). The "no hosted demo" statements above no longer apply.
+- **PayPal Sandbox:** one provider-confirmed capture (`…2XfQtp`, $15.56, COMPLETED) and one provider-confirmed void (`…afKCrn`, $15.56 held then VOIDED after a 0 Wh outage run) through the app UI on the deployed build, both with signature-verified webhooks: `docs/PAYPAL_AI_EVIDENCE.md`. Settlement after a recovery run remains MOCK-tested only.
+- **Live model in recovery:** Gemini 3.6 Flash drove the tool steps in two runs (final step HTTP 503) and the free OpenRouter backup answered a tool step in one run (next step HTTP 429). Every final decision was the labelled `DETERMINISTIC_FALLBACK`; a live model final decision is still not claimed: `docs/AGENTIC_COMMERCE_EVIDENCE.md`.
+- **Test counts on the final code:** see the final release verification report (the 806-test figure in the header of this file is from 2026-11-09).

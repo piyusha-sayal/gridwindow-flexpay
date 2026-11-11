@@ -1,5 +1,8 @@
 # Post-UI release QA and defect closure
 
+> **Note (2026-11-11):** this is a dated record. Current test counts, benchmark figures and live PayPal evidence are in `docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md`.
+
+
 - Date: 2026-11-10
 - Base: `2a9985d` (approved UI release on `origin/main`)
 - Scope: presentation, configuration and read-model fixes only. No payment, settlement, recovery orchestration or scheduling algorithm was changed. No external provider (PayPal, Gemini, OpenRouter, Neon) was called.

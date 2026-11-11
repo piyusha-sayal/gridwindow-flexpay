@@ -68,6 +68,19 @@ Verdicts (both runs): modelOnlyAllowedTools **PASS**, noPaymentToolCalls **PASS*
 
 What this shows: a live Gemini model drove the agent's tool calls inside the allowlist, with zero access to payments, and when Google returned a capacity error the run completed safely on the labelled deterministic path. What it does not show: a live model *final* decision (`REAL_GEMINI` provenance); per the procedure, runs were not retried in a loop.
 
+## Backup provider runs, 2026-11-11 (OpenRouter, free model)
+
+The backup chain is Gemini 3.6 Flash, then Gemini 3.5 Flash-Lite, then OpenRouter with `baidu/ernie-5.5-flash-preview:free` ($0 per token, `data_collection: deny`). Two capped runs of `scripts/recovery-live.ts --provider=openrouter-fallback` (Gemini primary replaced by a labelled simulated outage that sends no Gemini request; payments MOCK; in-memory PGlite; at most 6 requests):
+
+| | Run 1 (15:36Z) | Run 2 (15:37Z) |
+|---|---|---|
+| Requests sent / successful responses | 1 / 0 | 2 / 1 |
+| What the model did | nothing: HTTP 429 from the free endpoint | answered the first tool step (`inspectDisruption`, served by `baidu/ernie-5.5-flash-preview:free`, 4.4 s, 319 in / 534 out tokens); the next step got HTTP 429 |
+| Outcome | `COMMITTED` by the deterministic path, version 2, `aiUsed: false` | `COMMITTED` by the deterministic path, version 2, `aiUsed: true`, decision `DETERMINISTIC_FALLBACK` |
+| Verdicts | noPaymentToolCalls PASS (0 gateway calls), chosenCandidatePassedValidation PASS, consentRespected PASS, requestCapEnforced PASS, modelFailureFallsBack PASS, provenanceMatchesServingProvider PASS | same |
+
+Outside the recovery agent, the request-parsing feature returned a schema-valid `MODEL` answer from the same free model through the production adapter (4.7 s). What this shows: the backup provider is wired, answers within the allowlist, has no payment access, and a throttled answer ends in the labelled deterministic path. What it does not show: a live model *final* recovery decision. The free endpoint throttles often (3 of the 7 calls made to it on 2026-11-11 got HTTP 429), so no further runs were made. The chain's provenance labelling is covered by `tests/integration/providerFailover.test.ts` ("three-provider chain"), mutation-checked.
+
 ## Limits of this evidence
 - No live model decision exists in this QA. The sentence "an AI agent recovered the schedule" is true of the orchestration and tools and of the scripted model, not of a verified Gemini decision.
 - The existing Devpost text cites an earlier live Gemini certification (2026-11-05). This QA did not re-run or verify it.

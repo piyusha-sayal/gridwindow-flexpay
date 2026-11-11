@@ -1,0 +1,19 @@
+# MCP check (local) against http://localhost:3210 at 2026-11-11T16:49:28.203Z
+tools (7): get_site_info, parse_charging_request, request_charging_offers, recommend_offer, prepare_paypal_checkout, get_reservation_status, find_ev_gear
+  get_site_info()
+  parse_charging_request(text)
+  request_charging_offers(portId, nightOf, plugInLocal, departLocal, targetBatteryKWh, spendCapCents, requiredMinSavingsCents)
+  recommend_offer(quoteSetId, preference, minSavingsCents)
+  prepare_paypal_checkout(quoteSetId, offerId, termsHash, driverConfirmed)
+  get_reservation_status(reservationId)
+  find_ev_gear(query, maxPriceCents, limit)
+payment-moving tools exposed: none
+tools that accept a price or amount: none
+get_site_info: Harbor Lane Overnight Depot (synthetic) | provider MOCK | ports 3
+parse_charging_request: source=DETERMINISTIC_FALLBACK target=30 kWh
+request_charging_offers: 2 server-priced offers: $9.15 | $9.15
+recommend_offer: source=DETERMINISTIC_FALLBACK status=RECOMMENDED
+tampered termsHash: refused by the server (prepare_paypal_checkout: 409 {"code":"TERMS_MISMATCH","message":"Offer terms do not match.)
+driverConfirmed=false: refused (prepare_paypal_checkout: MCP error -32602: Input validation error: Invalid arguments for t)
+prepare_paypal_checkout: provider MOCK; approval link returned for the human: http://localhost:3210/mock-checkout?…
+get_reservation_status: paymentState=ORDER_CREATED (nothing authorized until the human approves)

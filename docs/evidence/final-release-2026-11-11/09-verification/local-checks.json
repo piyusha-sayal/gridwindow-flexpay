@@ -1,0 +1,460 @@
+{
+  "capturedAt": "2026-11-11T16:49:22.366Z",
+  "base": "local isolated MOCK server",
+  "records": [
+    {
+      "file": "01-product/04-ai-assisted-form.png",
+      "env": "LOCAL-MOCK",
+      "url": "/drive",
+      "viewport": "1440x900",
+      "feature": "Plain-language request fills the form (deterministic parser; no model key on this server)",
+      "note": "",
+      "bytes": 396988,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "/impact-lab net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "05-ai-agentic-commerce/01-assistant-request-parsing-fallback.png",
+      "env": "LOCAL-MOCK",
+      "url": "/drive",
+      "viewport": "1440x900",
+      "feature": "Request assistant result (deterministic fallback, no model call)",
+      "note": "",
+      "bytes": 36858,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "01-product/05b-savings-goal-not-relaxed.png",
+      "env": "LOCAL-MOCK",
+      "url": "/drive",
+      "viewport": "1440x900",
+      "feature": "A required $4.00 saving that no offer meets is reported, never relaxed",
+      "note": "",
+      "bytes": 430921,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "05-ai-agentic-commerce/02b-deal-agent-goal-not-met-fallback.png",
+      "env": "LOCAL-MOCK",
+      "url": "/drive",
+      "viewport": "1440x900",
+      "feature": "Deal agent: no offer meets the goal (deterministic fallback)",
+      "note": "",
+      "bytes": 59322,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "01-product/05-validated-charging-offers.png",
+      "env": "LOCAL-MOCK",
+      "url": "/drive",
+      "viewport": "1440x900",
+      "feature": "Priced offers under the station cap, with the deal agent's pick",
+      "note": "",
+      "bytes": 522653,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "/ net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "05-ai-agentic-commerce/02-deal-agent-recommendation-fallback.png",
+      "env": "LOCAL-MOCK",
+      "url": "/drive",
+      "viewport": "1440x900",
+      "feature": "Deal agent recommendation (deterministic fallback, no model call)",
+      "note": "",
+      "bytes": 89230,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "01-product/06-recommended-offer-explanation.png",
+      "env": "LOCAL-MOCK",
+      "url": "/drive",
+      "viewport": "1440x900",
+      "feature": "Why the offer is cheaper (deterministic explanation; every number from the quote)",
+      "note": "",
+      "bytes": 106631,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "02-paypal/01-offer-consent.png",
+      "env": "LOCAL-MOCK",
+      "url": "/drive",
+      "viewport": "1440x900",
+      "feature": "Driver consents to one exact offer (MOCK provider on this server; live uses PayPal Sandbox)",
+      "note": "",
+      "bytes": 246756,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "02-paypal/03-authorization-confirmed.png",
+      "env": "LOCAL-MOCK",
+      "url": "/reservations/<id>",
+      "viewport": "1440x900",
+      "feature": "Authorization confirmed after buyer approval (MOCK provider)",
+      "note": "",
+      "bytes": 185301,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "/ net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED",
+          "/impact-lab net::ERR_ABORTED",
+          "/drive net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/drive net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED",
+          "/impact-lab net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/impact-lab net::ERR_ABORTED",
+          "/how-it-works net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "02-paypal/04-authorized-not-captured.png",
+      "env": "LOCAL-MOCK",
+      "url": "/reservations/<id>",
+      "viewport": "1440x900",
+      "feature": "Held, not captured: capture waits for delivered energy (MOCK provider)",
+      "note": "",
+      "bytes": 68577,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "08-responsive/03-mobile-offers.png",
+      "env": "LOCAL-MOCK",
+      "url": "/drive",
+      "viewport": "390x844",
+      "feature": "Offers on a phone",
+      "note": "",
+      "bytes": 213172,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "04-bryntum-recovery/01-original-schedule.png",
+      "env": "LOCAL-MOCK",
+      "url": "/operator/schedule?night=2026-11-18",
+      "viewport": "1440x900",
+      "feature": "Bryntum: the committed plan before any disturbance",
+      "note": "",
+      "bytes": 121102,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "/how-it-works net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED",
+          "/how-it-works net::ERR_ABORTED",
+          "/impact-lab net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "04-bryntum-recovery/02-charger-power-reduction.png",
+      "env": "LOCAL-MOCK",
+      "url": "/operator",
+      "viewport": "1440x900",
+      "feature": "Operator records a SYNTHETIC charger power reduction; the run ends INFEASIBLE",
+      "note": "",
+      "bytes": 293162,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "/impact-lab net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/drive net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "04-bryntum-recovery/03-recovery-proposal.png",
+      "env": "LOCAL-MOCK",
+      "url": "/operator/schedule?night=2026-11-18",
+      "viewport": "1440x900",
+      "feature": "Bryntum: proposed change in its own hatched lane, not committed",
+      "note": "",
+      "bytes": 169076,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "/operator net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/how-it-works net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED",
+          "/impact-lab net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "04-bryntum-recovery/04-deterministic-validation.png",
+      "env": "LOCAL-MOCK",
+      "url": "/operator",
+      "viewport": "1440x900",
+      "feature": "Run detail: every candidate checked by validateRecoveryPlan before it can be proposed",
+      "note": "",
+      "bytes": 368570,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "/ net::ERR_ABORTED",
+          "/drive net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED",
+          "/operator/schedule net::ERR_ABORTED",
+          "/ net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "05-ai-agentic-commerce/03-recovery-decision-provenance.png",
+      "env": "LOCAL-MOCK",
+      "url": "/operator",
+      "viewport": "1440x900",
+      "feature": "Decision provenance label: DETERMINISTIC_FALLBACK · no model decision · No model was configured, so the deterministic path decided. (7 trace entries)",
+      "note": "",
+      "bytes": 368570,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "04-bryntum-recovery/05-driver-consent-required.png",
+      "env": "LOCAL-MOCK",
+      "url": "/reservations/<id>",
+      "viewport": "1440x900",
+      "feature": "Driver sees what changes, what does not, and must approve before anything is committed",
+      "note": "",
+      "bytes": 69207,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "/operator net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/impact-lab net::ERR_ABORTED",
+          "/how-it-works net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/how-it-works net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED",
+          "/how-it-works net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/drive net::ERR_ABORTED",
+          "/impact-lab net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/drive net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED",
+          "/impact-lab net::ERR_ABORTED",
+          "/how-it-works net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    },
+    {
+      "file": "04-bryntum-recovery/06-driver-approved-recovery.png",
+      "env": "LOCAL-MOCK",
+      "url": "/reservations/<id>",
+      "viewport": "1440x900",
+      "feature": "After consent: committed schedule version 2",
+      "note": "",
+      "bytes": 190770,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "04-bryntum-recovery/07-updated-bryntum-schedule.png",
+      "env": "LOCAL-MOCK",
+      "url": "/operator/schedule?night=2026-11-18",
+      "viewport": "1440x900",
+      "feature": "Bryntum shows the committed recovery without a reload",
+      "note": "",
+      "bytes": 166959,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [],
+        "http": []
+      }
+    },
+    {
+      "file": "04-bryntum-recovery/08-accessible-schedule-table.png",
+      "env": "LOCAL-MOCK",
+      "url": "/operator/schedule?night=2026-11-18",
+      "viewport": "1440x900",
+      "feature": "Accessible table with the same schedule, after a reload",
+      "note": "",
+      "bytes": 29928,
+      "overflowPx": 0,
+      "errors": {
+        "console": [],
+        "page": [],
+        "failed": [
+          "/how-it-works net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED",
+          "/drive net::ERR_ABORTED",
+          "/ net::ERR_ABORTED",
+          "/how-it-works net::ERR_ABORTED",
+          "/operator net::ERR_ABORTED",
+          "/rewards net::ERR_ABORTED",
+          "/impact-lab net::ERR_ABORTED"
+        ],
+        "http": []
+      }
+    }
+  ],
+  "checks": {
+    "parse": {
+      "energy": "30",
+      "readyBy": "07:00",
+      "labelPresent": false
+    },
+    "goalNotRelaxed": "FLEX DEAL AGENT No offer meets your goals No available offer meets your $4.00 savings minimum and 07:00 deadline. Lowest-cost window: saves $3.76, below your $4.00 minimum. Gentle Charging: saves $2.99, below your $4.00 ",
+    "offers": {
+      "deal": "FLEX DEAL AGENT Recommended for your goals OFFER Lowest-cost window PRICE $13.04 VALIDATED SAVING $3.76 CHARGES 00:00–04:45 Lowest-cost window meets your requirements: $13.04 instead of $16.80 for imm"
+    },
+    "explanation": {
+      "points": 4,
+      "labelPresent": false
+    },
+    "authorized": {
+      "paymentState": "AUTHORIZED",
+      "proofs": [
+        "ORDER_CREATED:MOCK_PROVIDER",
+        "BUYER_APPROVED:MOCK_PROVIDER",
+        "AUTHORIZED:MOCK_PROVIDER"
+      ]
+    },
+    "recovery": {
+      "severeCut": {
+        "status": "INFEASIBLE",
+        "runId": "rrun_grsQHI897-EZTSz_"
+      },
+      "mildCut": {
+        "status": "NEEDS_APPROVAL",
+        "runId": "rrun_mxAEsEbwJRrl1wNb"
+      },
+      "consentRun": {
+        "status": "NEEDS_APPROVAL",
+        "aiUsed": false,
+        "tools": [
+          "orchestrator",
+          "requestRecoveryCandidates",
+          "validateRecoveryPlan",
+          "proposeRecovery",
+          "requestDriverApproval"
+        ],
+        "validated": [
+          "OK",
+          "OK"
+        ],
+        "versionBeforeConsent": 1
+      },
+      "versionAfterConsent": 2,
+      "boardUpdatedWithoutReload": true,
+      "tableAfterReload": [
+        "Port B res_UHnvGHUgwDxXzUm2 19:00 07:00 07:00 v1 (agreed) 32.63 32.63 7.2",
+        "Port C res_mpafD-Sx-eE6cNvZ 19:00 07:00 07:00 v2 (recovered) 32.63 32.63 4.8"
+      ]
+    }
+  }
+}
