@@ -6,6 +6,7 @@ import * as host from "./core/runtime-environment.js";
 import * as s from "./core/validation/index.js";
 import { AiApi } from "./resources/ai-api.js";
 import { Checkout } from "./resources/checkout.js";
+import { Gear } from "./resources/gear.js";
 import { Offers } from "./resources/offers.js";
 import { Operator } from "./resources/operator.js";
 import { Reservations } from "./resources/reservations.js";
@@ -40,6 +41,7 @@ export class GridWindowFlexPayApiClient {
   #reservations?: Reservations;
   #operator?: Operator;
   #webhooks?: Webhooks;
+  #gear?: Gear;
 
   constructor(options: ClientOptions = {}) {
     this.#rawClient = new RawClient({
@@ -108,5 +110,12 @@ export class GridWindowFlexPayApiClient {
    */
   get webhooks(): Webhooks {
     return (this.#webhooks ??= new Webhooks(this.#rawClient, this.#servers));
+  }
+
+  /**
+   * EV accessory search through Channel3 (read-only)
+   */
+  get gear(): Gear {
+    return (this.#gear ??= new Gear(this.#rawClient, this.#servers));
   }
 }

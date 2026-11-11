@@ -31,3 +31,5 @@ terms are refused. Returns the PayPal approval link. Nothing is authorized or ch
     - [Every reservation of a night with load, ports and payment states](/api/openapi/operator/getOperatorDashboard): Every reservation of a night with load, ports and payment states.
   - Webhooks: PayPal Sandbox webhooks
     - [PayPal Sandbox webhook receiver](/api/openapi/webhooks/paypalWebhook): Verifies the PayPal signature against the unaltered body, then re-reads provider state. A webhook alone never marks a payment captured or voided.
+  - Gear: EV accessory search through Channel3 (read-only)
+    - [Find in-stock EV charging accessories across merchants](/api/openapi/gear/findEvGear): Read-only product search through Channel3. Returns merchant links; nothing is bought. `enabled` is false when no Channel3 key is configured on the server.

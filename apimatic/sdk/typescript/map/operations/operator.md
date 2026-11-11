@@ -20,7 +20,7 @@ Accessor: `client.operator` · Source: `src/resources/operator.ts` · 4 operatio
 
 | Field | Channel | Type | Req |
 | --- | --- | --- | --- |
-| `nightOf` | `query` | `string` | no |
+| `night` | `query` | `string` | no |
 
 | Type | Schema value | Source |
 | --- | --- | --- |

@@ -12,6 +12,7 @@ export { Checkout } from "./resources/checkout.js";
 export { Reservations } from "./resources/reservations.js";
 export { Operator } from "./resources/operator.js";
 export { Webhooks } from "./resources/webhooks.js";
+export { Gear } from "./resources/gear.js";
 
 export { aiSchema, type Ai } from "./models/ai.js";
 export { apiAgentDealsRequestSchema, type ApiAgentDealsRequest } from "./models/api-agent-deals-request.js";
@@ -20,6 +21,7 @@ export {
   apiAssistExplainRequestSchema,
   type ApiAssistExplainRequest,
 } from "./models/api-assist-explain-request.js";
+export { apiGearResponseSchema, type ApiGearResponse } from "./models/api-gear-response.js";
 export {
   apiOffersAcceptRequestSchema,
   type ApiOffersAcceptRequest,
@@ -56,6 +58,7 @@ export { errorSchema, type Error } from "./models/error.js";
 export { error1Schema, type Error1 } from "./models/error1.js";
 export { errorErrorSchema, type ErrorError } from "./models/error-error.js";
 export { evaluationSchema, type Evaluation } from "./models/evaluation.js";
+export { itemSchema, type Item } from "./models/item.js";
 export { Kind, kindSchema } from "./models/kind.js";
 export { offerTermsSchema, type OfferTerms } from "./models/offer-terms.js";
 export { parseResultSchema, type ParseResult } from "./models/parse-result.js";

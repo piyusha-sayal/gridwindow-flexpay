@@ -58,7 +58,7 @@ export class Operator {
         urlTemplate: this.#servers.default("/api/operator/dashboard"),
         auth: this.#auth.operatorCookie,
         pathParams: [],
-        query: [{ name: "nightOf", value: request.nightOf, schema: s.optional(s.string()) }],
+        query: [{ name: "night", value: request.night, schema: s.optional(s.string()) }],
         headers: [],
         body: { kind: "empty" },
       },
@@ -176,12 +176,13 @@ export class Operator {
 
 export namespace Operator {
   export type GetOperatorDashboardRequest = {
-    nightOf?: string;
+    /** Night to show (YYYY-MM-DD, station-local). Defaults to the current charging night. */
+    night?: string;
   };
 
   export const getOperatorDashboardRequestSchema: Schema<GetOperatorDashboardRequest> = s.lazySchema(() =>
     s.object<GetOperatorDashboardRequest>({
-      nightOf: s.optional(s.string().check(s.pattern("^\\d{4}-\\d{2}-\\d{2}$"))),
+      night: s.optional(s.string().check(s.pattern("^\\d{4}-\\d{2}-\\d{2}$"))),
     }),
   );
 

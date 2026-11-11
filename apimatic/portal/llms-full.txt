@@ -228,3 +228,9 @@ Every reservation of a night with load, ports and payment states.
 `POST /api/webhooks/paypal`
 
 Verifies the PayPal signature against the unaltered body, then re-reads provider state. A webhook alone never marks a payment captured or voided.
+
+# Find in-stock EV charging accessories across merchants (/api/openapi/gear/findEvGear)
+
+`GET /api/gear`
+
+Read-only product search through Channel3. Returns merchant links; nothing is bought. `enabled` is false when no Channel3 key is configured on the server.

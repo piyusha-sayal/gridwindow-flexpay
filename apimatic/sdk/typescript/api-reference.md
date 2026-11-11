@@ -1054,7 +1054,7 @@ Every reservation of a night with load, ports and payment states.
 
 ```ts
 try {
-  const response = await client.operator.getOperatorDashboard();
+  const response = await client.operator.getOperatorDashboard({ night: "2026-11-12" });
   // TODO: Handle 'response' of type Record<string, unknown>
 } catch (err) {
   // TODO: Handle 'err' of type Operator.GetOperatorDashboardError, discriminated with 'err.payload.kind'
@@ -1070,7 +1070,7 @@ try {
 <dd>
 
 ```ts
-const result = await client.operator.getOperatorDashboard().asApiResult();
+const result = await client.operator.getOperatorDashboard({ night: "2026-11-12" }).asApiResult();
 // TODO: Use 'result.status' and 'result.headers' to read the raw response status and headers
 if (result.ok) {
   // TODO: Use 'result.value' of type Record<string, unknown>
@@ -1089,7 +1089,7 @@ if (result.ok) {
 
 | Name | Type | Description |
 | --- | --- | --- |
-| <code>nightOf?</code> | <code>string</code> | - |
+| <code>night?</code> | <code>string</code> | Night to show (YYYY-MM-DD, station-local). Defaults to the current charging night. |
 
 </dd>
 </dl>
@@ -1438,6 +1438,106 @@ if (result.ok) {
 **As ApiResult**: `await client.webhooks.paypalWebhook(request).asApiResult()`
 
 - **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;undefined, Webhooks.PaypalWebhookError&gt;</code>, with `result.value` of type <code>undefined</code>
+- **OnError**: `result.payload` discriminated on `kind`, with `result.message`
+
+**Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</details>
+
+## Gear
+
+> Source: [Gear](src/resources/gear.ts)
+
+<details>
+<summary><code>findEvGear(request?: Gear.FindEvGearRequest, options?: RequestOptions): ApiPromise&lt;ApiGearResponse, Gear.FindEvGearError&gt;</code></summary>
+
+<dl>
+<dd>
+
+### Description
+
+<dl>
+<dd>
+
+Read-only product search through Channel3. Returns merchant links; nothing is bought. `enabled` is false when no Channel3 key is configured on the server.
+
+</dd>
+</dl>
+
+### Direct Usage
+
+<dl>
+<dd>
+
+```ts
+try {
+  const response = await client.gear.findEvGear({
+    q: "J1772 to Tesla adapter",
+    maxPriceCents: 6000,
+    limit: 6,
+  });
+  // TODO: Handle 'response' of type ApiGearResponse
+} catch (err) {
+  // TODO: Handle 'err' of type Gear.FindEvGearError, discriminated with 'err.payload.kind'
+}
+```
+
+</dd>
+</dl>
+
+### Usage as ApiResult
+
+<dl>
+<dd>
+
+```ts
+const result = await client.gear
+  .findEvGear({ q: "J1772 to Tesla adapter", maxPriceCents: 6000, limit: 6 })
+  .asApiResult();
+// TODO: Use 'result.status' and 'result.headers' to read the raw response status and headers
+if (result.ok) {
+  // TODO: Use 'result.value' of type ApiGearResponse
+} else {
+  // TODO: Handle 'result', discriminated with 'result.payload.kind'
+}
+```
+
+</dd>
+</dl>
+
+### Parameters
+
+<dl>
+<dd>
+
+| Name | Type | Description |
+| --- | --- | --- |
+| <code>q?</code> | <code>string</code> | Search text; defaults to common EV charging accessories. |
+| <code>maxPriceCents?</code> | <code>number</code> | Price cap in US cents. |
+| <code>limit?</code> | <code>number</code> | Number of results (1-12). |
+
+</dd>
+</dl>
+
+### Response
+
+<dl>
+<dd>
+
+**Direct**: `await client.gear.findEvGear(request)`
+
+- **OnSuccess**: <code>[ApiGearResponse](src/models/api-gear-response.ts)</code>
+- **OnError**: throws <code>[Gear.FindEvGearError](src/resources/gear.ts)</code>, with `err.payload` discriminated on `kind`
+
+**As ApiResult**: `await client.gear.findEvGear(request).asApiResult()`
+
+- **OnSuccess**: <code>[ApiResult](src/core/api-promise.ts)&lt;ApiGearResponse, Gear.FindEvGearError&gt;</code>, with `result.value` of type <code>[ApiGearResponse](src/models/api-gear-response.ts)</code>
 - **OnError**: `result.payload` discriminated on `kind`, with `result.message`
 
 **Thrown**: <code>[GridWindowFlexPayApiError](src/core/errors.ts)</code> on any operational failure — a caller abort and a programmer error stay outside the family and reach you raw
