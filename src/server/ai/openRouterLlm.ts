@@ -14,6 +14,16 @@ import { classifyHttpStatus, type LlmDiagnostic, type LlmFailure, type LlmResult
  * (served by Amazon Bedrock) but advertise no response_format or structured_outputs, so they cannot honour the strict schema.
  */
 export const DEFAULT_OPENROUTER_MODEL = "anthropic/claude-haiku-5.5";
+/**
+ * Models whose published OpenRouter parameters omit response_format. With require_parameters, sending it would leave no
+ * endpoint to serve the request. For these the schema goes in the system prompt instead; the local schema parse below stays
+ * the only acceptance test, so the guarantee is the same and a non-conforming answer is rejected, never repaired.
+ */
+const PROMPT_ONLY_JSON_MODELS: readonly RegExp[] = [/^amazon\/nova-/];
+
+export function supportsResponseFormat(model: string): boolean {
+  return !PROMPT_ONLY_JSON_MODELS.some((re) => re.test(model));
+}
 export const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const TIMEOUT_MS = 8_000;
 /** Reasoning-capable models count thinking against max_tokens; headroom keeps a short answer from being cut off. */
@@ -63,14 +73,16 @@ export class OpenRouterLlm implements StructuredLlm {
   async generate<S extends z.ZodType>(req: { system: string; user: string; schema: S; maxTokens: number }): Promise<LlmResult<z.infer<S>>> {
     const schema = z.toJSONSchema(req.schema) as Record<string, unknown>;
     delete schema.$schema;
+    const structured = supportsResponseFormat(this.model);
+    const system = structured ? `${req.system}\n\n${JSON_ONLY}` : `${req.system}\n\n${JSON_ONLY}\nResponse schema (JSON Schema): ${JSON.stringify(schema)}`;
     const body = JSON.stringify({
       model: this.model,
       messages: [
-        { role: "system", content: `${req.system}\n\n${JSON_ONLY}` },
+        { role: "system", content: system },
         { role: "user", content: req.user },
       ],
       max_tokens: req.maxTokens + OUTPUT_HEADROOM_TOKENS,
-      response_format: { type: "json_schema", json_schema: { name: "response", strict: true, schema } },
+      ...(structured ? { response_format: { type: "json_schema", json_schema: { name: "response", strict: true, schema } } } : {}),
       // Only endpoints that honour every parameter above, and none that may retain or train on the prompt.
       provider: { require_parameters: true, data_collection: "deny" },
     });

@@ -8,6 +8,8 @@ import type { z } from "zod";
 import { DEMO_STATION } from "@/domain/station";
 import { SLOT_MS } from "@/domain/units";
 import { FailoverLlm } from "@/server/ai/failoverLlm";
+import { GeminiLlm } from "@/server/ai/geminiLlm";
+import { OpenRouterLlm, type FetchLike } from "@/server/ai/openRouterLlm";
 import { classifyHttpStatus, type LlmFailure, type LlmResult, type ModelProvider, type StructuredLlm } from "@/server/ai/llm";
 import { getReservation } from "@/server/repo";
 import { acceptOffer, handleCheckoutReturn } from "@/server/services/checkoutService";
@@ -152,6 +154,46 @@ describe("which failures switch to OpenRouter", () => {
     expect(["COMMITTED", "NEEDS_APPROVAL", "INFEASIBLE"]).toContain(run.status);
     expect(provenance(run)).toMatchObject({ decision: "DETERMINISTIC_FALLBACK", decisionCode: "DETERMINISTIC_FALLBACK", modelLabel: null });
     expect(run.aiUsed).toBe(false);
+    expect(app.gateway.calls.length).toBe(gatewayBefore);
+  });
+});
+
+describe("real adapters: Gemini 503, then a complete recovery on OpenRouter Nova 2 Lite (stubbed transports)", () => {
+  it("finishes the whole recovery on Nova without response_format, inside the shared budget, with no payment call", async () => {
+    const rid = await disturb("evt_pf_0009");
+    const gatewayBefore = app.gateway.calls.length;
+    let geminiCalls = 0;
+    const geminiLlm = new GeminiLlm("unused", "gemini-3.8-flash", {
+      generate: async () => {
+        geminiCalls += 1;
+        throw Object.assign(new Error("503 UNAVAILABLE"), { name: "ApiError", status: 503 });
+      },
+    });
+    const bodies: Record<string, unknown>[] = [];
+    const replies = DECIDING_STEPS.map(([tool, args = {}]) => ({ tool, argsJson: JSON.stringify(args) }));
+    const fetch: FetchLike = async (_url, init) => {
+      bodies.push(JSON.parse(init.body) as Record<string, unknown>);
+      const content = JSON.stringify(replies.shift() ?? { tool: "noop", argsJson: "{}" });
+      const body = { model: "amazon/nova-2-lite-v1", choices: [{ finish_reason: "stop", message: { content } }], usage: { prompt_tokens: 10, completion_tokens: 5 } };
+      return { ok: true, status: 200, text: async () => JSON.stringify(body) };
+    };
+    app.deps.llm = new FailoverLlm(geminiLlm, new OpenRouterLlm("unused", "amazon/nova-2-lite-v1", { fetch }));
+
+    const run = await orchestrateRecovery(app.deps, "evt_pf_0009");
+
+    expect(run.status).toBe("COMMITTED");
+    expect(run.aiUsed).toBe(true);
+    expect(provenance(run)).toMatchObject({ decision: "MODEL_DECISION", decisionCode: "OPENROUTER_MODEL_DECISION" });
+    expect(geminiCalls).toBe(1); // the 503, then skipped for the cooldown
+    expect(bodies.length).toBeGreaterThanOrEqual(DECIDING_STEPS.length);
+    expect(geminiCalls + bodies.length).toBeLessThanOrEqual(MAX_MODEL_REQUESTS);
+    for (const b of bodies) {
+      expect(b.model).toBe("amazon/nova-2-lite-v1");
+      for (const unsupported of ["response_format", "tools", "tool_choice", "functions"]) expect(b).not.toHaveProperty(unsupported);
+    }
+    const versions = await app.db.query("select version from schedule_versions where reservation_id = $1", [rid]);
+    expect(versions).toHaveLength(1);
+    expect((await getReservation(app.db, rid))!.payment_state).toBe("AUTHORIZED");
     expect(app.gateway.calls.length).toBe(gatewayBefore);
   });
 });

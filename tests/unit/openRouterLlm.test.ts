@@ -1,7 +1,7 @@
 /** OpenRouter adapter, offline: every request goes to a stubbed fetch. No network, no key. */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { DEFAULT_OPENROUTER_MODEL, OPENROUTER_ENDPOINT, OpenRouterLlm, type FetchLike } from "@/server/ai/openRouterLlm";
+import { DEFAULT_OPENROUTER_MODEL, OPENROUTER_ENDPOINT, OpenRouterLlm, supportsResponseFormat, type FetchLike } from "@/server/ai/openRouterLlm";
 
 const API_KEY = "sk-or-test-key-should-never-appear";
 const SECRET_PROMPT = "PROMPT-CONTENT-THAT-MUST-NOT-LEAK";
@@ -46,6 +46,28 @@ describe("OpenRouterLlm request", () => {
     expect(messages.map((m) => m.role)).toEqual(["system", "user"]);
     expect(messages[0]!.content).toContain("exactly one JSON object");
     expect(JSON.stringify(c.body)).not.toContain(API_KEY);
+  });
+
+  it("omits response_format for Amazon Nova (not in its published parameters) and states the schema in the prompt instead", async () => {
+    expect(supportsResponseFormat("amazon/nova-2-lite-v1")).toBe(false);
+    expect(supportsResponseFormat(DEFAULT_OPENROUTER_MODEL)).toBe(true);
+    const s = stub(success({ summary: "ok" }));
+    const res = await new OpenRouterLlm(API_KEY, "amazon/nova-2-lite-v1", { fetch: s.fetch }).generate(req);
+    expect(res).toMatchObject({ ok: true, value: { summary: "ok" }, provider: "openrouter" });
+    const c = s.calls[0]!;
+    for (const unsupported of ["response_format", "structured_outputs", "tools", "tool_choice", "functions"]) expect(c.body).not.toHaveProperty(unsupported);
+    expect(c.body.provider).toEqual({ require_parameters: true, data_collection: "deny" });
+    const system = (c.body.messages as { content: string }[])[0]!.content;
+    expect(system).toContain("exactly one JSON object");
+    expect(system).toContain('"summary"');
+    expect(system).not.toContain("$schema");
+  });
+
+  it("still rejects, never repairs, a Nova answer that breaks the schema or wraps JSON in prose", async () => {
+    const nova = (reply: Reply) => new OpenRouterLlm(API_KEY, "amazon/nova-2-lite-v1", { fetch: stub(reply).fetch }).generate(req);
+    expect(await nova(success({ nope: 1 }))).toMatchObject({ ok: false, reason: "SCHEMA_MISMATCH" });
+    const fenced = { status: 200, body: { choices: [{ finish_reason: "stop", message: { content: '```json\n{"summary":"x"}\n```' } }] } };
+    expect(await nova(fenced)).toMatchObject({ ok: false, reason: "INVALID_OUTPUT" });
   });
 
   it("uses a configured model id", async () => {
