@@ -77,12 +77,40 @@ export interface AiHealth {
   recent: AiAttempt[];
 }
 
+/**
+ * A shared cap on provider requests for one unit of work (one recovery run). The caller takes one request before each
+ * generate call; a failover wrapper takes one more before it asks its second provider. take() never blocks.
+ */
+export interface RequestBudget {
+  take(): boolean;
+  readonly used: number;
+  readonly limit: number;
+}
+
+export class ModelRequestBudget implements RequestBudget {
+  private count: number;
+  constructor(
+    readonly limit: number,
+    used = 0,
+  ) {
+    this.count = Math.min(used, limit);
+  }
+  get used(): number {
+    return this.count;
+  }
+  take(): boolean {
+    if (this.count >= this.limit) return false;
+    this.count += 1;
+    return true;
+  }
+}
+
 export interface StructuredLlm {
   readonly provider: ModelProvider;
   readonly model: string;
   /** Present only on wrappers that track provider attempts. */
   health?(): AiHealth;
-  generate<S extends z.ZodType>(req: { system: string; user: string; schema: S; maxTokens: number }): Promise<LlmResult<z.infer<S>>>;
+  generate<S extends z.ZodType>(req: { system: string; user: string; schema: S; maxTokens: number; requestBudget?: RequestBudget }): Promise<LlmResult<z.infer<S>>>;
 }
 
 export const DEFAULT_AI_MODEL = "claude-opus-5-5";

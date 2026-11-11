@@ -9,10 +9,11 @@
  *    not an outage to route around, and a rejected request would be rejected again);
  *  - fallback failure -> returned, and the caller shows its labelled deterministic answer.
  * After a transient primary failure the primary is skipped for a short cooldown, so users are not made to wait on a provider
- * that just failed. Total waiting is capped by an overall budget.
+ * that just failed. Total waiting is capped by an overall budget, and an optional shared request budget caps how many
+ * provider requests one unit of work may make across both providers.
  */
 import type { z } from "zod";
-import type { AiAttempt, AiHealth, LlmFailure, LlmResult, ModelProvider, StructuredLlm } from "./llm";
+import type { AiAttempt, AiHealth, LlmFailure, LlmResult, ModelProvider, RequestBudget, StructuredLlm } from "./llm";
 
 export const OVERALL_BUDGET_MS = 16_000;
 export const PRIMARY_COOLDOWN_MS = 30_000;
@@ -29,7 +30,7 @@ export interface FailoverOptions {
   minFallbackBudgetMs?: number;
 }
 
-type Req<S extends z.ZodType> = { system: string; user: string; schema: S; maxTokens: number };
+type Req<S extends z.ZodType> = { system: string; user: string; schema: S; maxTokens: number; requestBudget?: RequestBudget };
 
 export class FailoverLlm implements StructuredLlm {
   readonly provider: ModelProvider;
@@ -68,6 +69,8 @@ export class FailoverLlm implements StructuredLlm {
   private async second<S extends z.ZodType>(req: Req<S>, started: number, primaryReason: LlmFailure | null): Promise<LlmResult<z.infer<S>>> {
     const remaining = this.budgetMs - (this.now() - started);
     if (remaining < this.minFallbackBudgetMs) return { ok: false, reason: primaryReason ?? "TIMEOUT" };
+    // The caller paid for the first request of this call. A second request (after a real primary attempt) needs its own.
+    if (primaryReason !== null && req.requestBudget && !req.requestBudget.take()) return { ok: false, reason: primaryReason };
     const res = await this.attempt(this.fallback, req, remaining);
     const outcome = res.ok ? "ok" : res.reason;
     console.warn(`[gridwindow] ai failover: ${this.primary.provider} ${primaryReason ?? "skipped (cooldown)"} -> ${this.fallback.provider} ${outcome}`);

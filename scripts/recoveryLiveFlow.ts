@@ -6,7 +6,7 @@ import { createHash } from "node:crypto";
 import { TOOL_NAMES } from "../src/server/services/recoveryTools";
 
 /** The only keys the live script takes from .env.local. Everything else in the file (database URLs included) is ignored. */
-export const LIVE_ENV_KEYS = ["GEMINI_API_KEY", "GEMINI_MODEL"] as const;
+export const LIVE_ENV_KEYS = ["GEMINI_API_KEY", "GEMINI_MODEL", "OPENROUTER_API_KEY", "OPENROUTER_MODEL"] as const;
 
 const MODEL_SKIP_PREFIX = "model not used for this step: ";
 

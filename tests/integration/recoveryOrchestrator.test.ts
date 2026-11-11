@@ -9,7 +9,7 @@ import { getReservation, effectivePowerOf } from "@/server/repo";
 import { acceptOffer, handleCheckoutReturn } from "@/server/services/checkoutService";
 import { createQuote, scenarioFor } from "@/server/services/quoteService";
 import { approveRecoveryRun, recordDisruption, rejectRecoveryRun, runRecovery } from "@/server/services/scheduleService";
-import { LEASE_MS, MAX_ATTEMPTS, MAX_TOOL_STEPS, orchestrateRecovery, resumeStuckRuns } from "@/server/services/recoveryOrchestrator";
+import { LEASE_MS, MAX_ATTEMPTS, MAX_MODEL_REQUESTS, MAX_TOOL_STEPS, orchestrateRecovery, resumeStuckRuns } from "@/server/services/recoveryOrchestrator";
 import { getRecoveryRunView } from "@/server/services/recoveryRuns";
 import { reservationView } from "@/server/services/viewService";
 import { runSimulation } from "@/server/services/settlementService";
@@ -334,14 +334,15 @@ describe("model failure falls back to the deterministic path", () => {
     expect(run.aiUsed).toBe(false);
   });
 
-  it("the loop is bounded: a model that never stops is cut off at the step limit", async () => {
+  it("the loop is bounded: a model that never stops is cut off by the request budget before the step limit", async () => {
     const rid = await scheduled(DRIVER);
     await insertDisturbance(rid, "evt_fb_0003", "CHARGER_POWER_REDUCTION", { maxPowerW: 7_200 }, EVENING_SLOT);
     const llm = new ScriptedLlm(() => ok({ tool: "readStationState", argsJson: "{}" }));
     app.deps.llm = llm;
     const run = await orchestrateRecovery(app.deps, "evt_fb_0003");
-    expect(llm.calls).toHaveLength(MAX_TOOL_STEPS);
-    expect(run.trace.some((t) => t.detail === "model step limit reached")).toBe(true);
+    expect(MAX_MODEL_REQUESTS).toBeLessThan(MAX_TOOL_STEPS);
+    expect(llm.calls).toHaveLength(MAX_MODEL_REQUESTS);
+    expect(run.trace.some((t) => t.detail.includes("REQUEST_BUDGET"))).toBe(true);
     expect(["COMMITTED", "NEEDS_APPROVAL"]).toContain(run.status);
   });
 });

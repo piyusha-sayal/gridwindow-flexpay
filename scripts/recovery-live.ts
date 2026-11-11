@@ -4,6 +4,10 @@
  * --approve-gemini-calls it repeats the rehearsal gate, then runs ONE recovery with the real GeminiLlm behind the meter:
  * at most 6 model requests, a fixed budget, no retries, no tool access beyond the recovery tool set. Payments stay MOCK.
  * Writes artifacts/recovery-live-<ISO>.json with sanitized evidence only (no keys, prompts, model text or DATABASE_URL).
+ *
+ * --provider=openrouter-fallback (approved separately with --approve-openrouter-calls) exercises the failover path instead:
+ * the Gemini primary is replaced by a labelled SIMULATED outage that sends no Gemini request, so the same FailoverLlm hands
+ * the run to the real OpenRouter adapter behind the same meter, request cap and budget.
  */
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -12,7 +16,9 @@ import { SYNTHETIC_ECONOMICS } from "../src/domain/economics";
 import { DEMO_STATION } from "../src/domain/station";
 import { SLOT_MS } from "../src/domain/units";
 import { DEFAULT_GEMINI_MODEL, GeminiLlm } from "../src/server/ai/geminiLlm";
+import { FailoverLlm } from "../src/server/ai/failoverLlm";
 import type { LlmDiagnostic, LlmResult, StructuredLlm } from "../src/server/ai/llm";
+import { DEFAULT_OPENROUTER_MODEL, OpenRouterLlm } from "../src/server/ai/openRouterLlm";
 import { openPglite, type Db } from "../src/server/db/client";
 import type { AppDeps } from "../src/server/deps";
 import { getReservation, effectivePowerOf, type ReservationRow } from "../src/server/repo";
@@ -25,7 +31,17 @@ import { MockGateway } from "../src/payments/mockGateway";
 import { BudgetExceededError, MeteredLlm } from "./aiSmokeFlow";
 import { boundedToolVerdict, fallbackVerdict, pickLiveEnv, resolveLiveModel, resolveRequestCap, skippedModelReasons, summarizeTrace, type BoundedVerdict } from "./recoveryLiveFlow";
 
-const APPROVAL_FLAG = "--approve-gemini-calls";
+const FALLBACK_MODE = process.argv.includes("--provider=openrouter-fallback");
+const APPROVAL_FLAG = FALLBACK_MODE ? "--approve-openrouter-calls" : "--approve-gemini-calls";
+
+/** Stands in for Gemini in fallback mode: always unavailable, never sends a request. Recorded as a simulated outage. */
+class SimulatedOutage implements StructuredLlm {
+  readonly provider = "gemini" as const;
+  constructor(readonly model: string) {}
+  async generate<S extends z.ZodType>(): Promise<LlmResult<z.infer<S>>> {
+    return { ok: false, reason: "UNAVAILABLE" };
+  }
+}
 const MAX_REQUESTS = resolveRequestCap(process.argv);
 const BUDGET_USD = 0.25;
 /** Budgeting only: a conservative planning rate. The Gemini free tier is priced at $0 and the paid tariff was not verified. */
@@ -148,8 +164,10 @@ function sanitizeDiagnostic(d: LlmDiagnostic | null): Partial<LlmDiagnostic> | n
 }
 
 async function liveRecovery(apiKey: string, model: string) {
-  const meter = new MeteredLlm(new GeminiLlm(apiKey, model), { maxRequests: MAX_REQUESTS, budgetUsd: BUDGET_USD, price: PLANNING_PRICE });
-  const counting = new CountingLlm(meter);
+  const adapter: StructuredLlm = FALLBACK_MODE ? new OpenRouterLlm(apiKey, model) : new GeminiLlm(apiKey, model);
+  const meter = new MeteredLlm(adapter, { maxRequests: MAX_REQUESTS, budgetUsd: BUDGET_USD, price: PLANNING_PRICE });
+  // Fallback mode: the run's model is the production FailoverLlm with a simulated primary outage in front of the meter.
+  const counting = new CountingLlm(FALLBACK_MODE ? new FailoverLlm(new SimulatedOutage(DEFAULT_GEMINI_MODEL), meter) : meter);
   const h = await openHarness(counting);
   const rid = await seedScheduled(h);
   await insertDisturbance(h, rid);
@@ -202,20 +220,23 @@ function buildVerdicts(live: LiveResult, rehearsal: { proposed: number }) {
 
 async function main() {
   const approved = process.argv.includes(APPROVAL_FLAG);
-  log(`Recovery live plan: provider=gemini, one recovery run, at most ${MAX_REQUESTS} model requests, budget cap $${BUDGET_USD} (planning rate), no retries, payments MOCK, Neon/DATABASE_URL not used (in-memory PGlite).`);
+  log(`Recovery live plan: provider=${FALLBACK_MODE ? "openrouter (Gemini primary SIMULATED as unavailable, no Gemini request)" : "gemini"}, one recovery run, at most ${MAX_REQUESTS} model requests, budget cap $${BUDGET_USD} (planning rate), no retries, payments MOCK, Neon/DATABASE_URL not used (in-memory PGlite).`);
   const rehearsal = await rehearse();
   log(`Deterministic rehearsal: run status=${rehearsal.run.status}, usable candidates=${rehearsal.proposed}, rejected=${rehearsal.rejected}.`);
   if (rehearsal.proposed < MIN_USABLE_CANDIDATES) throw new Error(`rehearsal found fewer than ${MIN_USABLE_CANDIDATES} usable candidates; no live call made`);
   if (!approved) {
-    log(`Dry run only. The .env.local file is not opened. Re-run with ${APPROVAL_FLAG} to make the authorized real Gemini call.`);
+    log(`Dry run only. The .env.local file is not opened. Re-run with ${APPROVAL_FLAG} to make the authorized real ${FALLBACK_MODE ? "OpenRouter" : "Gemini"} call.`);
     return;
   }
 
   const envText = await readFile(path.join(process.cwd(), ".env.local"), "utf8").catch(() => "");
   const fileEnv = pickLiveEnv(envText);
-  const apiKey = fileEnv.GEMINI_API_KEY ?? process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY is not set in .env.local");
-  const model = resolveLiveModel(process.argv, fileEnv.GEMINI_MODEL, process.env.GEMINI_MODEL, DEFAULT_GEMINI_MODEL);
+  const keyName = FALLBACK_MODE ? "OPENROUTER_API_KEY" : "GEMINI_API_KEY";
+  const apiKey = (fileEnv[keyName] ?? process.env[keyName])?.trim();
+  if (!apiKey) throw new Error(`${keyName} is not set in .env.local`);
+  const model = FALLBACK_MODE
+    ? resolveLiveModel(process.argv, fileEnv.OPENROUTER_MODEL, process.env.OPENROUTER_MODEL, DEFAULT_OPENROUTER_MODEL)
+    : resolveLiveModel(process.argv, fileEnv.GEMINI_MODEL, process.env.GEMINI_MODEL, DEFAULT_GEMINI_MODEL);
 
   const live = await liveRecovery(apiKey, model);
   const run = live.run;
@@ -225,7 +246,8 @@ async function main() {
   const trace = run?.trace ?? [];
   const evidence = {
     ranAt,
-    provider: "gemini",
+    provider: FALLBACK_MODE ? "openrouter" : "gemini",
+    primary: FALLBACK_MODE ? "gemini SIMULATED_OUTAGE (no Gemini request sent)" : "gemini (live)",
     model: live.model,
     servedModels: [...new Set(live.meter.calls.flatMap((c) => (c.servedModel ? [c.servedModel] : [])))],
     paymentsMode: "MOCK",
@@ -236,7 +258,7 @@ async function main() {
     tokens: live.meter.calls.reduce((t, c) => ({ inputTokens: t.inputTokens + c.inputTokens, outputTokens: t.outputTokens + c.outputTokens }), { inputTokens: 0, outputTokens: 0 }),
     calls: live.meter.calls.map((c) => ({ ok: c.ok, responded: c.responded, reason: c.reason, diagnostic: sanitizeDiagnostic(c.diagnostic), latencyMs: c.latencyMs, inputTokens: c.inputTokens, outputTokens: c.outputTokens })),
     runError: live.runError,
-    run: run ? { status: run.status, aiUsed: run.aiUsed, mode: runProvenance(run).decision, provenance: runProvenance(run).decisionLabel, explanationSource: run.explanation?.source ?? null, outcomeKind: run.outcome?.kind ?? null, versionCommitted: run.outcome?.versionCommitted ?? null } : null,
+    run: run ? { status: run.status, aiUsed: run.aiUsed, mode: runProvenance(run).decision, decisionCode: runProvenance(run).decisionCode, provenance: runProvenance(run).decisionLabel, explanationSource: run.explanation?.source ?? null, outcomeKind: run.outcome?.kind ?? null, versionCommitted: run.outcome?.versionCommitted ?? null } : null,
     fallbackReasons: [...skippedModelReasons(trace), ...modelFailures],
     trace: summarizeTrace(trace),
     chosenCandidate: (() => {

@@ -58,6 +58,16 @@ Status: documented, not run. Migrating the real Neon database needs separate aut
 7. App smoke check, without any payment step: `npm run build`, then `npm start`. Load the home page and the operator console. Confirm the server log has no `SchemaNotReadyError`. Use `npm run db:migrate -- --status` again if the app refuses to start.
 8. Record the outcome, the branch name and the exit codes in `plans/PROGRESS.md`.
 
+### Optional rehearsal on an isolated Neon branch (before step 2)
+
+Status: prepared 2026-11-10, not run. Needs the same owner approval as the procedure above.
+
+1. In the Neon console, create a second branch (for example `rehearsal-003-005`) from the app's branch. It copies schema and data; nothing written to it reaches the app branch.
+2. Set `MIGRATION_DATABASE_URL` to that branch's direct URL only. Leave `DATABASE_URL` pointing at the app branch.
+3. Run steps 3 to 6 against the rehearsal branch. Its fingerprint differs from the app branch's only if the host differs; always read it from `--status`, never reuse one.
+4. Optionally point a local `npm start` at the rehearsal branch (`DATABASE_URL` override in your own shell, `PAYMENT_MODE=mock`) and run step 7.
+5. Delete the rehearsal branch in the console, then run the real procedure from step 2.
+
 ## Recovery
 
 - `--apply` exits 1. Read the printed error class and code. The failing migration is rolled back and not recorded; the earlier ones are recorded. Do not edit the SQL, the ledger or the schema by hand. Run `--status` to see the state. Fix the cause (for example a lock timeout: retry off-peak; an object that already exists: find out how it got there before anything else). Then run `--status` and `--apply` again with the same fingerprint.

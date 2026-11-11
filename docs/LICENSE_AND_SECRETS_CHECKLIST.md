@@ -38,7 +38,7 @@
 
 ## Sign-off
 
-- Owner review required for the Bryntum license line before any public release.
+- Bryntum license line: resolved 2026-11-10 (MIT, commercial use permitted; see `THIRD_PARTY_NOTICES.md` "Conclusion"). Keep the copyright and MIT notice with any redistribution.
 - No secrets in the repository: supported by the scans above, not by a full history scan (`git log -p` was not searched).
 
 ## Bryntum licence verification (2026-11-09, registry metadata only)

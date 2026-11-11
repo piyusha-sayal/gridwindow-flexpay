@@ -8,18 +8,20 @@ import { z } from "zod";
 import { formatLocalTime, slotStartMs } from "@/domain/time";
 import { snapshotSession, type AgreedSession, type PlanningContext } from "@/domain/recovery";
 import type { QuoteSet } from "@/domain/quotes";
-import type { LlmResult, StructuredLlm } from "@/server/ai/llm";
+import { ModelRequestBudget, type LlmResult, type StructuredLlm } from "@/server/ai/llm";
 import { ServiceError, type AppDeps } from "../deps";
 import { committedPlans, effectivePowerOf, getReservation, type ReservationRow } from "../repo";
 import { agreedSession, commitScheduleVersion, currentVersion, findEvent, isActiveSession, nightContext, PROPOSAL_TTL_MS, type DisruptionRow } from "./scheduleService";
 import { appendTraceFenced, appendTraceUnfenced, findRunRow, findRunRowById, patchRun, saveOutcomeFenced, toRunView, transitionRun, type CandidateRecord, type RecoveryOutcome, type RecoveryRunView, type RunTraceEntry } from "./recoveryRuns";
 import { deterministicExplanation, type NarrativeKind } from "./recoveryNarrative";
-import { MODEL_SKIP_PREFIX, NO_MODEL_DETAIL } from "./recoveryProvenance";
+import { MODEL_SKIP_PREFIX, NO_MODEL_DETAIL, RESUMED_DETERMINISTIC_DETAIL } from "./recoveryProvenance";
 import { RECOVERY_SYSTEM, STEP_SCHEMA, buildRecoveryPrompt, type TranscriptItem } from "./recoveryPrompt";
 import { allowedToolNames, dispatchTool, narrativeFacts, newRunState, parseModelCall, pickDeterministic, sanitizeForTrace, summarizeCandidate, type RunState, type ToolOutcome } from "./recoveryTools";
 
 export const MAX_TOOL_STEPS = 8;
 export const MAX_ATTEMPTS = 3;
+/** Provider requests one recovery run may make, across the primary and the fallback model together. */
+export const MAX_MODEL_REQUESTS = 6;
 export const LEASE_MS = 60_000;
 /** Wall-clock budget for the whole model loop; the deterministic path needs no budget. */
 export const LOOP_BUDGET_MS = 45_000;
@@ -174,6 +176,7 @@ class RunWorker {
   private readonly resumed: boolean;
   private state: RunState | null = null;
   private committedVersion: number | null = null;
+  private readonly requests = new ModelRequestBudget(MAX_MODEL_REQUESTS);
 
   constructor(
     private readonly deps: AppDeps,
@@ -213,7 +216,10 @@ class RunWorker {
       const state = await loadRunState(this.deps, this.event);
       if (!state) return await this.finish("FAILED", "The session is not an active scheduled session.");
       this.state = state;
-      if (this.llm) await this.modelLoop(state);
+      // A resumed run never asks a model again: its earlier attempt may already have spent the request budget, and the
+      // deterministic path finishes it through the same validated tools.
+      if (this.llm && this.resumed) await this.log("orchestrator", "DETERMINISTIC", {}, "INFO", RESUMED_DETERMINISTIC_DETAIL);
+      else if (this.llm) await this.modelLoop(state);
       else await this.log("orchestrator", "DETERMINISTIC", {}, "INFO", NO_MODEL_DETAIL);
       await this.completeDeterministically(state);
       if (state.decision) return await this.finish(state.decision, null);
@@ -244,6 +250,7 @@ class RunWorker {
     for (let step = 1; step <= MAX_TOOL_STEPS; step++) {
       const remaining = this.deadline - Date.now();
       if (remaining <= 0) return this.skipModel("TIMEOUT");
+      if (!this.requests.take()) return this.skipModel(`REQUEST_BUDGET (${this.requests.limit} model requests used)`);
       await this.renewLeaseOnly();
       const res = await withTimeout(this.callModel(state, transcript, MAX_TOOL_STEPS - step), remaining);
       if (res === TIMED_OUT) return this.skipModel("TIMEOUT");
@@ -292,7 +299,7 @@ class RunWorker {
       transcript.slice(-MAX_TOOL_STEPS),
     );
     return this.llm!
-      .generate({ system: RECOVERY_SYSTEM, user: prompt, schema: STEP_SCHEMA, maxTokens: STEP_MAX_TOKENS })
+      .generate({ system: RECOVERY_SYSTEM, user: prompt, schema: STEP_SCHEMA, maxTokens: STEP_MAX_TOKENS, requestBudget: this.requests })
       .catch((): LlmResult<z.infer<typeof STEP_SCHEMA>> => ({ ok: false, reason: "UNAVAILABLE" }));
   }
 

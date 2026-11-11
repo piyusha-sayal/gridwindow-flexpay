@@ -198,7 +198,8 @@ describe("retry and lease fencing", () => {
     });
 
     const view = await orchestrateRecovery(app.deps, "evt_stale_0001");
-    expect(calls).toBe(2);
+    // The resumed worker finishes deterministically and never asks a model again.
+    expect(calls).toBe(1);
     expect(view.status).toBe("COMMITTED");
     expect(view.trace.some((t) => t.actor === "GEMINI")).toBe(false);
     expect(view.trace.map((t) => t.seq)).toEqual(view.trace.map((_, i) => i + 1));
