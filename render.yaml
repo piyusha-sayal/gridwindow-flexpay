@@ -37,11 +37,11 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: AI_PROVIDER
-        sync: false
+        value: gemini
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
-        sync: false
+        value: gemini-3.6-flash
       - key: CHANNEL3_API_KEY
         sync: false
       - key: DEMO_TOOLS
