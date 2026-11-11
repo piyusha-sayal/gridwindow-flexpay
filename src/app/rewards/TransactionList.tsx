@@ -20,7 +20,7 @@ function OfferPrice({ r }: { r: SessionReservation }) {
 function CommitmentRef({ r }: { r: SessionReservation }) {
   return (
     <>
-      <Link href={`/reservations/${encodeURIComponent(r.id)}`} className="font-mono text-[13px] break-all">
+      <Link href={`/reservations/${encodeURIComponent(r.id)}`} className="id-link font-mono text-[13px] break-all underline underline-offset-4">
         {r.id}
       </Link>
       <p className="text-muted text-[13px]">Created {formatStamp(Date.parse(r.createdAt), r.timeZone)}</p>
@@ -31,7 +31,7 @@ function CommitmentRef({ r }: { r: SessionReservation }) {
 function DesktopRow({ r }: { r: SessionReservation }) {
   return (
     <>
-      <tr className="align-top border-t border-line">
+      <tr className="tx-row align-top border-t border-line">
         <td className="p-3"><CommitmentRef r={r} /></td>
         <td className="p-3">
           <p>{batteryLabel(r.offer.targetBatteryWh)}</p>
@@ -45,7 +45,7 @@ function DesktopRow({ r }: { r: SessionReservation }) {
         </td>
         <td className="p-3 text-[13px]">{settlementStep(r).label}</td>
       </tr>
-      <tr className="border-none">
+      <tr className="tx-events border-none">
         <td colSpan={6} className="px-3 pb-3"><EventTrail events={r.events} timeZone={r.timeZone} /></td>
       </tr>
     </>
@@ -54,7 +54,7 @@ function DesktopRow({ r }: { r: SessionReservation }) {
 
 function MobileCard({ r }: { r: SessionReservation }) {
   return (
-    <article className="card p-4 space-y-3 min-w-0">
+    <article className="card card-lift p-4 space-y-3 min-w-0">
       <CommitmentRef r={r} />
       <dl className="grid grid-cols-1 gap-2 text-sm">
         <div><dt className="meta">Offer</dt><dd>{batteryLabel(r.offer.targetBatteryWh)} · {windowLabel(r)}</dd></div>
@@ -71,9 +71,9 @@ function MobileCard({ r }: { r: SessionReservation }) {
 export function TransactionList({ reservations }: { reservations: SessionReservation[] }) {
   return (
     <section aria-labelledby="transactions" className="space-y-4">
-      <h2 id="transactions" className="text-[22px] font-semibold tracking-[-0.01em]">Transactions</h2>
+      <h2 id="transactions" className="section-title text-[clamp(22px,2.6vw,28px)] font-semibold">Transactions</h2>
       <div className="card hidden md:block overflow-hidden">
-        <table className="w-full table-fixed text-sm">
+        <table className="tx-table w-full table-fixed text-sm">
           <caption className="sr-only">Charging commitments for this browser session, newest first</caption>
           <thead className="text-left text-muted">
             <tr>
@@ -92,7 +92,7 @@ export function TransactionList({ reservations }: { reservations: SessionReserva
           </tbody>
         </table>
       </div>
-      <div className="space-y-3 md:hidden">
+      <div className="stagger space-y-3 md:hidden">
         {reservations.map((r) => (
           <MobileCard key={r.id} r={r} />
         ))}

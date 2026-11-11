@@ -21,7 +21,7 @@ export function RequestCard({ config, form, onEdit }: { config: DriverConfig; fo
     ["Min. saving", Number(form.minSavings) > 0 ? `at least $${Number(form.minSavings).toFixed(2)} · ${form.minSavingsRequired ? "required" : "preferred"}` : "any"],
   ];
   return (
-    <section aria-labelledby="request-card-title" className="card p-5 space-y-4">
+    <section aria-labelledby="request-card-title" className="card aside-card p-5 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h2 id="request-card-title" className="meta">
           Your request
@@ -55,7 +55,7 @@ interface SelectedProps {
 /** Navy card for the selected offer (≥760px). */
 export function SelectedCard({ offer, tz, expired, onReview }: SelectedProps) {
   return (
-    <section aria-labelledby="selected-title" className="card card-navy p-5 space-y-4">
+    <section aria-labelledby="selected-title" className="card card-navy ring-flow selected-card p-5 space-y-4">
       <div>
         <p className="meta">Selected</p>
         <h2 id="selected-title" className="mt-1 text-[18px] font-semibold text-white">
@@ -66,10 +66,10 @@ export function SelectedCard({ offer, tz, expired, onReview }: SelectedProps) {
         </p>
       </div>
       <p className="flex items-baseline gap-3 tabular">
-        <span className="text-[44px] font-semibold leading-none tracking-[-0.03em] text-white">{formatUsd(offer.priceCents)}</span>
+        <span className="selected-price text-[44px] font-semibold leading-none tracking-[-0.03em] text-white">{formatUsd(offer.priceCents)}</span>
         <s className="text-on-navy-muted">{formatUsd(offer.listPriceCents)}</s>
       </p>
-      <p className="text-[14px] text-teal-bright">You save {formatUsd(offer.discountCents)}</p>
+      <p className="save-line text-[14px] text-teal-bright">You save {formatUsd(offer.discountCents)}</p>
       <button type="button" className="btn btn-teal w-full" onClick={onReview} disabled={expired}>
         Review and approve
       </button>
@@ -81,7 +81,7 @@ export function SelectedCard({ offer, tz, expired, onReview }: SelectedProps) {
 /** Fixed bottom bar replacing the aside on small screens (step 2). */
 export function MobileOfferBar({ offer, expired, onReview }: Omit<SelectedProps, "tz">) {
   return (
-    <div className="fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] z-20 border-t border-line bg-surface/95 px-[var(--gutter)] py-3 backdrop-blur min-[760px]:hidden">
+    <div className="offer-bar fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] z-20 border-t border-line bg-surface/95 px-[var(--gutter)] py-3 backdrop-blur min-[760px]:hidden">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-[14px] font-medium">{offer.label}</p>

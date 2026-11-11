@@ -57,21 +57,22 @@ export const ATTENTION_STATES = new Set(["NEEDS_RECONCILIATION", "CAPTURE_PENDIN
 export type KpiVariant = "default" | "hero" | "hero-navy" | "attention" | "strip";
 
 const KPI_CLASS: Record<KpiVariant, string> = {
-  default: "card kpi",
-  hero: "card kpi kpi-hero",
-  "hero-navy": "card card-navy kpi kpi-hero",
+  default: "card kpi kpi-default",
+  hero: "card kpi kpi-hero kpi-glow",
+  "hero-navy": "card card-navy kpi kpi-hero kpi-navy",
   attention: "card kpi kpi-hero kpi-attention",
-  strip: "kpi px-0 py-3",
+  strip: "kpi kpi-strip",
 };
 
 export function Kpi({ label, value, hint, variant = "default", children }: { label: string; value: ReactNode; hint?: ReactNode; variant?: KpiVariant; children?: ReactNode }) {
   const navy = variant === "hero-navy";
   return (
     <div className={KPI_CLASS[variant]}>
+      <span aria-hidden="true" className="kpi-spark" />
       <span className="meta">{label}</span>
       <span className="kpi-value">{value}</span>
       {children}
-      {hint && <span className={`text-[13px] ${navy ? "text-on-navy-body" : "text-muted"}`}>{hint}</span>}
+      {hint && <span className={`kpi-hint text-[13px] ${navy ? "text-on-navy-body" : "text-muted"}`}>{hint}</span>}
     </div>
   );
 }
@@ -112,18 +113,24 @@ export function aiSourceText(src: AiSource): { summary: string; detail: string }
 export function AiSourceBadge({ src }: { src: AiSource }) {
   const t = aiSourceText(src);
   return (
-    <details className="text-[12px] text-muted">
-      <summary className="cursor-pointer underline underline-offset-4">{t.summary}</summary>
-      <p className="mt-1">{t.detail}</p>
+    <details className="disclosure ai-source text-[12px] text-muted">
+      <summary className="cursor-pointer">
+        <span aria-hidden="true" className="ico ico-spark" />
+        {t.summary}
+      </summary>
+      <p className="ai-source-note mt-2">{t.detail}</p>
     </details>
   );
 }
 
 export function Alert({ tone, title, children }: { tone: Tone; title?: string; children?: ReactNode }) {
   return (
-    <div role={tone === "danger" ? "alert" : "status"} className={`card p-4 tone-${tone}`}>
-      {title && <p className="font-semibold">{title}</p>}
-      {children && <div className="text-sm mt-0.5">{children}</div>}
+    <div role={tone === "danger" ? "alert" : "status"} className={`alert card tone-${tone}`}>
+      <span aria-hidden="true" className="alert-icon" />
+      <div className="alert-body">
+        {title && <p className="alert-title font-semibold">{title}</p>}
+        {children && <div className="text-sm mt-0.5">{children}</div>}
+      </div>
     </div>
   );
 }

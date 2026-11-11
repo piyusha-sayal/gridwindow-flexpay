@@ -37,18 +37,19 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <div className="space-y-8">
+    <div className="step-enter space-y-8">
       <header className="space-y-3">
-        <p className="meta">
+        <p className="meta step-kicker">
           {config.station.name} · {config.station.timeZone}
         </p>
-        <h1 tabIndex={-1} className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(34px,4.6vw,48px)]">What does your car need tonight?</h1>
+        <h1 tabIndex={-1} className="step-title font-semibold leading-[1.02] text-[clamp(36px,5vw,56px)]">What does your car need tonight?</h1>
       </header>
 
       <GuidedDemo onLoad={onUpdate} />
 
       <section aria-labelledby="nl-label" className="space-y-2">
-        <div className="flex flex-wrap items-center gap-2 rounded-[var(--r-card-sm)] border border-line bg-surface p-2 pl-4 focus-within:border-ink">
+        <div className="say-bar flex flex-wrap items-center gap-2 p-2 pl-4">
+          <span aria-hidden="true" className="ico ico-spark say-spark" />
           <span id="nl-label" className="font-mono text-[12px] tracking-[0.08em] text-teal-ink">
             SAY IT
           </span>
@@ -57,7 +58,7 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
           </label>
           <input
             id="nl"
-            className="min-w-0 flex-[1_1_220px] bg-transparent py-2 text-[16px] outline-none placeholder:text-faint"
+            className="say-input min-w-0 flex-[1_1_220px] bg-transparent py-2 text-[16px] placeholder:text-muted"
             maxLength={300}
             placeholder="Find me 30 kWh before 7 AM and save at least $4."
             value={text}
@@ -73,7 +74,7 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
           {!config.ai.enabled && " AI is not configured, so a deterministic parser is used."}
         </p>
         {parseResult && (
-          <div className="space-y-1 badge-wrap" aria-live="polite">
+          <div className="ai-note space-y-2 badge-wrap" aria-live="polite">
             <AiSourceBadge src={parseResult} />
             <ul className="text-[14px] text-muted list-disc pl-5">
               {(parseResult.parsed.notes.length ? parseResult.parsed.notes : ["Form updated. Review every field before requesting offers."]).map((n) => (
@@ -94,7 +95,7 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
         )}
       </section>
 
-      <form onSubmit={onSubmit} noValidate aria-label="Your charging need">
+      <form onSubmit={onSubmit} noValidate aria-label="Your charging need" className="request-form">
         <Row label={<label htmlFor="kwh">Energy<span className="sr-only"> into battery (kWh)</span></label>} hintId="targetBatteryKWh-hint" hint="Added to your battery, 0.01–120 kWh.">
           <div className="flex items-baseline gap-2">
             <input
@@ -104,7 +105,7 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
               max="120"
               step="0.01"
               inputMode="decimal"
-              className={`w-[5.5ch] min-w-0 bg-transparent border-0 border-b-2 pb-1 text-[56px] font-semibold leading-none tracking-[-0.03em] tabular ${errors.targetBatteryKWh ? "border-red" : "border-ink"}`}
+              className={`kwh-input w-[5.5ch] min-w-0 bg-transparent border-0 border-b-2 pb-1 text-[56px] font-semibold leading-none tracking-[-0.03em] tabular ${errors.targetBatteryKWh ? "border-red" : "border-ink"}`}
               value={form.targetBatteryKWh}
               onChange={(e) => onUpdate({ targetBatteryKWh: e.target.value })}
               required
@@ -161,7 +162,7 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
 
         <Row label={<label htmlFor="minsave">Minimum saving<span className="sr-only"> (USD, optional)</span></label>} hintId="minSavings-hint" hint="Optional. Compared with charging now.">
           <UsdInput id="minsave" invalid={!!errors.minSavings} value={form.minSavings} placeholder="any" onChange={(v) => onUpdate({ minSavings: v })} {...field("minSavings")} />
-          <label className="mt-2 flex items-start gap-2 text-[14px] text-text-2 cursor-pointer">
+          <label className="check-row mt-2 flex items-start gap-2 text-[14px] text-text-2 cursor-pointer">
             <input id="minsave-required" type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--ink)]" checked={form.minSavingsRequired} onChange={(e) => onUpdate({ minSavingsRequired: e.target.checked })} />
             <span>Require this saving. Offers that save less cannot be approved.</span>
           </label>
@@ -188,18 +189,18 @@ export function RequestStep({ config, form, errors, text, parseResult, busy, onT
           />
         </Row>
 
-        <div className="flex flex-wrap items-center gap-4 border-t border-line pt-6">
-          <button type="submit" className="btn btn-primary btn-lg" disabled={busy !== null}>
+        <div className="form-actions flex flex-wrap items-center gap-4 pt-6">
+          <button type="submit" className="btn btn-primary btn-lg btn-glow" disabled={busy !== null}>
             {busy === "quote" ? (
               "Finding offers…"
             ) : (
               <>
-                See offers <span aria-hidden="true">→</span>
+                See offers <span aria-hidden="true" className="btn-arrow">→</span>
               </>
             )}
           </button>
           {busy === "quote" && (
-            <p className="meta" aria-live="polite">
+            <p className="meta working" aria-live="polite">
               Checking port, station capacity and tariff windows…
             </p>
           )}
@@ -225,7 +226,7 @@ interface UsdInputProps {
 
 function UsdInput({ id, value, invalid, placeholder, required, onChange, ...aria }: UsdInputProps & { "aria-invalid"?: boolean; "aria-describedby": string }) {
   return (
-    <div className={`flex max-w-[220px] items-center rounded-[var(--r-input)] border bg-surface focus-within:border-ink ${invalid ? "border-red" : "border-line-strong"}`}>
+    <div className={`usd-field flex max-w-[220px] items-center rounded-[var(--r-input)] border ${invalid ? "border-red" : "border-line-strong"}`}>
       <span className="pl-3 text-muted" aria-hidden="true">
         $
       </span>
@@ -239,7 +240,7 @@ function UsdInput({ id, value, invalid, placeholder, required, onChange, ...aria
 
 function Row({ label, hint, hintId, children }: { label: ReactNode; hint: string; hintId?: string; children: ReactNode }) {
   return (
-    <div className="flex flex-wrap gap-x-8 gap-y-3 border-t border-line py-6">
+    <div className="form-row flex flex-wrap gap-x-8 gap-y-3 py-6">
       <div className="flex-[0_1_220px] min-w-[180px]">
         <div className="text-[17px] font-semibold">{label}</div>
         <p id={hintId} className="mt-1.5 text-[14px] leading-snug text-muted">
@@ -275,9 +276,9 @@ function ParkedStrip({ form, portMaxPowerW }: { form: FormState; portMaxPowerW: 
   const fits = s.chargeMin <= s.parkedMin;
   return (
     <div className="space-y-1.5 pt-1">
-      <div className="relative h-5 rounded-[3px] bg-[var(--chart-track)]" aria-hidden="true">
-        <span className="hatch absolute inset-y-0 rounded-[3px] opacity-60" style={{ left: pct(s.plugInMin), width: `calc(${pct(s.departMin)} - ${pct(s.plugInMin)})` }} />
-        <span className="absolute inset-y-0 rounded-[3px] bg-teal" style={{ left: pct(s.plugInMin), width: `calc(${pct(Math.min(s.departMin, s.plugInMin + s.chargeMin))} - ${pct(s.plugInMin)})` }} />
+      <div className="parked-track relative h-6 rounded-[6px] bg-[var(--chart-track)]" aria-hidden="true">
+        <span className="hatch parked-span absolute inset-y-0 rounded-[6px] opacity-60" style={{ left: pct(s.plugInMin), width: `calc(${pct(s.departMin)} - ${pct(s.plugInMin)})` }} />
+        <span className="parked-charge absolute inset-y-0 rounded-[6px] bg-teal" style={{ left: pct(s.plugInMin), width: `calc(${pct(Math.min(s.departMin, s.plugInMin + s.chargeMin))} - ${pct(s.plugInMin)})` }} />
       </div>
       <AxisTicks axis={FIXED_NIGHT_AXIS} />
       <p className="flex flex-wrap gap-x-5 gap-y-1 meta">

@@ -22,7 +22,7 @@ export function CapacityStrip({ model }: { model: ScheduleModel }) {
         Scheduled charging demand plus forecast base load for every quarter-hour of the night, compared with the usable site limit (station cap minus safety headroom). Voided, failed and cancelled sessions are not counted. This is the plan and a synthetic forecast, not measured consumption.
       </p>
 
-      <dl className="grid gap-px overflow-hidden rounded-[var(--r-card-sm)] border border-line bg-line sm:grid-cols-3">
+      <dl className="glance stagger grid gap-px overflow-hidden sm:grid-cols-3">
         <Stat label="Peak site demand" value={formatKw(s.peakKw)} />
         <Stat label="Usable site limit" value={limitText} />
         <Stat
@@ -42,7 +42,7 @@ export function CapacityStrip({ model }: { model: ScheduleModel }) {
           ))}
         </div>
         <div className="min-w-0">
-          <div className="relative h-40 border-b border-l border-line-strong" role="list" aria-label="Scheduled demand against the site limit, per quarter-hour">
+          <div className="cap-strip relative h-40 border-b border-l border-line-strong" role="list" aria-label="Scheduled demand against the site limit, per quarter-hour">
             {yTicks.slice(0, 2).map((kw) => (
               <div key={kw} className="pointer-events-none absolute inset-x-0 border-t border-dashed border-line" style={{ top: `${((topKw - kw) / topKw) * 100}%` }} aria-hidden="true" />
             ))}
@@ -50,7 +50,7 @@ export function CapacityStrip({ model }: { model: ScheduleModel }) {
               {model.capacity.map((c) => {
                 const label = `${timeLabel(c.startMs, model.timeZone)}: ${formatKw(c.drawKw)} scheduled charging plus ${formatKw(c.baseKw)} forecast base load of ${formatKw(c.capKw)} limit${c.over ? ", over capacity" : ""}`;
                 return (
-                  <div key={c.slot} role="listitem" aria-label={label} title={label} className="relative h-full min-w-[3px] flex-1">
+                  <div key={c.slot} role="listitem" aria-label={label} title={label} className="cap-slot relative h-full min-w-[3px] flex-1">
                     <div className="absolute inset-x-0 bottom-0 bg-line-strong" style={{ height: `${(c.baseKw / topKw) * 100}%` }} aria-hidden="true" />
                     <div className={`absolute inset-x-0 rounded-t-[2px] ${c.over ? "gw-capacity-over" : "bg-teal"}`} style={{ bottom: `${(c.baseKw / topKw) * 100}%`, height: `${(c.drawKw / topKw) * 100}%` }} aria-hidden="true" />
                     <div className="absolute inset-x-0 border-t-2 border-ink" style={{ bottom: `${(c.capKw / topKw) * 100}%` }} aria-hidden="true" />
@@ -91,7 +91,7 @@ export function CapacityStrip({ model }: { model: ScheduleModel }) {
 
 function Stat({ label, value, note, alert = false }: { label: string; value: string; note?: string; alert?: boolean }) {
   return (
-    <div className={`min-w-0 bg-surface px-4 py-3 ${alert ? "text-red" : ""}`}>
+    <div className={`glance-cell min-w-0 px-4 py-3 ${alert ? "text-red" : ""}`}>
       <dt className="meta text-text-2!">{label}</dt>
       <dd className="mt-1 text-[17px] font-semibold tabular [overflow-wrap:anywhere]">{value}</dd>
       {note && <dd className="text-[12px] text-muted">{note}</dd>}

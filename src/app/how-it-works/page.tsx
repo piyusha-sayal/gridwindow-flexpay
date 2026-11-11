@@ -69,11 +69,11 @@ const FAQ: { question: string; answer: string[] }[] = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="space-y-12">
+    <div className="stagger space-y-12">
       <header className="space-y-3 max-w-[820px]">
         <p className="eyebrow">Four steps</p>
-        <h1 className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(32px,4.6vw,52px)]">How It Works</h1>
-        <p className="text-[17px] text-text-2">
+        <h1 className="page-title font-semibold leading-[1.02] text-[clamp(36px,5.4vw,64px)]">How It Works</h1>
+        <p className="lede">
           Smart Charge moves flexible overnight charging to cheaper hours and asks you to approve every term first. Everything here is a simulation.
         </p>
       </header>
@@ -84,10 +84,10 @@ export default function HowItWorksPage() {
       </section>
 
       <section aria-labelledby="faq" className="space-y-5">
-        <h2 id="faq" className="text-[clamp(24px,2.8vw,30px)] font-semibold tracking-[-0.01em]">Frequently asked questions</h2>
-        <div className="grid items-start gap-3 min-[1000px]:grid-cols-2">
+        <h2 id="faq" className="section-title text-[clamp(24px,2.8vw,30px)] font-semibold">Frequently asked questions</h2>
+        <div className="stagger grid items-start gap-3 min-[1000px]:grid-cols-2">
           {FAQ.map((item) => (
-            <details key={item.question} className="card group px-5 py-4">
+            <details key={item.question} className="card faq-item group px-5 py-4">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-semibold [&::-webkit-details-marker]:hidden">
                 {item.question}
                 <span aria-hidden="true" className="font-mono text-[20px] leading-none text-teal-ink transition-transform group-open:rotate-45">+</span>
@@ -103,7 +103,7 @@ export default function HowItWorksPage() {
       </section>
 
       <p className="text-[15px] text-text-2">
-        Ready to try it? <Link href="/drive" className="font-semibold underline underline-offset-2">Start Smart Charge</Link>
+        Ready to try it? <Link href="/drive" className="link-arrow">Start Smart Charge</Link>
       </p>
     </div>
   );

@@ -28,9 +28,10 @@ interface DealAgentPanelProps {
  */
 export function DealAgentPanel({ deal, tz, expired, onRun, onEdit }: DealAgentPanelProps) {
   return (
-    <section aria-labelledby="deal-agent-title" className="card space-y-3 p-5" aria-busy={deal.status === "loading"}>
+    <section aria-labelledby="deal-agent-title" className="card agent-panel space-y-3 p-5" aria-busy={deal.status === "loading"}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="deal-agent-title" className="meta">
+        <h2 id="deal-agent-title" className="meta agent-title">
+          <span aria-hidden="true" className="ico ico-spark" />
           Flex Deal Agent
         </h2>
         {deal.status === "done" && (
@@ -45,7 +46,7 @@ export function DealAgentPanel({ deal, tz, expired, onRun, onEdit }: DealAgentPa
             Check offers against my goals
           </button>
         )}
-        {deal.status === "loading" && <p className="text-muted">Checking every validated offer against your goals…</p>}
+        {deal.status === "loading" && <p className="working text-muted">Checking every validated offer against your goals…</p>}
         {deal.status === "error" && (
           <p role="alert" className="text-red">
             {deal.message}{" "}
@@ -65,9 +66,9 @@ function DealResultView({ evaluation: e, summary, points, tz, expired, onEdit }:
   const rec = e.candidates.find((c) => c.offerId === e.recommendedOfferId);
   return (
     <>
-      <p className="text-[17px] font-semibold">{HEADLINE[status]}</p>
+      <p className="agent-headline text-[17px] font-semibold">{HEADLINE[status]}</p>
       {rec && !expired && (
-        <dl className="grid grid-cols-[repeat(auto-fit,minmax(min(130px,100%),1fr))] gap-3 rounded-[var(--r-card-sm)] border border-ink bg-teal-tint p-3 text-[14px] tabular">
+        <dl className="agent-rec grid grid-cols-[repeat(auto-fit,minmax(min(130px,100%),1fr))] gap-3 p-3 text-[14px] tabular">
           {[
             ["Offer", rec.label],
             ["Price", formatUsd(rec.priceCents)],

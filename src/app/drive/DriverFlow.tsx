@@ -137,7 +137,7 @@ export function DriverFlow({ initialError }: { initialError: string | null }) {
   const recommendedKind = PREFERENCES.find((p) => p.value === form?.preference)?.kind ?? "flex_lowest_cost";
 
   if (!config || !form) {
-    return error ? <Alert tone="danger" title="Station unavailable">{error}</Alert> : <p aria-live="polite" className="text-muted">Loading station…</p>;
+    return error ? <Alert tone="danger" title="Station unavailable">{error}</Alert> : <p aria-live="polite" className="flow-loading text-muted">Loading station…</p>;
   }
   const tz = config.station.timeZone;
   const expired = secondsLeft === 0;
@@ -263,7 +263,7 @@ export function DriverFlow({ initialError }: { initialError: string | null }) {
       <StepProgress step={step} reachable={reachable} onGo={goStep} />
       {error && <Alert tone="danger">{error}</Alert>}
       <div className={`flex flex-wrap items-start gap-x-10 gap-y-8 ${step === 2 && offer ? "pb-40 min-[760px]:pb-0" : ""}`}>
-        <div ref={headingRef} className="min-w-0 flex-[999_1_560px] [&_h1]:outline-none">
+        <div ref={headingRef} className="flow-stage min-w-0 flex-[999_1_560px] [&_h1]:outline-none">
           {step === 1 && (
             <RequestStep
               config={config}
@@ -303,7 +303,7 @@ export function DriverFlow({ initialError }: { initialError: string | null }) {
             <TermsApproval config={config} quote={quote} offer={offer} preferredMinSavingsCents={preferredMin} secondsLeft={secondsLeft} consent={consent} busy={busy === "accept"} onConsent={setConsent} onApprove={approve} onBack={() => goStep(2)} />
           )}
         </div>
-        <aside className={`min-w-0 flex-[1_1_280px] space-y-4 min-[760px]:sticky min-[760px]:top-24 ${step === 2 ? "hidden min-[760px]:block" : ""}`} aria-label="Request summary">
+        <aside className={`stagger min-w-0 flex-[1_1_280px] space-y-4 min-[760px]:sticky min-[760px]:top-24 ${step === 2 ? "hidden min-[760px]:block" : ""}`} aria-label="Request summary">
           <RequestCard config={config} form={form} onEdit={step > 1 ? () => goStep(1) : undefined} />
           {step === 2 && offer && <SelectedCard offer={offer} tz={tz} expired={expired} onReview={() => goStep(3)} />}
         </aside>

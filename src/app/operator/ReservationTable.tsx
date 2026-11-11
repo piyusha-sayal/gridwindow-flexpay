@@ -27,13 +27,14 @@ export function ReservationTable({ d, busyId, selectedId, onAct, onSelect }: Res
   const mock = d.providerMode === "MOCK";
   const attention = d.sessions.filter((s) => needsAttention(s, ATTENTION_STATES));
   return (
-    <section className="card p-5 sm:p-6 space-y-4" aria-labelledby="res-title">
+    <section className="card ops-panel p-5 sm:p-6 space-y-4" aria-labelledby="res-title">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="res-title" className="text-[22px] font-semibold tracking-[-0.01em]">
+        <h2 id="res-title" className="panel-title text-[22px] font-semibold">
           Reservations
         </h2>
         {attention.length > 0 && (
-          <p className="text-[14px] text-[var(--amber-ink)]" role="status">
+          <p className="attn-note text-[14px] text-warn" role="status">
+            <span aria-hidden="true" className="live-dot live-dot-amber" />
             {attention.length} need attention (payment pending, declined, failed or reconciling)
           </p>
         )}
@@ -47,7 +48,7 @@ export function ReservationTable({ d, busyId, selectedId, onAct, onSelect }: Res
             <Card key={s.id} d={d} s={s} mock={mock} busy={busyId !== null} working={busyId === s.id} selected={selectedId === s.id} onAct={onAct} onSelect={onSelect} />
           ))}
         </ul>
-        <div className="hidden min-[1000px]:block relative overflow-x-auto" tabIndex={0} role="region" aria-label="Reservations table (scrolls horizontally)">
+        <div className="table-wrap hidden min-[1000px]:block relative overflow-x-auto" tabIndex={0} role="region" aria-label="Reservations table (scrolls horizontally)">
           <table className="data-table text-[14px]">
             <caption className="sr-only">Reservations for the night of {d.nightOf}</caption>
             <thead className="text-left text-muted">
@@ -70,7 +71,7 @@ export function ReservationTable({ d, busyId, selectedId, onAct, onSelect }: Res
         </div>
         </>
       )}
-      <p className="text-[13px] text-muted">
+      <p className="fine-print text-[13px] text-muted">
         Outage injection affects only the synthetic simulator; it voids the authorization through the payment provider.
         {mock && " Pending/declined capture controls script the MOCK provider only and are unavailable with PayPal."}
       </p>
@@ -93,9 +94,9 @@ interface RowProps {
 function Row({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps) {
   const attention = needsAttention(s, ATTENTION_STATES);
   return (
-    <tr className={`border-t border-border align-top ${selected ? "bg-teal-tint" : attention ? "bg-[#fffbf2]" : ""}`}>
+    <tr className={`ops-row border-t border-border align-top ${selected ? "is-selected bg-teal-tint" : attention ? "is-attention bg-warn-soft" : ""}`}>
       <td className="py-3 pr-3">
-        <button type="button" className="font-mono text-[13px] underline underline-offset-4 text-left" onClick={() => onSelect(s.id)} aria-pressed={selected}>
+        <button type="button" className="id-link font-mono text-[13px] underline underline-offset-4 text-left" onClick={() => onSelect(s.id)} aria-pressed={selected}>
           <span aria-hidden="true">{shortId(s.id)}</span>
           <span className="sr-only">{s.id}</span>
         </button>
@@ -119,7 +120,7 @@ function Row({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps)
         <PaymentBadge state={s.paymentState} capacityConfirmed={s.slotsCommitted} />
         <code className="block meta mt-0.5">{s.paymentState}</code>
         <ProviderTag s={s} runtimeMode={d.providerMode} />
-        {hasCaptureConflict(s) && <span className="block meta mt-0.5 text-[var(--amber-ink)]">Provider captured. Reconcile</span>}
+        {hasCaptureConflict(s) && <span className="block meta mt-0.5 text-warn">Provider captured. Reconcile</span>}
         <ResolutionNote s={s} timeZone={d.timeZone} />
       </td>
       <td className="py-3">
@@ -132,7 +133,7 @@ function Row({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps)
 function Card({ d, s, mock, busy, working, selected, onAct, onSelect }: RowProps) {
   const attention = needsAttention(s, ATTENTION_STATES);
   return (
-    <li className={`card p-4 space-y-3 ${selected ? "bg-teal-tint" : attention ? "bg-[#fffbf2]" : ""}`}>
+    <li className={`card res-card p-4 space-y-3 ${selected ? "is-selected bg-teal-tint" : attention ? "is-attention bg-warn-soft" : ""}`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="eyebrow">Reservation</p>
@@ -218,7 +219,7 @@ function Actions({ s, mock, busy, working, onAct }: Pick<RowProps, "s" | "mock" 
         </button>
       </div>
       {working && (
-        <p className="meta" aria-live="polite">
+        <p className="meta working" aria-live="polite">
           Working…
         </p>
       )}
@@ -249,5 +250,5 @@ function ProviderTag({ s, runtimeMode }: { s: DashboardSession; runtimeMode: str
 function ResolutionNote({ s, timeZone }: { s: DashboardSession; timeZone: string }) {
   const text = resolutionText(s, timeZone);
   if (!text) return null;
-  return <span className={`block meta mt-0.5 ${s.resolutionOverdue ? "text-[var(--amber-ink)] font-semibold" : ""}`}>{text}</span>;
+  return <span className={`block meta mt-0.5 ${s.resolutionOverdue ? "text-warn font-semibold" : ""}`}>{text}</span>;
 }

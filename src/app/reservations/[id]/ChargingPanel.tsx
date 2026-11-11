@@ -25,7 +25,7 @@ export function ChargingPanel({ r, shown, busy, onSimulate }: ChargingPanelProps
   const chargingStart = r.powerW.findIndex((w) => w > 0);
 
   return (
-    <section className="card p-5 sm:p-6 space-y-5 min-w-0" aria-labelledby="sim-title">
+    <section className="card charge-panel p-5 sm:p-6 space-y-5 min-w-0" aria-labelledby="sim-title">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="sim-title" className="eyebrow text-ink">
           Charging · synthetic
@@ -35,12 +35,12 @@ export function ChargingPanel({ r, shown, busy, onSimulate }: ChargingPanelProps
 
       <div className="flex flex-wrap items-end justify-between gap-4" aria-live="polite">
         <p className="flex items-baseline gap-2 tabular">
-          <span className="text-[clamp(44px,6vw,64px)] font-semibold leading-none tracking-[-0.03em]">{(Math.floor(deliveredMilliWh / 1000) / 1000).toFixed(2)}</span>
+          <span className="charge-figure text-gradient text-[clamp(48px,6.4vw,72px)] font-semibold leading-none tracking-[-0.04em]">{(Math.floor(deliveredMilliWh / 1000) / 1000).toFixed(2)}</span>
           <span className="text-[17px] text-muted">of {formatKWh(r.targetBatteryWh)}</span>
           <span className="sr-only">delivered ({pct}%)</span>
         </p>
         {finished && (
-          <strong className={r.simulation!.outcome === "DELIVERED" ? "text-teal-ink" : "text-red"}>
+          <strong className={r.simulation!.outcome === "DELIVERED" ? "outcome-chip text-teal-ink" : "outcome-chip text-red"}>
             {r.simulation!.outcome === "DELIVERED" ? "Delivered" : r.simulation!.outageInjected ? "Failed: charger outage" : "Failed: short of target"}
           </strong>
         )}
@@ -60,7 +60,8 @@ export function ChargingPanel({ r, shown, busy, onSimulate }: ChargingPanelProps
 
       {r.simulation === null &&
         (r.canSimulate ? (
-          <button type="button" className="btn btn-primary" onClick={onSimulate} disabled={busy}>
+          <button type="button" className="btn btn-primary btn-glow" onClick={onSimulate} disabled={busy}>
+            <span aria-hidden="true" className="ico ico-bolt" />
             {busy ? "Simulating night…" : "Run the synthetic overnight charge"}
           </button>
         ) : (
@@ -75,14 +76,15 @@ function Battery({ pct }: { pct: number }) {
     <div className="flex items-center gap-3">
       <div className="flex flex-1 items-center">
         <div
-          className="relative h-11 flex-1 rounded-[10px] border-[1.5px] border-ink p-[3px]"
+          className="battery relative h-12 flex-1 rounded-[12px] border-[1.5px] border-ink p-[3px]"
           role="progressbar"
           aria-label="Energy delivered"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={pct}
         >
-          <span className="block h-full rounded-[7px] bg-teal" style={{ width: `${pct}%`, transition: "width var(--t-slow) var(--ease)" }} />
+          <span className="battery-fill block h-full rounded-[8px] bg-teal" style={{ width: `${pct}%`, transition: "width var(--t-slow) var(--ease)" }} />
+          <span aria-hidden="true" className="battery-bolt ico ico-bolt" />
         </div>
         <span className="h-4 w-[5px] rounded-r-[2px] bg-ink" aria-hidden="true" />
       </div>
@@ -108,20 +110,20 @@ function ScheduleColumns({ r, revealed }: { r: ReservationView; revealed: Energy
         Scheduled versus delivered charging power: {r.powerW.filter((w) => w > 0).length} scheduled slots, {revealed.filter((x) => x.deliveredW > 0).length} delivered so far
         {failedSlots ? `, ${failedSlots} short of schedule` : ""}. Departure {formatLocalTime(r.departMs, r.timeZone)}.
       </figcaption>
-      <div className="relative h-24" aria-hidden="true">
+      <div className="sched-cols relative h-24" aria-hidden="true">
         <div className="flex h-full items-end gap-px">
           {r.powerW.map((w, i) => {
             const rec = delivered.get(i);
             const short = rec !== undefined && rec.deliveredW < rec.commandedW;
             return (
-              <span key={i} className="relative flex-1 rounded-[1px]" style={{ height: `${(w / maxW) * 100}%`, background: short ? "var(--red)" : "var(--chart-scheduled)" }}>
-                {rec && !short && <span className="absolute inset-x-0 bottom-0 rounded-[1px] bg-teal" style={{ height: `${w > 0 ? (rec.deliveredW / w) * 100 : 0}%`, transition: "height var(--t-bar) var(--ease)" }} />}
+              <span key={i} className="sched-col relative flex-1 rounded-t-[2px]" style={{ height: `${(w / maxW) * 100}%`, background: short ? "var(--red)" : "var(--chart-scheduled)", "--i": i } as React.CSSProperties}>
+                {rec && !short && <span className="sched-fill absolute inset-x-0 bottom-0 rounded-t-[2px] bg-teal" style={{ height: `${w > 0 ? (rec.deliveredW / w) * 100 : 0}%`, transition: "height var(--t-bar) var(--ease)" }} />}
               </span>
             );
           })}
         </div>
-        <span className="absolute -inset-y-1 border-l border-dashed border-ink" style={{ left: pctOf(leaveSlot, n) }}>
-          <span className="absolute -top-4 left-1 whitespace-nowrap font-mono text-[10px] tracking-[0.06em]">LEAVE {formatLocalTime(r.departMs, r.timeZone)}</span>
+        <span className="power-depart absolute -inset-y-1 border-l border-dashed border-ink" style={{ left: pctOf(leaveSlot, n) }}>
+          <span className="absolute -top-4 left-1 whitespace-nowrap font-mono text-[10px] tracking-[0.06em] text-warn">LEAVE {formatLocalTime(r.departMs, r.timeZone)}</span>
         </span>
       </div>
       <AxisTicks axis={axis} />

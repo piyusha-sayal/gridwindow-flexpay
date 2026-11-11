@@ -93,7 +93,7 @@ function deliveredLine(r: ReservationView): string {
     : `${kwh}, charging failed (simulated)`;
 }
 
-const SETTLEMENT_TONE = { success: "text-teal-ink", neutral: "text-ink", warn: "text-[var(--amber-ink)]", danger: "text-red" } as const;
+const SETTLEMENT_TONE = { success: "text-teal-ink", neutral: "text-ink", warn: "text-warn", danger: "text-red" } as const;
 
 /** Joins approved terms, synthetic delivery evidence and provider-confirmed payment state. */
 export function FlexReceipt({ r }: { r: ReservationView }) {
@@ -105,12 +105,12 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
   return (
     <section
       ref={ref}
-      className="print-receipt mx-auto w-full max-w-[780px] overflow-hidden rounded-[4px] border border-line bg-surface shadow-[var(--shadow-receipt)]"
+      className="print-receipt receipt-ticket mx-auto w-full max-w-[780px] overflow-hidden"
       aria-labelledby="receipt-title"
     >
       <style>{printPageStyle(receiptNumber(r.id))}</style>
-      <div className="h-1.5 bg-ink" aria-hidden="true" />
-      <div className="space-y-7 p-5 sm:p-9">
+      <div className="receipt-strip" aria-hidden="true" />
+      <div className="receipt-body space-y-7 p-5 sm:p-9">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div className="space-y-2">
             <p className="flex items-center gap-2.5 font-mono text-[11px] tracking-[0.12em] text-muted">
@@ -122,7 +122,7 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
               </span>
               GRIDWINDOW FLEXPAY
             </p>
-            <h2 id="receipt-title" className="text-[32px] font-semibold tracking-[-0.02em] leading-tight">
+            <h2 id="receipt-title" className="receipt-title text-[clamp(32px,5vw,44px)] font-semibold leading-none">
               FlexReceipt
             </h2>
             <div className="flex flex-wrap gap-2 badge-wrap">
@@ -132,6 +132,9 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
           </div>
           <div className="flex flex-col items-start gap-3 sm:items-end">
             <button type="button" className="btn btn-sm no-print" onClick={() => window.print()}>
+              <svg aria-hidden="true" focusable="false" className="icon" viewBox="0 0 24 24">
+                <path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v7H7z" />
+              </svg>
               Print receipt
             </button>
             <dl className="font-mono text-[11px] tracking-[0.06em] tabular space-y-0.5 sm:text-right">
@@ -147,12 +150,14 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
           </div>
         </div>
 
-        <p className={`text-[15px] font-semibold ${SETTLEMENT_TONE[status.tone]}`}>{status.text}</p>
+        <div aria-hidden="true" className="receipt-perf" />
+
+        <p className={`receipt-status text-[15px] font-semibold ${SETTLEMENT_TONE[status.tone]}`}>{status.text}</p>
 
         <dl className="tabular" aria-label="Receipt summary">
           <div className="receipt-total flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 pb-3">
             <dt className="text-[15px] font-semibold">{total.label}</dt>
-            <dd className="text-right text-[clamp(28px,4.4vw,48px)] font-semibold leading-tight tracking-[-0.02em] [overflow-wrap:anywhere]">{total.value}</dd>
+            <dd className="receipt-amount num-rise text-right text-[clamp(28px,4.4vw,48px)] font-semibold leading-tight [overflow-wrap:anywhere]">{total.value}</dd>
           </div>
           <Row k="Energy delivered" v={deliveredLine(r)} />
           <Row k="Charging schedule" v={`Port ${r.portLabel} · ${formatLocalTime(r.plugInMs, r.timeZone)}–${formatLocalTime(r.departMs, r.timeZone)}`} />
@@ -224,7 +229,7 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
             </Section>
           )}
           <Section title={`Event trail (${r.events.length})`}>
-            <ol className="space-y-0.5 font-mono text-[11px] text-muted tabular [overflow-wrap:anywhere]">
+            <ol className="receipt-trail space-y-0.5 font-mono text-[11px] text-muted tabular [overflow-wrap:anywhere]">
               {r.events.map((e, i) => (
                 <li key={i}>
                   {new Date(e.occurredAt).toISOString()} · {e.source} · {e.type}
@@ -234,7 +239,7 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
           </Section>
         </div>
 
-        <div className="space-y-1 text-[13px] text-muted">
+        <div className="receipt-note space-y-1 text-[13px] text-muted">
           <p className="font-semibold text-text-2">Limitations</p>
           <p>
             Charging and building load are a synthetic simulation; no vehicle or charger was involved. Tariffs, fees and costs are assumptions, so savings are modeled, not
@@ -248,7 +253,7 @@ export function FlexReceipt({ r }: { r: ReservationView }) {
 
 function Row({ k, v, mono = false }: { k: string; v: string; mono?: boolean }) {
   return (
-    <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5 border-b border-line-2 py-2.5 text-[14px] last:border-b-0">
+    <div className="receipt-row flex flex-wrap justify-between gap-x-4 gap-y-0.5 border-b border-line-2 py-2.5 text-[14px] last:border-b-0">
       <dt className="text-muted">{k}</dt>
       <dd className={`min-w-0 text-right [overflow-wrap:anywhere] ${mono ? "font-mono text-[12px]" : ""}`}>{v}</dd>
     </div>
@@ -258,7 +263,7 @@ function Row({ k, v, mono = false }: { k: string; v: string; mono?: boolean }) {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <details className="receipt-section group border-b border-line">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-3.5 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
+      <summary className="receipt-summary flex cursor-pointer list-none items-center justify-between gap-3 py-3.5 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
         <span>{title}</span>
         <span aria-hidden="true" className="font-mono text-[18px] font-normal text-muted group-open:hidden">
           +

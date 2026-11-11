@@ -29,15 +29,15 @@ function isCurrent(item: NavItem, pathname: string): boolean {
 
 function Logo() {
   return (
-    <span className="flex items-center gap-2.5">
+    <span className="logo">
       <span aria-hidden="true" className="logo-grid">
         <span />
         <span />
         <span />
         <span />
       </span>
-      <span className="text-[17px] font-semibold tracking-[-0.02em] text-ink">GridWindow</span>
-      <span className="hidden min-[520px]:inline font-mono text-[10px] tracking-[0.08em] text-muted border border-[#d9d5cb] rounded px-1.5 py-px">FLEXPAY</span>
+      <span className="logo-word">GridWindow</span>
+      <span className="logo-tag hidden min-[520px]:inline">FLEXPAY</span>
     </span>
   );
 }
@@ -52,17 +52,18 @@ export function SiteNav() {
   return (
     <>
       <nav aria-label="Main" className="page-wrap h-full flex items-center gap-3 min-[900px]:gap-6">
-        <Link href="/" aria-label="GridWindow FlexPay home" className="no-underline">
+        <Link href="/" aria-label="GridWindow FlexPay home" className="logo-link no-underline">
           <Logo />
         </Link>
-        <div className="nav-desktop ml-auto items-center gap-1">
+        <div className="nav-desktop nav-rail ml-auto items-center gap-1">
           {PRIMARY.map((l) => (
             <Link key={l.href} href={l.href} className="nav-link" aria-current={isCurrent(l, pathname) ? "page" : undefined}>
               {l.label}
             </Link>
           ))}
-          <span aria-hidden="true" className="mx-2 h-4 w-px bg-line-strong" />
+          <span aria-hidden="true" className="nav-sep" />
           <Link href={OPERATOR.href} className="nav-link nav-link-quiet" aria-current={isCurrent(OPERATOR, pathname) ? "page" : undefined}>
+            <span aria-hidden="true" className="live-dot" />
             {OPERATOR.label}
           </Link>
         </div>

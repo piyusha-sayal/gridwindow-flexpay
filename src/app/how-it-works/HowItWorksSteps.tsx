@@ -62,7 +62,7 @@ export function HowItWorksSteps() {
 
   return (
     <div className="space-y-6">
-      <div role="tablist" aria-label="How Smart Charge works" className="grid gap-3 sm:grid-cols-4">
+      <div role="tablist" aria-label="How Smart Charge works" className="hiw-tabs grid gap-3 sm:grid-cols-4" style={{ "--sel": selected } as React.CSSProperties}>
         {STEPS.map((s, i) => {
           const active = i === selected;
           return (
@@ -79,9 +79,9 @@ export function HowItWorksSteps() {
                 tabIndex={active ? 0 : -1}
                 onClick={() => setSelected(i)}
                 onKeyDown={(e) => onKeyDown(e, i)}
-                className={`card w-full h-full p-4 text-left flex gap-3 items-start cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 ${active ? "border-teal" : ""}`}
+                className={`card hiw-tab w-full h-full p-4 text-left flex gap-3 items-start cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 ${active ? "is-active border-teal" : ""}`}
               >
-                <span aria-hidden="true" className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${active ? "bg-teal-ink text-surface" : "bg-surface-2 text-text-2"}`}>
+                <span aria-hidden="true" className={`hiw-num flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${active ? "bg-teal-ink text-surface" : "bg-surface-2 text-text-2"}`}>
                   {i + 1}
                 </span>
                 <span className="font-semibold leading-snug">
@@ -93,13 +93,15 @@ export function HowItWorksSteps() {
           );
         })}
       </div>
-      <div role="tabpanel" id={`${baseId}-panel`} aria-labelledby={`${baseId}-tab-${selected}`} tabIndex={0} className="card p-6 space-y-3 focus-visible:outline-2 focus-visible:outline-offset-2">
-        <h2 className="text-[22px] font-semibold tracking-[-0.01em]">{step.title}</h2>
+      <div role="tabpanel" id={`${baseId}-panel`} aria-labelledby={`${baseId}-tab-${selected}`} tabIndex={0} className="card hiw-panel p-6 focus-visible:outline-2 focus-visible:outline-offset-2">
+        <div key={selected} className="hiw-body space-y-3">
+        <h2 className="text-[clamp(22px,2.6vw,28px)] font-semibold">{step.title}</h2>
         {step.body.map((line) => (
           <p key={line} className="text-text-2">
             {line}
           </p>
         ))}
+        </div>
       </div>
     </div>
   );

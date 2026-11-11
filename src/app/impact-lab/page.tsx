@@ -31,10 +31,10 @@ export default async function ImpactLabPage({ searchParams }: { searchParams: Pr
   }
 
   return (
-    <div className="space-y-12">
+    <div className="stagger space-y-12">
       <header className="space-y-3 max-w-[820px]">
-        <h1 className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(32px,4.6vw,52px)]">Impact Lab</h1>
-        <p className="text-[17px] text-text-2">
+        <h1 className="page-title font-semibold leading-[1.02] text-[clamp(36px,5.4vw,64px)]">Impact Lab</h1>
+        <p className="lede">
           Explore one modeled night at the demo station. Every number is synthetic and modeled, not measured.
         </p>
       </header>
@@ -49,7 +49,7 @@ export default async function ImpactLabPage({ searchParams }: { searchParams: Pr
 
       <section className="space-y-10" aria-labelledby="study-title">
         <div className="space-y-3 max-w-[820px]">
-          <h2 id="study-title" className="text-[22px] font-semibold tracking-[-0.01em]">
+          <h2 id="study-title" className="section-title text-[clamp(22px,2.6vw,28px)] font-semibold">
             Precomputed study
           </h2>
           {s ? (
@@ -57,7 +57,7 @@ export default async function ImpactLabPage({ searchParams }: { searchParams: Pr
               <p className="meta break-words">
                 {s.provenance} · generated {s.generatedAt} · seeds {s.seedRange}
               </p>
-              <p className="text-[17px] text-text-2">
+              <p className="lede">
                 {s.scenarioCount.toLocaleString("en-US")}-scenario synthetic benchmark: {s.scenarioCount.toLocaleString("en-US")} seeded nights and{" "}
                 {s.requestCount.toLocaleString("en-US")} charging requests. Each seeded night replays the same requests under every scheduling policy, so differences come from the
                 policy alone. This is a simulation, not measured field data.
@@ -81,14 +81,14 @@ function BenchmarkStudy({ s }: { s: BenchmarkSummary }) {
       <OfferEconomics s={s} />
 
       <section className="space-y-4" aria-labelledby="full">
-        <h2 id="full" className="text-[22px] font-semibold tracking-[-0.01em]">
+        <h2 id="full" className="section-title text-[clamp(22px,2.6vw,28px)] font-semibold">
           Full results
         </h2>
-        <div className="card p-5 space-y-3">
+        <div className="card ops-panel p-5 space-y-3">
           <h3 id="t1" className="text-[16px] font-semibold">
             Policy comparison (identical requests, sequential arrival)
           </h3>
-          <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-label="Policy comparison table (scrolls horizontally)">
+          <div className="table-wrap relative overflow-x-auto" tabIndex={0} role="region" aria-label="Policy comparison table (scrolls horizontally)">
             <table className="data-table text-[14px]">
               <caption className="sr-only">Per-policy results</caption>
               <thead className="text-left text-muted">
@@ -104,7 +104,7 @@ function BenchmarkStudy({ s }: { s: BenchmarkSummary }) {
               </thead>
               <tbody>
                 {s.policies.map((p) => (
-                  <tr key={p.policy} className={`border-t border-border ${p.policy === "optimized" ? "bg-teal-tint" : ""}`}>
+                  <tr key={p.policy} className={`border-t border-border ${p.policy === "optimized" ? "row-key bg-teal-tint" : ""}`}>
                     <th scope="row" className="py-2 pr-3 text-left">
                       {p.policy}
                     </th>
@@ -128,14 +128,14 @@ function BenchmarkStudy({ s }: { s: BenchmarkSummary }) {
           </div>
         </div>
 
-        <div className="card p-5 space-y-3">
+        <div className="card ops-panel p-5 space-y-3">
           <h3 id="t2" className="text-[16px] font-semibold">
             Optimized vs. each baseline (same served request, paired)
           </h3>
           <p className="text-[14px] text-muted">
             A request is paired only when both policies served it. Every request is accounted for: paired + excluded = {s.requestCount}.
           </p>
-          <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-label="Pairwise comparison table (scrolls horizontally)">
+          <div className="table-wrap relative overflow-x-auto" tabIndex={0} role="region" aria-label="Pairwise comparison table (scrolls horizontally)">
             <table className="data-table text-[14px]">
               <caption className="sr-only">Pairwise comparison with denominators</caption>
               <thead className="text-left text-muted">
@@ -178,7 +178,7 @@ function BenchmarkStudy({ s }: { s: BenchmarkSummary }) {
       </section>
 
       <section className="space-y-3 max-w-[820px]" aria-labelledby="m">
-        <h2 id="m" className="text-[22px] font-semibold tracking-[-0.01em]">
+        <h2 id="m" className="section-title text-[clamp(22px,2.6vw,28px)] font-semibold">
           Methodology
         </h2>
         <ol className="list-decimal space-y-2 pl-6 text-[14px] text-text-2">
@@ -200,20 +200,20 @@ function OfferEconomics({ s }: { s: BenchmarkSummary }) {
     { k: "Operator contribution improvement", v: usd(o.meanOperatorImprovementCents), def: "Net, after the driver discount, assumed payment fee and operating cost." },
   ];
   return (
-    <section className="card card-navy p-5 sm:p-7 space-y-6" aria-labelledby="t3">
+    <section className="card card-navy reveal p-5 sm:p-7 space-y-6" aria-labelledby="t3">
       <div className="space-y-1">
-        <h2 id="t3" className="text-[22px] font-semibold tracking-[-0.01em]">
+        <h2 id="t3" className="section-title text-[clamp(22px,2.6vw,28px)] font-semibold">
           Offer economics
         </h2>
         <p className="text-[14px] text-on-navy-body">
           Means per published offer ({o.offerCount ?? "n/a"} offers). Three separate measures, not parts of one total.
         </p>
       </div>
-      <dl className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))]">
+      <dl className="stagger grid gap-6 grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))]">
         {measures.map((m) => (
           <div key={m.k} className="space-y-1 border-t border-white/20 pt-3">
             <dt className="eyebrow">{m.k}</dt>
-            <dd className="text-[36px] font-semibold leading-none tracking-[-0.02em] tabular">{m.v}</dd>
+            <dd className="kpi-figure num-rise text-[clamp(36px,4.4vw,48px)] font-semibold leading-none tracking-[-0.03em] tabular">{m.v}</dd>
             <dd className="text-[13px] text-on-navy-body">{m.def}</dd>
           </div>
         ))}

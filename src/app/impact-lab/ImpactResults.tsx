@@ -41,13 +41,13 @@ export function ImpactResults({ comparison: c, ports, timeZone }: { comparison: 
   const when = (ms: number) => formatLocalTime(ms, timeZone);
 
   return (
-    <div className="space-y-6">
-      <section className="card p-5 sm:p-6 space-y-3" aria-labelledby="results-title">
+    <div className="stagger space-y-6">
+      <section className="card card-accent p-5 sm:p-6 space-y-3" aria-labelledby="results-title">
         <h3 id="results-title" className="text-[18px] font-semibold">
           Results for Port {port?.label ?? c.scenario.portId}, {c.scenario.kWh} kWh
         </h3>
-        <p className="text-[15px]">{recommendationText(c, c.recommendation)}</p>
-        <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-label="Comparison table (scrolls horizontally)">
+        <p className="rec-line text-[15px]">{recommendationText(c, c.recommendation)}</p>
+        <div className="table-wrap relative overflow-x-auto" tabIndex={0} role="region" aria-label="Comparison table (scrolls horizontally)">
           <table className="data-table text-[14px]">
             <caption className="sr-only">Charge Now and each offer, with modeled price, saving, peak power, duration, completion and feasibility</caption>
             <thead className="text-left text-muted">
@@ -83,7 +83,7 @@ export function ImpactResults({ comparison: c, ports, timeZone }: { comparison: 
       </section>
 
       {c.rejected.length > 0 && (
-        <section className="card p-5 space-y-2" aria-labelledby="rejected-title">
+        <section className="card offer-rejected p-5 space-y-2" aria-labelledby="rejected-title">
           <h3 id="rejected-title" className="text-[16px] font-semibold">
             Variants not offered
           </h3>
@@ -97,7 +97,7 @@ export function ImpactResults({ comparison: c, ports, timeZone }: { comparison: 
         </section>
       )}
 
-      <section className="card p-5 space-y-4" aria-labelledby="chart-title">
+      <section className="card ops-panel p-5 space-y-4" aria-labelledby="chart-title">
         <h3 id="chart-title" className="text-[16px] font-semibold">
           Charging power over time
         </h3>
@@ -139,10 +139,10 @@ export function ImpactResults({ comparison: c, ports, timeZone }: { comparison: 
 function OfferRow({ offer: o, when, highlighted }: { offer: OfferView; when: (ms: number) => string; highlighted: boolean }) {
   const p: ChargeProfile = o.profile;
   return (
-    <tr className={`border-t border-border ${highlighted ? "bg-teal-tint" : ""}`}>
+    <tr className={`border-t border-border ${highlighted ? "row-key bg-teal-tint" : ""}`}>
       <th scope="row" className="py-2 pr-3 text-left">
         {o.label}
-        {highlighted && <span className="block text-xs font-semibold text-teal-ink">Recommended</span>}
+        {highlighted && <span className="badge badge-rec no-dot tone-success">Recommended</span>}
       </th>
       <td className="pr-3">{formatUsd(o.priceCents)}</td>
       <td className="pr-3">{formatUsd(o.savingCents)}</td>
@@ -161,7 +161,7 @@ function EvidenceBlock({ c, port }: { c: ImpactComparison; port: PortOption | un
       <h3 id="evidence-title" className="text-[18px] font-semibold text-ink">
         Evidence and limitations
       </h3>
-      <dl className="space-y-2">
+      <dl className="evidence-list space-y-3">
         <div>
           <dt className="font-semibold text-ink">Inputs</dt>
           <dd>

@@ -83,7 +83,7 @@ export function RecoveryConsent({ r, onChanged }: { r: ReservationView; onChange
   }
 
   return (
-    <section className="card p-5 sm:p-6 space-y-5" aria-labelledby="consent-title">
+    <section className="card card-amber pulse-ring p-5 sm:p-6 space-y-5" aria-labelledby="consent-title">
       <div className="flex flex-wrap items-center gap-2">
         <h2 id="consent-title" className="text-[22px] font-semibold tracking-[-0.01em]">
           Charging change proposed
@@ -95,7 +95,7 @@ export function RecoveryConsent({ r, onChanged }: { r: ReservationView; onChange
       </p>
       {error && <Alert tone="danger">{error}</Alert>}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="stagger grid gap-4 sm:grid-cols-2">
         <OriginalPromise r={r} />
         {pending.map(({ runId, run }) => (
           <ProposalCard key={runId} r={r} run={run} busy={busy === runId} onDecide={(d) => void decide(runId, d)} />
@@ -107,22 +107,22 @@ export function RecoveryConsent({ r, onChanged }: { r: ReservationView; onChange
 
 function OriginalPromise({ r }: { r: ReservationView }) {
   return (
-    <div className="rounded-[var(--r-card-sm)] border border-line p-4 space-y-2">
+    <div className="promise-card rounded-[var(--r-card-sm)] border border-line p-4 space-y-2">
       <p className="eyebrow">Your original commitment</p>
       <dl className="text-[14px] space-y-1">
-        <div className="flex justify-between gap-3">
+        <div className="plan-row flex justify-between gap-3">
           <dt className="text-muted">Departure</dt>
           <dd>{formatLocalTime(r.departMs, r.timeZone)}</dd>
         </div>
-        <div className="flex justify-between gap-3">
+        <div className="plan-row flex justify-between gap-3">
           <dt className="text-muted">Finish charging</dt>
           <dd>{fmtTime(finishMs(r.gridStartMs, r.powerW), r)}</dd>
         </div>
-        <div className="flex justify-between gap-3">
+        <div className="plan-row flex justify-between gap-3">
           <dt className="text-muted">Planned energy (forecast)</dt>
           <dd>{formatKWh(planWh(r.powerW))}</dd>
         </div>
-        <div className="flex justify-between gap-3">
+        <div className="plan-row flex justify-between gap-3">
           <dt className="text-muted">Price</dt>
           <dd>{formatUsd(r.economics.priceCents)}</dd>
         </div>
@@ -137,7 +137,7 @@ function ProposalCard({ r, run, busy, onDecide }: { r: ReservationView; run: Rec
   const expired = run.status === "EXPIRED";
   const proposedFinish = proposal ? finishMs(r.gridStartMs, proposal.powerW) : null;
   return (
-    <div className="rounded-[var(--r-card-sm)] border-2 border-dashed border-ink p-4 space-y-2" aria-labelledby={`proposal-${run.runId}`}>
+    <div className="proposal-card rounded-[var(--r-card-sm)] border-2 border-dashed border-ink p-4 space-y-2" aria-labelledby={`proposal-${run.runId}`}>
       <p id={`proposal-${run.runId}`} className="eyebrow">
         Proposed change
       </p>
@@ -145,23 +145,23 @@ function ProposalCard({ r, run, busy, onDecide }: { r: ReservationView; run: Rec
         <p className="text-[14px]">The proposal details are not available. Refresh to see the current status.</p>
       ) : (
         <dl className="text-[14px] space-y-1">
-          <div className="flex justify-between gap-3">
+          <div className="plan-row flex justify-between gap-3">
             <dt className="text-muted">Finish charging</dt>
             <dd>{fmtTime(proposedFinish, r)}</dd>
           </div>
-          <div className="flex justify-between gap-3">
+          <div className="plan-row flex justify-between gap-3">
             <dt className="text-muted">Planned energy (forecast)</dt>
             <dd>{formatKWh(planWh(proposal.powerW))}</dd>
           </div>
-          <div className="flex justify-between gap-3">
+          <div className="plan-row flex justify-between gap-3">
             <dt className="text-muted">Price</dt>
             <dd>{formatUsd(proposal.priceCents)} (unchanged)</dd>
           </div>
-          <div className="flex justify-between gap-3">
+          <div className="plan-row flex justify-between gap-3">
             <dt className="text-muted">Departure</dt>
             <dd>{formatLocalTime(r.departMs, r.timeZone)} (unchanged)</dd>
           </div>
-          <div className="flex justify-between gap-3">
+          <div className="plan-row flex justify-between gap-3">
             <dt className="text-muted">Expires</dt>
             <dd>{run.expiresAt ? formatLocalTime(new Date(run.expiresAt).getTime(), r.timeZone) : "n/a"}</dd>
           </div>

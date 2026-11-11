@@ -16,11 +16,11 @@ export default async function RewardsPage() {
   const providerNote = deps.gateway.mode === "PAYPAL_SANDBOX" ? "Authorizations use PayPal Sandbox." : "Payments are simulated (MOCK, not PayPal).";
 
   return (
-    <div className="space-y-8">
+    <div className="stagger space-y-8">
       <header className="space-y-3 max-w-[820px]">
         <p className="eyebrow">This browser session only</p>
-        <h1 className="font-semibold tracking-[-0.03em] leading-[1.05] text-[clamp(32px,4.6vw,52px)]">Rewards &amp; Payments</h1>
-        <p className="text-[17px] text-text-2">
+        <h1 className="page-title font-semibold leading-[1.02] text-[clamp(36px,5.4vw,64px)]">Rewards &amp; Payments</h1>
+        <p className="lede">
           Only charging commitments made from this browser appear here. Savings are modeled from synthetic tariffs. {providerNote}
         </p>
       </header>
@@ -28,9 +28,12 @@ export default async function RewardsPage() {
       <SummaryCards summary={summary} />
 
       {reservations.length === 0 ? (
-        <section aria-labelledby="empty" className="card p-6 space-y-4 text-center">
+        <section aria-labelledby="empty" className="card empty-card p-6 space-y-4 text-center">
+          <span aria-hidden="true" className="icon-tile mx-auto">
+            <span className="ico ico-wallet" />
+          </span>
           <h2 id="empty" className="text-[18px] font-semibold">No charging commitments yet.</h2>
-          <Link href="/drive" className="btn btn-primary no-underline">Plan My Charge</Link>
+          <Link href="/drive" className="btn btn-primary btn-glow no-underline">Plan My Charge</Link>
         </section>
       ) : (
         <TransactionList reservations={reservations} />

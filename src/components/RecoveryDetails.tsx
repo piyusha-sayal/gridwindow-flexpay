@@ -35,8 +35,8 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
     <div className="space-y-5 text-[14px]">
       <p className="text-muted">{recovery.evidenceStatement}</p>
 
-      <div className="space-y-2">
-        <h3 className="font-semibold">Original commitment</h3>
+      <div className="recovery-block space-y-2">
+        <h3 className="recovery-title font-semibold">Original commitment</h3>
         <p>
           Parked {formatLocalTime(recovery.originalSchedule.plugInMs, timeZone)} to departure {formatLocalTime(recovery.originalSchedule.departMs, timeZone)} ·{" "}
           {formatKWh(recovery.originalSchedule.targetBatteryWh)} target · {recovery.originalSchedule.chargingSlots} charging slots · peak{" "}
@@ -44,8 +44,8 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
         </p>
       </div>
 
-      <div className="space-y-2">
-        <h3 className="font-semibold">Energy against the agreed target</h3>
+      <div className="recovery-block space-y-2">
+        <h3 className="recovery-title font-semibold">Energy against the agreed target</h3>
         <p>
           Target {formatKWh(recovery.energy.targetBatteryWh)} to battery · planned (forecast) {formatKWh(recovery.energy.forecastBatteryWh)}
           <span className="block meta">{FORECAST_NOTE}</span>
@@ -53,8 +53,8 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
         <EnergyOutcome energy={recovery.energy} />
       </div>
 
-      <div className="space-y-2">
-        <h3 className="font-semibold">Disturbances</h3>
+      <div className="recovery-block space-y-2">
+        <h3 className="recovery-title font-semibold">Disturbances</h3>
         <ul className="space-y-1">
           {recovery.disturbances.map((d) => (
             <li key={d.eventId} className="flex flex-wrap items-center gap-2">
@@ -73,8 +73,8 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
       </div>
 
       {recovery.runs.map((run) => (
-        <div key={run.runId} className="space-y-2">
-          <h3 className="font-semibold">Recovery run · {runStatusLabel(run.status, run.consent)}</h3>
+        <div key={run.runId} className="recovery-block recovery-run space-y-2">
+          <h3 className="recovery-title font-semibold">Recovery run · {runStatusLabel(run.status, run.consent)}</h3>
           <p className="meta">
             Decided by: {run.provenance.decisionLabel}. {run.provenance.reason}
           </p>
@@ -95,9 +95,9 @@ export function RecoveryDetails({ recovery, timeZone }: { recovery: RecoveryRece
         </div>
       ))}
 
-      <div className="space-y-2">
-        <h3 className="font-semibold">Schedule versions</h3>
-        <ul className="space-y-2">
+      <div className="recovery-block space-y-2">
+        <h3 className="recovery-title font-semibold">Schedule versions</h3>
+        <ul className="timeline space-y-3">
           {recovery.versions.map((v) => (
             <li key={v.version} className="tabular">
               v{v.version} · {v.source.toLowerCase()} · {v.reason}

@@ -20,7 +20,7 @@ function ScenarioChecklist({ steps }: { steps: ScenarioStep[] }) {
       <h3 id="scenario-c-title" className="text-[16px] font-semibold">Scenario C: recovery steps</h3>
       <ol className="space-y-2 text-[14px]">
         {steps.map((step, i) => (
-          <li key={step.id} className="rounded-[var(--r-card-sm)] border border-line-2 p-2">
+          <li key={step.id} className={`step-row is-${step.status} rounded-[var(--r-card-sm)] border border-line-2 p-2`}>
             <span className="font-semibold">
               {i + 1}. {step.title}
             </span>{" "}
@@ -70,13 +70,13 @@ export function RecoveryRunDetail({ eventId, reservationId, attribution }: { eve
   }, [eventId, reservationId]);
 
   if (error) return <Alert tone="danger">{error}</Alert>;
-  if (!data) return <p aria-live="polite" className="text-muted">Loading recovery run…</p>;
+  if (!data) return <p aria-live="polite" className="working text-muted">Loading recovery run…</p>;
   const steps = buildScenarioSteps({ eventId, eventProvenance: data.eventProvenance, run: data.run, paymentState: data.payment, providerMode: data.providerMode });
   const checklist = <ScenarioChecklist steps={steps} />;
   const attributionLine = <p className="text-[14px] font-semibold">{attributionStatusText(attribution)}</p>;
   if (!data.run) {
     return (
-      <div className="space-y-5 border-t border-line pt-5">
+      <div className="run-detail space-y-5 border-t border-line pt-5">
         {attributionLine}
         {checklist}
       </div>
@@ -86,7 +86,7 @@ export function RecoveryRunDetail({ eventId, reservationId, attribution }: { eve
   const run = data.run;
   const provenance = runProvenance(run);
   return (
-    <div className="space-y-5 border-t border-line pt-5" aria-labelledby={`run-${run.runId}`}>
+    <div className="run-detail space-y-5 border-t border-line pt-5" aria-labelledby={`run-${run.runId}`}>
       {attributionLine}
       {checklist}
       <div className="flex flex-wrap items-center gap-2">
@@ -102,7 +102,7 @@ export function RecoveryRunDetail({ eventId, reservationId, attribution }: { eve
       <p className="text-[14px]">{provenance.reason}</p>
 
       {run.explanation && (
-        <div className="space-y-1">
+        <div className="ai-answer space-y-1">
           <p className="meta">Reasoning summary · {run.explanation.source === "MODEL" ? "model text, checked against backend numbers" : "deterministic text"}</p>
           <p className="text-[15px]">{run.explanation.text}</p>
         </div>
@@ -111,7 +111,7 @@ export function RecoveryRunDetail({ eventId, reservationId, attribution }: { eve
       {run.outcome && <p className="text-[14px]">{run.outcome.reason}</p>}
 
       {run.proposal && (
-        <dl className="grid gap-2 text-[14px] sm:grid-cols-2">
+        <dl className="proposal-card grid gap-2 rounded-[var(--r-card-sm)] border border-dashed p-3 text-[14px] sm:grid-cols-2">
           <div>
             <dt className="meta">Proposed preference</dt>
             <dd>{run.proposal.preference}</dd>
@@ -151,11 +151,11 @@ export function RecoveryRunDetail({ eventId, reservationId, attribution }: { eve
         </div>
       )}
 
-      <details className="text-[14px]">
+      <details className="disclosure text-[14px]">
         <summary className="cursor-pointer font-semibold">Tool trace ({run.trace.length} entries)</summary>
         <ol className="mt-2 space-y-2">
           {run.trace.map((t) => (
-            <li key={t.seq} className="rounded-[var(--r-card-sm)] border border-line-2 p-2">
+            <li key={t.seq} className="step-row trace-row rounded-[var(--r-card-sm)] border border-line-2 p-2">
               <span className="font-mono text-[12px]">
                 #{t.seq} {t.tool} · {t.actor} · {t.outcome}
               </span>

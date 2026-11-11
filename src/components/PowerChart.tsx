@@ -66,9 +66,9 @@ export function PowerChart({
   const ticks = Array.from({ length: slots }, (_, i) => i).filter((i) => i % 8 === 0);
 
   return (
-    <figure className="space-y-1">
-      <div className="relative" style={{ height: boxH }}>
-        <svg viewBox={`0 0 ${W} ${boxH}`} preserveAspectRatio="none" className="absolute inset-0 w-full h-full" role="img" aria-label={summary}>
+    <figure className="power-chart space-y-1.5">
+      <div className="pc-plot relative" style={{ height: boxH }}>
+        <svg viewBox={`0 0 ${W} ${boxH}`} preserveAspectRatio="none" className="pc-svg absolute inset-0 w-full h-full" role="img" aria-label={summary}>
           {shade &&
             shade.map((v, i) => {
               const lo = Math.min(...shade);
@@ -83,34 +83,34 @@ export function PowerChart({
             let acc = 0;
             const width = Math.max(barW - 0.5, 0.5);
             return (
-              <g key={i}>
+              <g key={i} className="pc-slot" style={{ "--i": i } as React.CSSProperties}>
                 {series.map((s) => {
                   const v = s.values[i] ?? 0;
                   if (v <= 0) return null;
                   const top = y(acc + v);
-                  const rect = <rect key={s.label} x={i * barW} y={top} width={width} height={y(acc) - top} fill={s.color} fillOpacity={stacked ? 1 : 0.6} />;
+                  const rect = <rect key={s.label} className="pc-bar" x={i * barW} y={top} width={width} height={y(acc) - top} fill={s.color} fillOpacity={stacked ? 1 : 0.6} />;
                   if (stacked) acc += v;
                   return rect;
                 })}
-                {stacked && overW !== undefined && acc > overW && <rect x={i * barW} y={y(acc)} width={width} height={y(overW) - y(acc)} fill="var(--red)" />}
+                {stacked && overW !== undefined && acc > overW && <rect className="pc-bar pc-over" x={i * barW} y={y(acc)} width={width} height={y(overW) - y(acc)} fill="var(--red)" />}
               </g>
             );
           })}
-          {thresholdW !== undefined && <line x1={0} x2={W} y1={y(thresholdW)} y2={y(thresholdW)} stroke="var(--warn)" strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />}
-          {capW !== undefined && <line x1={0} x2={W} y1={y(capW)} y2={y(capW)} stroke="var(--cap)" strokeWidth="2" vectorEffect="non-scaling-stroke" />}
+          {thresholdW !== undefined && <line className="pc-threshold" x1={0} x2={W} y1={y(thresholdW)} y2={y(thresholdW)} stroke="var(--warn)" strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />}
+          {capW !== undefined && <line className="pc-cap" x1={0} x2={W} y1={y(capW)} y2={y(capW)} stroke="var(--cap)" strokeWidth="2" vectorEffect="non-scaling-stroke" />}
         </svg>
         {gridLines.slice(1).map((w) => (
-          <span key={w} aria-hidden className="absolute left-0 -translate-y-1/2 text-[11px] leading-none text-muted bg-surface/80 px-0.5 rounded tabular" style={{ top: y(w) }}>
+          <span key={w} aria-hidden className="pc-label absolute left-0 -translate-y-1/2 text-[11px] leading-none text-muted bg-surface/80 px-0.5 rounded tabular" style={{ top: y(w) }}>
             {(w / 1000).toFixed(0)} kW
           </span>
         ))}
         {capW !== undefined && (
-          <span aria-hidden className="absolute right-0 -translate-y-full pb-0.5 font-mono text-[10px] tracking-[0.06em] text-ink bg-surface/80 px-0.5" style={{ top: y(capW) }}>
+          <span aria-hidden className="pc-label absolute right-0 -translate-y-full pb-0.5 font-mono text-[10px] tracking-[0.06em] text-ink bg-surface/80 px-0.5" style={{ top: y(capW) }}>
             {capLabel.toUpperCase()}
           </span>
         )}
         {thresholdW !== undefined && (
-          <span aria-hidden className="absolute right-0 -translate-y-full pb-0.5 font-mono text-[10px] tracking-[0.06em] text-[var(--amber-ink)] bg-surface/80 px-0.5" style={{ top: y(thresholdW) }}>
+          <span aria-hidden className="pc-label absolute right-0 -translate-y-full pb-0.5 font-mono text-[10px] tracking-[0.06em] text-warn bg-surface/80 px-0.5" style={{ top: y(thresholdW) }}>
             {thresholdLabel.toUpperCase()}
           </span>
         )}
@@ -122,7 +122,7 @@ export function PowerChart({
           </span>
         ))}
       </div>
-      <figcaption className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+      <figcaption className="pc-legend flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
         {series.map((s) => (
           <span key={s.label} className="inline-flex items-center gap-1">
             <span aria-hidden className="inline-block w-3 h-3 rounded-sm" style={{ background: s.color }} />
@@ -154,10 +154,10 @@ export function PowerChart({
           </span>
         )}
       </figcaption>
-      <details className="text-xs">
+      <details className="disclosure text-xs">
         <summary className="cursor-pointer text-muted">Show data table</summary>
-        <div className="max-h-56 overflow-auto mt-2">
-          <table className="w-full tabular">
+        <div className="table-wrap max-h-56 overflow-auto mt-2">
+          <table className="pc-table w-full tabular">
             <caption className="sr-only">{title}</caption>
             <thead>
               <tr>

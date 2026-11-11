@@ -40,21 +40,21 @@ function HeroStatus() {
       <p className="hero-status-tag">ILLUSTRATIVE EXAMPLE</p>
       <dl className="grid grid-cols-3 gap-3 text-[13px]">
         <div>
-          <dt className="text-[#9db4c7]">Ready by</dt>
+          <dt className="text-on-navy-muted">Ready by</dt>
           <dd className="font-mono tabular text-white">{heroTimeLabel(HERO_DEFAULT_READY_SLOT)}</dd>
         </div>
         <div>
-          <dt className="text-[#9db4c7]">Charging window</dt>
+          <dt className="text-on-navy-muted">Charging window</dt>
           <dd className="font-mono tabular text-white">
             {heroTimeLabel(r.startSlot)} to {heroTimeLabel(r.endSlot)}
           </dd>
         </div>
         <div>
-          <dt className="text-[#9db4c7]">Modeled saving</dt>
+          <dt className="text-on-navy-muted">Modeled saving</dt>
           <dd className="font-mono tabular text-white">{formatUsd(r.discountCents)}</dd>
         </div>
       </dl>
-      <p className="mt-2 text-[11px] text-[#9db4c7]">Synthetic tariff, one {HERO_PORT_W / 1000} kW port, 30 kWh. Not a quote.</p>
+      <p className="mt-2 text-[11px] text-on-navy-muted">Synthetic tariff, one {HERO_PORT_W / 1000} kW port, 30 kWh. Not a quote.</p>
     </aside>
   );
 }
@@ -63,22 +63,23 @@ export default async function Home() {
   const s = await loadSummary();
   const unfavorable = s?.pairwise.reduce((a, c) => a + c.optimizedWorse, 0);
   return (
-    <div className="space-y-[clamp(56px,8vw,96px)]">
-      <section className="space-y-8">
+    <div className="landing space-y-[clamp(64px,9vw,112px)]">
+      <section className="hero space-y-10">
         <div className="grid items-center gap-x-12 gap-y-8 min-[960px]:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-          <div className="space-y-7">
+          <div className="hero-copy stagger space-y-7">
             <p className="eyebrow">FLEXIBLE EV CHARGING · AUTHORIZED WITH PAYPAL</p>
-            <h1 className="font-semibold leading-[1.02] tracking-[-0.04em] text-[clamp(36px,4.6vw,60px)]">
-              Your car ready on time. <span className="text-teal-ink">Your flexibility rewarded.</span>
+            <h1 className="hero-title font-semibold leading-[0.98] text-[clamp(40px,5.4vw,72px)]">
+              Your car ready on time. <span className="text-gradient">Your flexibility rewarded.</span>
             </h1>
-            <p className="max-w-[520px] text-[clamp(17px,1.6vw,19px)] text-text-2">
+            <p className="lede max-w-[540px]">
               Plan around your departure deadline, compare charging options, and get a modeled discount when your timing is flexible. You review and approve the exact terms before anything is authorized.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/drive" className="btn btn-primary px-5 py-3">
+            <div className="hero-cta flex flex-wrap gap-3">
+              <Link href="/drive" className="btn btn-primary btn-lg btn-glow">
                 Plan My Charge
+                <span aria-hidden="true" className="ico ico-arrow" />
               </Link>
-              <Link href="/how-it-works" className="btn px-5 py-3">
+              <Link href="/how-it-works" className="btn btn-lg">
                 How It Works
               </Link>
             </div>
@@ -88,9 +89,10 @@ export default async function Home() {
             <HeroStatus />
           </div>
         </div>
-        <ul className="grid gap-4 min-[760px]:grid-cols-3" aria-label="Why you can trust the plan">
+        <ul className="stagger grid gap-4 min-[760px]:grid-cols-3" aria-label="Why you can trust the plan">
           {TRUST.map(([title, body]) => (
-            <li key={title} className="rule-top pt-4 space-y-1.5">
+            <li key={title} className="trust-card space-y-1.5">
+              <span aria-hidden="true" className="trust-icon" />
               <p className="font-semibold">{title}</p>
               <p className="text-[14px] text-text-2">{body}</p>
             </li>
@@ -98,19 +100,19 @@ export default async function Home() {
         </ul>
       </section>
 
-      <section aria-labelledby="how" className="space-y-8">
+      <section aria-labelledby="how" className="reveal space-y-8">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 id="how" className="text-[clamp(28px,3.4vw,34px)]">
+          <h2 id="how" className="section-title text-[clamp(30px,3.8vw,44px)]">
             How it works
           </h2>
-          <Link href="/how-it-works" className="text-teal-ink underline underline-offset-4 text-[14px]">
+          <Link href="/how-it-works" className="link-arrow text-[14px]">
             See the full walkthrough and FAQ
           </Link>
         </div>
-        <ol className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))]">
+        <ol className="stagger grid gap-6 grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))]">
           {PREVIEW_STEPS.map(([title, body], i) => (
-            <li key={title} className="flex flex-col gap-2">
-              <span className="font-mono text-[13px] text-teal-ink">{String(i + 1).padStart(2, "0")}</span>
+            <li key={title} className="step-card flex flex-col gap-2" style={{ "--i": i } as React.CSSProperties}>
+              <span className="step-num">{String(i + 1).padStart(2, "0")}</span>
               <h3 className="text-[18px]">{title}</h3>
               <p className="text-[14px] text-text-2">{body}</p>
             </li>
@@ -118,13 +120,13 @@ export default async function Home() {
         </ol>
       </section>
 
-      <section aria-labelledby="why" className="space-y-6">
-        <h2 id="why" className="text-[clamp(28px,3.4vw,34px)]">
+      <section aria-labelledby="why" className="reveal space-y-6">
+        <h2 id="why" className="section-title text-[clamp(30px,3.8vw,44px)]">
           Why flexible charging matters
         </h2>
-        <div className="grid gap-8 grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))]">
+        <div className="stagger grid gap-8 grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))]">
           {WHY.map(([title, body]) => (
-            <div key={title} className="rule-top pt-5 space-y-2">
+            <div key={title} className="why-card space-y-2">
               <h3 className="text-[20px]">{title}</h3>
               <p className="text-text-2">{body}</p>
             </div>
@@ -133,9 +135,9 @@ export default async function Home() {
         <p className="meta">MODELED ON SYNTHETIC ASSUMPTIONS, NOT MEASURED GRID DATA</p>
       </section>
 
-      <section aria-labelledby="compare" className="space-y-6">
+      <section aria-labelledby="compare" className="reveal space-y-6">
         <div className="space-y-2">
-          <h2 id="compare" className="text-[clamp(28px,3.4vw,34px)]">
+          <h2 id="compare" className="section-title text-[clamp(30px,3.8vw,44px)]">
             Charge now or Smart Flex
           </h2>
           <p className="max-w-[640px] text-text-2">Move the ready-by marker to see how a later departure deadline changes the modeled price. This preview never creates a commitment.</p>
@@ -143,36 +145,36 @@ export default async function Home() {
         <HeroScheduler />
       </section>
 
-      <section aria-labelledby="paypal" className="space-y-8">
+      <section aria-labelledby="paypal" className="reveal space-y-8">
         <div className="space-y-2">
-          <h2 id="paypal" className="text-[clamp(28px,3.4vw,34px)]">
+          <h2 id="paypal" className="section-title text-[clamp(30px,3.8vw,44px)]">
             Payment that follows the energy
           </h2>
           <p className="max-w-[640px] text-text-2">PayPal authorizes the exact approved amount first. Nothing is collected until simulated delivery is verified.</p>
         </div>
-        <ol className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))]">
-          <li className="border-t border-dashed border-line-strong pt-3 space-y-1.5">
+        <ol className="stagger grid gap-6 grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))]">
+          <li className="pay-stage pay-stage-idle space-y-1.5">
             <p className="meta text-muted">BEFORE APPROVAL</p>
             <p className="text-[14px] text-text-2">No payment. You compare options and read the terms.</p>
           </li>
-          <li className="border-t-2 border-amber pt-3 space-y-1.5">
+          <li className="pay-stage pay-stage-hold space-y-1.5">
             <p className="meta text-warn">AUTHORIZED · HELD</p>
             <p className="text-[14px] text-text-2">PayPal Sandbox holds the amount. It is not captured and not escrow.</p>
           </li>
-          <li className="border-t-2 border-teal pt-3 space-y-1.5">
+          <li className="pay-stage pay-stage-done space-y-1.5">
             <p className="meta text-teal-ink">CAPTURED OR VOIDED</p>
             <p className="text-[14px] text-text-2">Delivered: captured once. Not delivered: voided, nothing collected. Your FlexReceipt shows the evidence.</p>
           </li>
         </ol>
-        <div className="grid gap-6 min-[760px]:grid-cols-[220px_1fr] border-t border-line pt-8">
+        <div className="sim-panel grid gap-6 min-[760px]:grid-cols-[220px_1fr]">
           <h3 className="meta">WHAT&apos;S SIMULATED</h3>
           <div className="space-y-4">
-            <ul className="space-y-2 list-disc pl-5 text-text-2">
+            <ul className="check-list space-y-2 text-text-2">
               {SIMULATED.map((t) => (
                 <li key={t}>{t}</li>
               ))}
             </ul>
-            <Link href="/impact-lab" className="inline-block text-teal-ink underline underline-offset-4">
+            <Link href="/impact-lab" className="link-arrow">
               {s ? `Open the Impact Lab, including ${s.scenarioCount} synthetic scenarios and ${unfavorable} unfavorable comparisons` : "Open the Impact Lab"}
             </Link>
           </div>

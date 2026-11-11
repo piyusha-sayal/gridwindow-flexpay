@@ -39,18 +39,18 @@ const SCENARIOS: readonly Scenario[] = [
 export function GuidedDemo({ onLoad }: { onLoad: (patch: Partial<FormState>) => void }) {
   const [active, setActive] = useState<Scenario | null>(null);
   return (
-    <details className="rounded-[var(--r-card-sm)] border border-line bg-surface px-4 py-3">
-      <summary className="cursor-pointer text-[14px] font-medium">
+    <details className="demo-panel px-4 py-3">
+      <summary className="demo-summary cursor-pointer text-[14px] font-medium">
         Guided demo scenarios <span className="badge tone-neutral ml-2">Demo mode</span>
       </summary>
       <div className="mt-3 space-y-3">
         <p className="text-[13px] text-muted">Each button only fills in the form below with a sample request. Nothing is submitted or authorized until you do it yourself.</p>
-        <ul className="grid gap-2 grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))]">
+        <ul className="stagger grid gap-2 grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))]">
           {SCENARIOS.map((s) => (
             <li key={s.id}>
               <button
                 type="button"
-                className="btn w-full flex-col items-start gap-0.5 text-left"
+                className="btn demo-scenario w-full flex-col"
                 aria-pressed={active?.id === s.id}
                 onClick={() => {
                   setActive(s);
@@ -66,7 +66,7 @@ export function GuidedDemo({ onLoad }: { onLoad: (patch: Partial<FormState>) => 
           ))}
         </ul>
         {active && (
-          <p role="status" className="text-[13px] text-text-2">
+          <p role="status" className="demo-status text-[13px] text-text-2">
             <strong>Loaded scenario {active.id}.</strong> {active.next}
           </p>
         )}

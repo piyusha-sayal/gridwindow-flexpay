@@ -6,7 +6,7 @@ import { SLOT_MS } from "@/domain/units";
 import type { DashboardSession, OperatorDashboard } from "@/server/services/viewService";
 import { activeSessions } from "./metrics";
 
-const HATCH = "repeating-linear-gradient(135deg, var(--teal) 0 2px, #bfe7e2 2px 4px)";
+const HATCH = "repeating-linear-gradient(135deg, var(--teal) 0 2px, var(--teal-soft) 2px 4px)";
 
 interface PortTimelineProps {
   d: OperatorDashboard;
@@ -25,14 +25,14 @@ export function PortTimeline({ d, selectedId, onSelect }: PortTimelineProps) {
   const axis = quoteAxis({ startMs: d.gridStartMs, slotCount: d.slotCount }, d.timeZone);
 
   return (
-    <section className="card p-5 sm:p-6 space-y-4" aria-labelledby="ports-title">
+    <section className="card ops-panel p-5 sm:p-6 space-y-4" aria-labelledby="ports-title">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="ports-title" className="text-[22px] font-semibold tracking-[-0.01em]">
+        <h2 id="ports-title" className="panel-title text-[22px] font-semibold">
           Ports
         </h2>
         <p className="meta">Parked occupancy vs. electrical draw · select a vehicle for details</p>
       </div>
-      <div className="overflow-x-auto">
+      <div className="table-wrap overflow-x-auto">
         <div className="min-w-[640px] space-y-2">
           <div className="grid grid-cols-[72px_1fr] items-center gap-3">
             <span className="meta">Tariff</span>
@@ -46,7 +46,7 @@ export function PortTimeline({ d, selectedId, onSelect }: PortTimelineProps) {
                   Port {port.label}
                   <span className="block meta font-normal">{port.maxPowerW / 1000} kW</span>
                 </span>
-                <div className="relative h-14 rounded-[6px] bg-paper">
+                <div className="port-lane relative h-14 rounded-[8px] bg-paper">
                   {sessions.length === 0 && <span className="absolute inset-0 flex items-center px-3 meta">Free all night</span>}
                   {sessions.map((s) => (
                     <SessionBar key={s.id} d={d} s={s} left={pct(s.plugInMs)} width={pct(s.departMs) - pct(s.plugInMs)} portMaxW={port.maxPowerW} selected={selectedId === s.id} onSelect={onSelect} />
@@ -97,7 +97,7 @@ function SessionBar({ d, s, left, width, portMaxW, selected, onSelect }: Session
   return (
     <button
       type="button"
-      className={`absolute inset-y-0 overflow-hidden rounded-[5px] bg-[var(--line)] text-left ${selected ? "ring-2 ring-ink" : "hover:ring-1 hover:ring-line-strong"}`}
+      className={`session-bar absolute inset-y-0 overflow-hidden rounded-[7px] bg-[var(--line)] text-left ${selected ? "is-selected ring-2 ring-ink" : "hover:ring-1 hover:ring-line-strong"}`}
       style={{ left: `${left}%`, width: `${width}%` }}
       aria-label={label}
       aria-pressed={selected}
@@ -117,7 +117,7 @@ function SessionBar({ d, s, left, width, portMaxW, selected, onSelect }: Session
           return (
             <span
               key={i}
-              className="absolute bottom-0"
+              className="slot-bar absolute bottom-0"
               style={{
                 left: `${(offset / parkedMs) * 100}%`,
                 width: `${(SLOT_MS / parkedMs) * 100}%`,

@@ -35,7 +35,7 @@ export function ChoiceGroup({ name, labelledBy, describedBy, value, choices, inp
   const previewing = shown !== undefined && shown.id !== value;
   return (
     <div className="space-y-3">
-      <div role="radiogroup" aria-labelledby={labelledBy} aria-describedby={describedBy} className="grid gap-2 grid-cols-[repeat(auto-fit,minmax(min(190px,100%),1fr))]">
+      <div role="radiogroup" aria-labelledby={labelledBy} aria-describedby={describedBy} className="stagger grid gap-2 grid-cols-[repeat(auto-fit,minmax(min(190px,100%),1fr))]">
         {choices.map((c) => {
           const on = value === c.id;
           return (
@@ -43,7 +43,7 @@ export function ChoiceGroup({ name, labelledBy, describedBy, value, choices, inp
             <label
               onMouseEnter={() => setHovered(c.id)}
               onMouseLeave={() => setHovered(null)}
-              className={`relative flex min-h-[72px] cursor-pointer flex-col gap-0.5 rounded-[var(--r-input)] border px-4 py-2.5 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-ink ${on ? "border-ink bg-ink text-white" : "border-line-strong bg-surface hover:border-ink"}`}
+              className={`choice-card relative flex min-h-[72px] cursor-pointer flex-col gap-0.5 rounded-[var(--r-input)] border px-4 py-2.5 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-ink ${on ? "choice-card-on border-navy bg-navy text-white" : "border-line-strong bg-surface hover:border-ink"}`}
             >
               <input
                 id={inputId?.(c.id)}
@@ -71,7 +71,7 @@ export function ChoiceGroup({ name, labelledBy, describedBy, value, choices, inp
         })}
       </div>
       {shown && (
-        <div className="grid gap-x-6 gap-y-2 rounded-[var(--r-card-sm)] border border-line bg-paper px-4 py-3 sm:grid-cols-2" data-testid={`${name}-details`}>
+        <div className="choice-details grid gap-x-6 gap-y-2 rounded-[var(--r-card-sm)] border border-line bg-paper px-4 py-3 sm:grid-cols-2" data-testid={`${name}-details`}>
           <div className="space-y-0.5">
             <p className="meta">{shown.label}{previewing ? " (preview, select to choose)" : ""}</p>
             <p className="text-[14px] font-semibold">{shown.benefitTitle}</p>

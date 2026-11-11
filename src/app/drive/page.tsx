@@ -5,5 +5,10 @@ export const metadata = { title: "Request a flexible charge · GridWindow FlexPa
 export default async function DrivePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
   const error = typeof params.error === "string" ? params.error.slice(0, 64) : null;
-  return <DriverFlow initialError={error} />;
+  return (
+    <div className="flow-shell">
+      <span aria-hidden="true" className="flow-shell-glow" />
+      <DriverFlow initialError={error} />
+    </div>
+  );
 }
