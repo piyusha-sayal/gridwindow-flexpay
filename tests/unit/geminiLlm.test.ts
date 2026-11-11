@@ -3,9 +3,9 @@
  * Proves request shape (no tools), failure mapping and that a model can only ever return validated JSON.
  */
 import type { GenerateContentParameters, GenerateContentResponse } from "@google/genai";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { DEFAULT_GEMINI_MODEL, GeminiLlm } from "@/server/ai/geminiLlm";
+import { DEFAULT_GEMINI_MODEL, GeminiLlm, serverDeadlineMs } from "@/server/ai/geminiLlm";
 import { createLlm, selectProvider } from "@/server/ai/llmFactory";
 
 const schema = z.object({ answer: z.string().max(200), n: z.number().nullable() });
@@ -94,5 +94,31 @@ describe("provider selection", () => {
   it("builds a Gemini adapter with the default or configured model without any network call", () => {
     expect(createLlm({ GEMINI_API_KEY: "g" })?.llm.model).toBe(DEFAULT_GEMINI_MODEL);
     expect(createLlm({ GEMINI_API_KEY: "g", GEMINI_MODEL: "gemini-3.5-flash-lite" })?.llm.model).toBe("gemini-3.5-flash-lite");
+  });
+});
+
+describe("server deadline sent to Google (X-Server-Timeout)", () => {
+  it("is never below 20 s, so a short adapter timeout does not make Gemini reject the request with HTTP 400", () => {
+    expect(serverDeadlineMs(8_000)).toBe(20_000);
+    expect(serverDeadlineMs(20_000)).toBe(20_000);
+    expect(serverDeadlineMs(30_000)).toBe(30_000);
+  });
+
+  it("the real SDK sends X-Server-Timeout: 20 when the adapter's own timeout is 8 s (the production setting with a fallback)", async () => {
+    const seen: string[] = [];
+    vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
+      const headers = new Headers(input instanceof Request ? input.headers : undefined);
+      new Headers(init?.headers).forEach((v, k) => headers.set(k, v));
+      seen.push(headers.get("X-Server-Timeout") ?? "none");
+      const body = { candidates: [{ content: { role: "model", parts: [{ text: '{"n":7}' }] }, finishReason: "STOP" }], modelVersion: "gemini-3.6-flash" };
+      return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+    });
+    try {
+      const res = await new GeminiLlm("test-key", "gemini-3.6-flash", { timeoutMs: 8_000 }).generate({ system: "s", user: "u", schema: z.object({ n: z.number() }), maxTokens: 16 });
+      expect(seen).toEqual(["20"]);
+      expect(res).toMatchObject({ ok: true, value: { n: 7 } });
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
