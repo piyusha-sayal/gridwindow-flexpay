@@ -224,7 +224,8 @@ function Dashboard({ onSignOut }: { onSignOut: () => void }) {
           <button type="submit" className="btn btn-primary">
             Load
           </button>
-          <Link href="/operator/schedule" className="btn">
+          {/* The night the dashboard shows, not an unloaded edit in the date field. */}
+          <Link href={`/operator/schedule?night=${encodeURIComponent(d.nightOf)}`} className="btn">
             Schedule view
           </Link>
           <button type="button" className="btn" onClick={onSignOut}>
