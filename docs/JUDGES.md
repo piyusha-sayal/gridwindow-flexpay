@@ -31,7 +31,7 @@ This route works best with the operator passphrase and a PayPal Sandbox buyer ac
 | **0:20 to 0:50** | [Smart Charge](https://gridwindow-flexpay.onrender.com/drive) | Type a charging request, press **Fill form**, then **See offers**. Compare server-validated windows and the deal agent's explanation. |
 | **0:50 to 1:15** | Offer review and PayPal | Open the exact terms, check consent and proceed to Sandbox. Return to the reservation showing **Authorized, not captured**, if a buyer account is available. |
 | **1:15 to 1:35** | [Operator Console](https://gridwindow-flexpay.onrender.com/operator) | Use AG Grid to inspect provider labels and payment states. Filter **Needs attention only** and export CSV. |
-| **1:35 to 2:15** | **Night of November 12, 2026** | Open **Recorded disturbances**. Show a driver-approved recovery and an infeasible operator-attributed recovery, then compare schedule versions in Bryntum. |
+| **1:35 to 2:15** | **Night of November 12, 2026** | Open **Recorded disturbances**. Show a driver-approved recovery and an infeasible operator-attributed recovery, then compare schedule versions in Bryntum. Then open **November 25** to see an infeasible recovery that moved no money. |
 | **2:15 to 2:40** | FlexReceipt and payment status | Show provider-confirmed capture after delivery and void after an eligible failure. Explain why Step 6 waits for confirmed settlement. |
 | **2:40 to 3:00** | [Rewards](https://gridwindow-flexpay.onrender.com/rewards) and [Developer Portal](https://gridwindow-flexpay-developers.onrender.com/) | Show live Channel3 gear and APIMatic's typed API documentation. Mention the MCP agent's human approval boundary. |
 
@@ -122,6 +122,8 @@ After signing in, use the **Night of** picker to inspect these preloaded nights.
 | **November 10, 2026** | AG Grid reservations and payment status | 11 reservations: 10 PayPal Sandbox and one clearly labeled MOCK. Provider-confirmed capture ending `…H62XfQtp`. Try payment sorting, **Needs attention only**, and **Export CSV**. |
 | **November 12, 2026** | **Recorded disturbances** and **Schedule view** | Provider-confirmed void ending `…C2afKCrn`. Two other Sandbox reservations went through recovery: a driver-approved commit followed by capture, and an infeasible operator-attributed disturbance followed by void. |
 | **November 14, 2026** | Automatic recovery and its seven-step checklist | A recovery committed within preapproved bounds. Payment remains **Authorized**, so the financial step correctly shows **Waiting** rather than Done. |
+| **November 23, 2026** | **Recorded disturbances** | Driver-approved recovery and capture on reservation `res_42W3op4GUph4lqbj`: schedule version **2**, 30.015 kWh synthetic delivery, and a PayPal Sandbox **capture of $13.04** confirmed by provider read-back and a verified webhook. |
+| **November 25, 2026** | **Recorded disturbances** | Infeasible recovery with unknown fault attribution on reservation `res_cg6ud43I8hjE8VfM`. The app required operator resolution and moved no money: the $13.03 authorization is held, with nothing captured or voided. |
 
 ### November 12: the two recovery cases to compare
 
@@ -131,6 +133,15 @@ After signing in, use the **Night of** picker to inspect these preloaded nights.
 | **No feasible repair** | Operator-attributed synthetic disturbance; validator returned **INFEASIBLE**. Reservation ending `…kfgzxjBp`. | PayPal Sandbox **authorization voided**, with nothing captured. |
 
 Both scenarios were exercised on **November 11, 2026**, using reservations for the night of November 12. The financial outcomes were read back from PayPal Sandbox.
+
+### An infeasible recovery is not a void: November 12 versus November 25
+
+| Scenario | Stored evidence | Financial result |
+| :--- | :--- | :--- |
+| **Infeasible, operator recorded as responsible** | Synthetic charger disturbance with fault attribution **OPERATOR**; the validator returned **INFEASIBLE**. Reservation ending `…kfgzxjBp` (night of November 12). | The app marked the service failed, and PayPal Sandbox **voided the authorization** nine seconds after the disturbance was recorded. Nothing captured. |
+| **Infeasible, cause not recorded** | Synthetic charger disturbance with fault attribution **UNKNOWN**; the validator returned **INFEASIBLE**, and the schedule stays at version 1. Reservation `res_cg6ud43I8hjE8VfM` (night of November 25). | The app recorded **OPERATOR_RESOLUTION_REQUIRED** and moved no money: the $13.03 authorization is **held**, with **$0.00 captured** and nothing voided. Step 6 shows **Waiting**. |
+
+The recovery result does not decide the money. The settlement policy voids automatically only for a confirmed operator failure, meaning attribution **OPERATOR** plus a conclusive recovery result. **UNKNOWN**, **DRIVER** and **EXTERNAL** never void or capture automatically; an operator has to decide. The November 25 row is the state we read back at 01:16 UTC on November 12, 2026. The older **Inject outage** action is a separate workflow (nothing is delivered, so the authorization is voided), and the server refuses it while a recorded disturbance has outdated the schedule and no valid recovery is committed. Full timelines: [EVIDENCE.md](EVIDENCE.md#two-more-recovery-runs-and-why-an-infeasible-recovery-is-not-a-void-2026-11-12-utc).
 
 ### Inspect the complete recovery trace
 
@@ -154,7 +165,7 @@ Both scenarios were exercised on **November 11, 2026**, using reservations for t
 
 </div>
 
-**Please leave the preloaded evidence reservations unchanged.** For hands-on fault injection, create your own booking and use its **Recovery engine** panel. The older **Inject outage** action and the newer recorded-disturbance recovery flow are different workflows.
+**Please leave the preloaded evidence reservations unchanged.** For hands-on fault injection, create your own booking and use its **Recovery engine** panel. The older **Inject outage** action and the newer recorded-disturbance recovery flow are different workflows, and the server refuses **Inject outage** on a reservation that a recorded disturbance has outdated until a valid recovery is committed.
 
 ---
 
