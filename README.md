@@ -570,14 +570,14 @@ flowchart TB
 
 ## 10 / Verification and release readiness
 
-The latest [v1.0.0 release](https://github.com/piyusha-sayal/gridwindow-flexpay/releases/tag/v1.0.0) was published on November 11, 2026. The release records report clean builds, passing automated suites and a live deployment verification.
+The latest [v1.0.2 release](https://github.com/piyusha-sayal/gridwindow-flexpay/releases/tag/v1.0.2) was published on November 11, 2026. The release records report clean builds, passing automated suites and a live deployment verification.
 
 <div align="center">
 
 ![Vitest](https://img.shields.io/badge/Vitest-1%2C023%20passed-16A34A?style=for-the-badge)
 ![Playwright](https://img.shields.io/badge/Playwright-131%20passed-16A34A?style=for-the-badge)
 ![Failures](https://img.shields.io/badge/Automated%20failures-0-0F766E?style=for-the-badge)
-![Release](https://img.shields.io/badge/Release-v1.0.0-2563EB?style=for-the-badge)
+![Release](https://img.shields.io/badge/Release-v1.0.2-2563EB?style=for-the-badge)
 
 </div>
 
@@ -623,7 +623,7 @@ The hosted operator console contains real PayPal Sandbox records from the releas
 
 These are recorded demo reservations. The operator passphrase is provided separately through the Devpost testing instructions.
 
-**[Open Judge Guide](docs/JUDGES.md)** · **[View GitHub CI](https://github.com/piyusha-sayal/gridwindow-flexpay/actions)** · **[Latest Release](https://github.com/piyusha-sayal/gridwindow-flexpay/releases/tag/v1.0.0)**
+**[Open Judge Guide](docs/JUDGES.md)** · **[View GitHub CI](https://github.com/piyusha-sayal/gridwindow-flexpay/actions)** · **[Latest Release](https://github.com/piyusha-sayal/gridwindow-flexpay/releases/tag/v1.0.2)**
 
 ---
 

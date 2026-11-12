@@ -50,3 +50,16 @@ The production smoke test on the release (`6265654`) found that every live Gemin
 | SDK contract | 17 of 17 calls, 13 operations, 6 live (`sdk-contract-2026-11-11.txt`) |
 
 Playwright was not re-run after `11cf209`: the later changes are the OpenAPI spec with the regenerated portal and SDK (not part of the app), documentation, and the Gemini client deadline, which applies only with a model key; e2e runs without one.
+
+## Final code: v1.0.2 (`af1be5c`) and `main` (2026-11-12)
+
+The submitted code is `af1be5c` (`v1.0.2`). Every later commit on `main` changes documentation only (`git diff v1.0.2 main` over `src`, `tests`, `scripts`, `package.json`, `package-lock.json`, `render.yaml` and `next.config.ts` is empty). The sections above stay as the record of the earlier commits.
+
+| Gate | Result |
+|---|---|
+| Vitest, re-run on `main` `67ec0c2` | 95 files passed, 1 skipped (96); **1,023 passed, 12 skipped (1,035)** |
+| Production build, re-run on `main` `67ec0c2` | exit 0 |
+| TypeScript, ESLint, release scan | passed in CI on `main` |
+| Playwright, last full run (`83e9d02`, the code just before `v1.0.2`) | desktop 114 passed; mobile 14 passed, 3 skipped; tablet 3 passed, 3 skipped; 0 failed. 129 distinct tests pass, because the operator sign-in setup runs once per profile |
+| Playwright after the `v1.0.2` change | the deal-agent spec (8 tests) passed on desktop; the full browser suites were not re-run |
+| GitHub Actions CI | success on every push to `main` from `af1be5c` through `67ec0c2` |
