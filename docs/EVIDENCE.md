@@ -14,46 +14,31 @@ Method: after each run, the team read the application database inside a read-onl
 
 The orders were approved on PayPal's Sandbox page with a Sandbox personal (buyer) account; for scenario A the approving account was confirmed to differ from the Sandbox business (merchant) account. Before every authorization the application compares the order's payee to the configured merchant, and the amount, currency and custom ID to the stored terms; mismatches stop before authorization.
 
-On the deployed build, the team also ran one capture (`…H62XfQtp`) and one void (`…C2afKCrn`) of USD 15.56 each. Both were read back from the PayPal Sandbox API after the 2026-11-11 deploy, with signature-verified webhooks. See [the release verification](FINAL_RELEASE_VERIFICATION_2026-11-11.md).
+## Recovery demo evidence: November 23 and 25, 2026 reservations
 
-## Recovery followed by PayPal Sandbox settlement (2026-11-11)
-
-Two bookings on the deployed site went through a recorded disturbance and then settled in PayPal Sandbox. We read them back through the operator API (GET requests only) the same day. Times are UTC, and both bookings are on the night of 2026-11-12.
+The following are the **two selected demo reservations**, grouped by their **scheduled charging nights**, not by the date on which synthetic test actions were run. Both use the deployed application's PayPal Sandbox integration and synthetic charging. Event-trail times below are **UTC**. These records do **not** show physical EV charging on the future reservation dates. The first recovery has been completed and paid; the second is **infeasible and awaiting an operator's planned outage/void action**.
 
 | Reservation | What happened | Result |
 |---|---|---|
-| `…n-qKqgUM` | Order, buyer approval and authorization in PayPal Sandbox at 19:09. At 19:09:57 the operator recorded a SYNTHETIC charger disturbance, with fault attribution left as UNKNOWN. The recovery run needed the driver's consent; the driver approved, and schedule version 2 was committed at 19:10:41. Synthetic delivery then recorded 30.015 kWh against a 30 kWh target. | Capture COMPLETED at 19:10:59, read from the PayPal Sandbox API. Webhook verified at 19:11:17. Run COMMITTED, consent DRIVER_APPROVED. |
-| `…kfgzxjBp` | Order, approval and authorization at 19:05 to 19:06. At 19:07:23 the operator recorded a SYNTHETIC disturbance and marked the operator as responsible. The recovery run found no feasible schedule (INFEASIBLE). Because the operator was responsible and nothing could fix it, the app marked the service failed and decided to void. | Void at 19:07:32, read from the PayPal Sandbox API. Webhook verified at 19:09:21. Nothing captured. |
+| **…UPH4LQBJ, November 23-24, Port B, 19:00-07:00, target 30.00 kWh** | The driver accepted the offer at **00:33:28 UTC**; the PayPal Sandbox order was created at 00:33:29, buyer approval recorded at 00:33:47 and authorization recorded at **00:33:49**. The operator recorded a **synthetic charger power reduction** at **00:34:24**. The changed schedule required **manual driver consent**, and the driver-facing page confirms *"Approved by you and applied."* The event trail records SCHEDULE_VERSION_COMMITTED at **00:36:01** and synthetic SERVICE_DELIVERED at **00:36:32**. Actual simulated battery delivery was **30.02 kWh** against the 30.00 kWh target; the original **$13.04** agreed price did not change. | **SUCCESSFUL RECOVERY: DRIVER APPROVED; CAPTURED.** PayPal Sandbox evidence shows CAPTURED · COMPLETED at **00:36:37 UTC**, followed by WEBHOOK_VERIFIED at **00:36:48**. FlexReceipt **FR-UPH4LQBJ** confirms **$13.04 paid** after **30.02 kWh** simulated delivery. The schedule change was committed; the numeric schedule version is not independently visible in the supplied event-trail screenshot. |
+| **…8HJE8VFM, November 25-26, Port B, 19:00-07:00, target 30.00 kWh** | The driver accepted the offer at **00:38:56 UTC**; the PayPal Sandbox order was created at 00:38:58, buyer approval recorded at 00:39:06 and authorization recorded at **00:39:08**. The operator recorded a **synthetic charger power reduction** at **00:39:40**, effective from slot 0. Recovery validation found **INFEASIBLE**: at the reduced power, the remaining energy could not be delivered before departure. The deterministic fallback made **no model decision**; the original schedule stayed unchanged, **no new schedule version** was written and **no driver consent** was requested. OPERATOR_RESOLUTION_REQUIRED was recorded at **00:39:57**. | **INFEASIBLE: AWAITING OPERATOR RESOLUTION / VOID.** The driver's page shows AUTHORIZED HOLD · NOT CAPTURED for **$13.03**, **0.00 kWh** delivered at the time of the screenshot, and **$0.00 collected so far**. Recovery step 6 (Financial outcome) and step 7 (FlexReceipt) are **WAITING**. **A completed void is not yet evidenced for this reservation.** |
 
-Judges with operator access can open both under **Recorded disturbances** on that night and read the seven recovery steps from the stored run.
+### What these two demo cases prove
 
-## Two more recovery runs, and why an infeasible recovery is not a void (2026-11-12 UTC)
+- *Driver-controlled recovery:* The first reservation demonstrates that a materially changed, feasible schedule is not silently committed. The driver approved the proposed change before the schedule was committed. The agreed price remained $13.04.
+- *Settlement follows simulated delivery:* In the first case, SERVICE_DELIVERED precedes the provider-reported capture and verified webhook. The FlexReceipt shows the same $13.04 total and 30.02 kWh delivered.
+- *No fictional recovery:* In the second case, the recovery engine explicitly refused a physically infeasible schedule, preserved the original plan, and reported that operator resolution was required. An infeasible plan does *not* itself prove a payment void.
+- *Evidence scope:* These findings come from the supplied screenshots of the driver reservation pages, FlexReceipt, recovery steps, application-displayed provider evidence and event trails. A separate raw PayPal API/DB GET reconciliation record for these *exact two* reservations was not supplied with this update. Prior provider-level verification in other sections should not be attributed to these reservations.
 
-Two more Sandbox bookings went through a recorded SYNTHETIC charger power reduction, each on its own night. They were run on the afternoon of 2026-11-11 Pacific time, which is 2026-11-12 in UTC. We read them back through the operator API (GET requests only) at 01:16 UTC. Times below are UTC on 2026-11-12. Both agent runs ended as DETERMINISTIC_FALLBACK (no model decision). Reservations are given by their full app ID here, so you can find them in the operator console.
+### Planned live demo step: second reservation
 
-| Reservation | What happened | Result |
-|---|---|---|
-| `res_42W3op4GUph4lqbj` (night 2026-11-23, Port B, $13.04) | Order, buyer approval and authorization in PayPal Sandbox at 00:33. At 00:34:24 the operator recorded the disturbance, with fault attribution OPERATOR. The recovery needed the driver's consent; the driver approved, and schedule version 2 was committed at 00:36:01. Synthetic delivery then recorded 30.015 kWh against a 30 kWh target. | Capture COMPLETED for $13.04 at 00:36:37, read from the PayPal Sandbox API. Webhook verified at 00:36:48. Run COMMITTED, consent DRIVER_APPROVED. |
-| `res_cg6ud43I8hjE8VfM` (night 2026-11-25, Port B, $13.03) | Order, approval and authorization in PayPal Sandbox at 00:38 to 00:39. At 00:39:40 the operator recorded the disturbance, with fault attribution UNKNOWN. The recovery run found no feasible schedule (INFEASIBLE): at the reduced charger limit, the remaining energy cannot be delivered before departure. The schedule stayed at version 1. At 00:39:57 the app recorded OPERATOR_RESOLUTION_REQUIRED. | The $13.03 authorization is held (payment state AUTHORIZED, service state SCHEDULED). $0.00 captured. No void and no capture is recorded. |
+During the demo, the operator plans to use *Inject outage* for …8HJE8VFM and show the zero-delivery failure/void path. *Do not change this evidence to VOIDED until the same reservation displays a PayPal Sandbox provider-confirmed void* (ideally with a corresponding event, webhook verification and final $0.00-collected receipt). The legacy outage action may not support an already-infeasible reservation; if it fails, label the result as *awaiting operator resolution* rather than claiming a void took place.
 
-The second row is the state at 01:16 UTC, not a final outcome. Under the settlement policy an operator has to decide it. If it is settled later, that will appear as new events and a new PayPal proof on the reservation.
-
-### An infeasible recovery is not a void
-
-The recovery engine decides only whether a valid schedule exists. What happens to the payment is decided separately, by the settlement policy (`OPERATOR_FAILURE_FULL_VOID_V1`) and the fault attribution the operator recorded with the disturbance. Two live Sandbox reservations show the difference:
-
-| Reservation | Recovery result | Attribution | What the app did with the money |
-|---|---|---|---|
-| `…kfgzxjBp` (night 2026-11-12) | INFEASIBLE | OPERATOR | Marked the service failed and decided to void at 19:07:30 on 2026-11-11 UTC. The authorization was VOIDED at 19:07:32, nine seconds after the disturbance was recorded. Nothing captured. |
-| `res_cg6ud43I8hjE8VfM` (night 2026-11-25) | INFEASIBLE | UNKNOWN | Recorded OPERATOR_RESOLUTION_REQUIRED. The authorization is held. Nothing captured or voided. |
-
-A full void needs a confirmed operator failure: attribution OPERATOR, a conclusive recovery result (INFEASIBLE, or FAILED on every attempt) and no driver-requested departure. An UNKNOWN, DRIVER or EXTERNAL attribution never voids and never captures automatically. It goes to the operator, with a stored resolution deadline 24 hours out. When that deadline passes, the app only marks the flag overdue, and no money moves either way. The rule is in `src/domain/outdatedSession.ts`, with tests in `tests/integration/attributionSettlement.test.ts`.
-
-The **Inject outage** button is a third, separate path: a synthetic charging run with an outage injected by the operator, so nothing is delivered and the authorization is voided. It is not what an infeasible recovery does. The server also refuses that run, and **Run the synthetic overnight charge**, on a reservation whose schedule a recorded disturbance has outdated while no valid recovery is committed (`PLAN_OUTDATED`: "A valid recovery must be committed before charging can be simulated"). `tests/integration/recoveryOrchestrator.test.ts` covers this.
-
-Judges with operator access can open the nights 2026-11-23 and 2026-11-25 with the **Night of** picker and read the seven recovery steps for each from the stored run.
+Judges can navigate to the two *future charging dates* in the operator schedule, open each reservation's *Recorded disturbances* and inspect the seven recovery steps. The first case shows consent → committed plan → simulated delivery → capture; the second shows validation → infeasible outcome → unchanged schedule → pending financial resolution.
 
 ## Signed webhooks
+
+The general webhook verification below covers previously documented provider tests. It should *not* be read as evidence that the November 25 reservation has already been voided.
 
 A Sandbox webhook subscribed to seven event types delivered, and the application verified (PayPal `verify-webhook-signature` over the unaltered raw body), correlated and durably processed, four event types: `CHECKOUT.ORDER.APPROVED`, `PAYMENT.AUTHORIZATION.CREATED`, `PAYMENT.CAPTURE.COMPLETED` and `PAYMENT.AUTHORIZATION.VOIDED`. Each processed event matched PayPal's own event record by event ID, was linked to its reservation, and caused no duplicate financial operation: money state is always read back from the PayPal API, never taken from the webhook body.
 
@@ -67,8 +52,6 @@ One live run on 2026-11-05 with a free-tier key and synthetic fixtures only: mod
 
 The model has no tools. It never sets a price, consent, authorization, capture or void, and any answer containing a number or payment claim the backend cannot confirm is replaced by deterministic text.
 
-On 2026-11-11 the deployed build answered request parsing, the deal agent and the offer explanation from Gemini (3 of 3 calls in the production smoke test), with Gemini 3.5 Flash-Lite and a free OpenRouter model as backups.
-
 ## Automated tests
 
 On the submitted code: TypeScript strict check and ESLint clean; Vitest 1,023 passed and 12 skipped (the skipped suite needs a disposable PostgreSQL server, see [SKIPPED_TESTS.md](SKIPPED_TESTS.md)); Playwright 114 passed on desktop, 14 on mobile and 3 on tablet, with 6 desktop-only keyboard journeys skipped on the smaller devices; production build and secret scan pass; `npm audit --omit=dev` reports 0 vulnerabilities. All of these run with the MOCK provider and a throwaway database, so they never call PayPal or a model.
@@ -79,7 +62,3 @@ On the submitted code: TypeScript strict check and ESLint clean; Vitest 1,023 pa
 - A PayPal authorization is not escrow. The honor period is three days and the lifetime up to 29 days; the application does not capture after expiry.
 - Free-tier Gemini traffic may be used by Google to improve its products: do not enter personal data into the assistant.
 - Operator and driver identities are pseudonymous demo sessions, not production authentication.
-
-## Final release evidence (2026-11-11)
-
-Screenshots with an evidence manifest, live PayPal Sandbox capture and void read-backs, SDK, MCP and OpenRouter run records: `docs/evidence/final-release-2026-11-11/`. Report: `docs/FINAL_RELEASE_VERIFICATION_2026-11-11.md`.
