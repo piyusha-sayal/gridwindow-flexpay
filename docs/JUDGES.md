@@ -7,7 +7,7 @@
 
 **[Launch the live app](https://gridwindow-flexpay.onrender.com/)** · **[Smart Charge](https://gridwindow-flexpay.onrender.com/drive)** · **[Operator Console](https://gridwindow-flexpay.onrender.com/operator)** · **[API Developer Portal](https://gridwindow-flexpay-developers.onrender.com/)**
 
-**Demo video:** `PASTE_PUBLIC_DEMO_VIDEO_URL_HERE`
+**Demo video:** [Watch on YouTube](https://youtu.be/eGmMA1O4EXU)
 
 <sub>Latest release: [v1.0.2](https://github.com/piyusha-sayal/gridwindow-flexpay/releases/tag/v1.0.2) | PayPal Sandbox test funds | Synthetic charging and grid conditions</sub>
 
