@@ -27,6 +27,32 @@ Two bookings on the deployed site went through a recorded disturbance and then s
 
 Judges with operator access can open both under **Recorded disturbances** on that night and read the seven recovery steps from the stored run.
 
+## Two more recovery runs, and why an infeasible recovery is not a void (2026-11-12 UTC)
+
+Two more Sandbox bookings went through a recorded SYNTHETIC charger power reduction, each on its own night. They were run on the afternoon of 2026-11-11 Pacific time, which is 2026-11-12 in UTC. We read them back through the operator API (GET requests only) at 01:16 UTC. Times below are UTC on 2026-11-12. Both agent runs ended as DETERMINISTIC_FALLBACK (no model decision). Reservations are given by their full app ID here, so you can find them in the operator console.
+
+| Reservation | What happened | Result |
+|---|---|---|
+| `res_42W3op4GUph4lqbj` (night 2026-11-23, Port B, $13.04) | Order, buyer approval and authorization in PayPal Sandbox at 00:33. At 00:34:24 the operator recorded the disturbance, with fault attribution OPERATOR. The recovery needed the driver's consent; the driver approved, and schedule version 2 was committed at 00:36:01. Synthetic delivery then recorded 30.015 kWh against a 30 kWh target. | Capture COMPLETED for $13.04 at 00:36:37, read from the PayPal Sandbox API. Webhook verified at 00:36:48. Run COMMITTED, consent DRIVER_APPROVED. |
+| `res_cg6ud43I8hjE8VfM` (night 2026-11-25, Port B, $13.03) | Order, approval and authorization in PayPal Sandbox at 00:38 to 00:39. At 00:39:40 the operator recorded the disturbance, with fault attribution UNKNOWN. The recovery run found no feasible schedule (INFEASIBLE): at the reduced charger limit, the remaining energy cannot be delivered before departure. The schedule stayed at version 1. At 00:39:57 the app recorded OPERATOR_RESOLUTION_REQUIRED. | The $13.03 authorization is held (payment state AUTHORIZED, service state SCHEDULED). $0.00 captured. No void and no capture is recorded. |
+
+The second row is the state at 01:16 UTC, not a final outcome. Under the settlement policy an operator has to decide it. If it is settled later, that will appear as new events and a new PayPal proof on the reservation.
+
+### An infeasible recovery is not a void
+
+The recovery engine decides only whether a valid schedule exists. What happens to the payment is decided separately, by the settlement policy (`OPERATOR_FAILURE_FULL_VOID_V1`) and the fault attribution the operator recorded with the disturbance. Two live Sandbox reservations show the difference:
+
+| Reservation | Recovery result | Attribution | What the app did with the money |
+|---|---|---|---|
+| `…kfgzxjBp` (night 2026-11-12) | INFEASIBLE | OPERATOR | Marked the service failed and decided to void at 19:07:30 on 2026-11-11 UTC. The authorization was VOIDED at 19:07:32, nine seconds after the disturbance was recorded. Nothing captured. |
+| `res_cg6ud43I8hjE8VfM` (night 2026-11-25) | INFEASIBLE | UNKNOWN | Recorded OPERATOR_RESOLUTION_REQUIRED. The authorization is held. Nothing captured or voided. |
+
+A full void needs a confirmed operator failure: attribution OPERATOR, a conclusive recovery result (INFEASIBLE, or FAILED on every attempt) and no driver-requested departure. An UNKNOWN, DRIVER or EXTERNAL attribution never voids and never captures automatically. It goes to the operator, with a stored resolution deadline 24 hours out. When that deadline passes, the app only marks the flag overdue, and no money moves either way. The rule is in `src/domain/outdatedSession.ts`, with tests in `tests/integration/attributionSettlement.test.ts`.
+
+The **Inject outage** button is a third, separate path: a synthetic charging run with an outage injected by the operator, so nothing is delivered and the authorization is voided. It is not what an infeasible recovery does. The server also refuses that run, and **Run the synthetic overnight charge**, on a reservation whose schedule a recorded disturbance has outdated while no valid recovery is committed (`PLAN_OUTDATED`: "A valid recovery must be committed before charging can be simulated"). `tests/integration/recoveryOrchestrator.test.ts` covers this.
+
+Judges with operator access can open the nights 2026-11-23 and 2026-11-25 with the **Night of** picker and read the seven recovery steps for each from the stored run.
+
 ## Signed webhooks
 
 A Sandbox webhook subscribed to seven event types delivered, and the application verified (PayPal `verify-webhook-signature` over the unaltered raw body), correlated and durably processed, four event types: `CHECKOUT.ORDER.APPROVED`, `PAYMENT.AUTHORIZATION.CREATED`, `PAYMENT.CAPTURE.COMPLETED` and `PAYMENT.AUTHORIZATION.VOIDED`. Each processed event matched PayPal's own event record by event ID, was linked to its reservation, and caused no duplicate financial operation: money state is always read back from the PayPal API, never taken from the webhook body.
