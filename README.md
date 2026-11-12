@@ -22,7 +22,7 @@
 
 ### Watch the demo
 
-**Demo Video:** `PASTE_PUBLIC_DEMO_VIDEO_URL_HERE`
+**Demo Video:** [Watch on YouTube](https://youtu.be/eGmMA1O4EXU)
 
 **[Explore Live Application](https://gridwindow-flexpay.onrender.com/)** · **[Try Smart Charge](https://gridwindow-flexpay.onrender.com/drive)** · **[Developer Portal](https://gridwindow-flexpay-developers.onrender.com/)** · **[Judge Guide](docs/JUDGES.md)**
 
@@ -787,7 +787,7 @@ The application uses open-source and third-party technologies, including the Gei
 
 ### Flexible charging. Verified delivery. Accountable payment.
 
-**[Live Application](https://gridwindow-flexpay.onrender.com/)** · **[Demo Video Placeholder: ADD URL]** · **[Judge Guide](docs/JUDGES.md)** · **[Back to Top](#gridwindow-flexpay)**
+**[Live Application](https://gridwindow-flexpay.onrender.com/)** · **[Demo Video](https://youtu.be/eGmMA1O4EXU)** · **[Judge Guide](docs/JUDGES.md)** · **[Back to Top](#gridwindow-flexpay)**
 
 <sub>GridWindow FlexPay | Built for a more trustworthy EV charging experience</sub>
 
